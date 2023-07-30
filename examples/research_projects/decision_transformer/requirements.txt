@@ -73,7 +73,7 @@ google-auth==2.6.2
 google-auth-oauthlib==0.4.6
 google-pasta==0.2.0
 greenlet==1.1.2
-grpcio==1.44.0
+grpcio==1.53.0
 gym==0.23.1
 gym-notices==0.0.6
 h5py==3.6.0
@@ -217,7 +217,7 @@ timm==0.5.4
 tokenizers==0.11.6
 tomli==2.0.1
 toolz==0.11.2
-torch==1.11.0
+torch==1.13.1
 torchaudio==0.11.0
 torchvision==0.12.0
 tqdm==4.63.0
