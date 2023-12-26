@@ -522,8 +522,12 @@ class Message:
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
+            try:
+                if result is not None:
+                    offline_runners = json.loads(result)
+            except json.decoder.JSONDecodeError:
+                offline_runners = []
+                print('Warning: OFFLINE_RUNNERS is not set or is set to an invalid JSON string.')
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
