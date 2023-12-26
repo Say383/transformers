@@ -519,10 +519,15 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
+        if not os.path.exists('offline_runners.txt'): result = '[]'
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
+                try:
+                    offline_runners = json.loads(result)
+                except json.decoder.JSONDecodeError:
+                    offline_runners = []
                 offline_runners = json.loads(result)
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
