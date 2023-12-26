@@ -22,7 +22,10 @@ def get_runner_status(target_runners, token):
 
     # save the result so we can report them on Slack
     with open("offline_runners.txt", "w") as fp:
-        fp.write(json.dumps(offline_runners))
+        if offline_runners:
+            fp.write(json.dumps(offline_runners))
+        else:
+            fp.write('No offline runners')
 
     if len(offline_runners) > 0:
         failed = "\n".join([x["name"] for x in offline_runners])
@@ -45,7 +48,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token", default='default_token', type=str, required=False, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
 
