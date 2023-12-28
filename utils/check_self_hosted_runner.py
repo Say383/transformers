@@ -1,6 +1,7 @@
 import argparse
 import json
 import subprocess
+import os
 
 
 def get_runner_status(target_runners, token):
@@ -45,7 +46,11 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token",
+        default=os.environ.get("GITHUB_TOKEN", ""),
+        type=str,
+        required=False,
+        help="A token that has actions:read permission."
     )
     args = parser.parse_args()
 
