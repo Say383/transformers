@@ -2,6 +2,7 @@ import argparse
 import json
 import subprocess
 import os
+import sys
 
 
 def get_runner_status(target_runners, token):
@@ -52,5 +53,8 @@ if __name__ == "__main__":
         "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
+    if args.token is None:
+        print("Error: --token argument is required.")
+        sys.exit(1)
 
     get_runner_status(args.target_runners, args.token)
