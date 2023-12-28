@@ -523,7 +523,9 @@ class Message:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
-                offline_runners = json.loads(result)
+                offline_runners = json.loads(result) if result else []
+        elif token_missing:
+            text = "💔 The '--token' argument is missing when calling 'check_self_hosted_runner.py' script. 😭"
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
@@ -540,10 +542,12 @@ class Message:
         }
 
         text = ""
-        if len(offline_runners) > 0:
+        if token_missing:
+            text = "  • The '--token' argument is missing. This token is required to check the self-hosted runners. Please provide it with the '--token' flag."
+        elif len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+        text += "🙏\nThe '--token' argument is missing. Please provide a valid token with the '--token' flag when running 'check_self_hosted_runner.py'.\nLet's fix it ASAP! 🙏"
 
         error_block_2 = {
             "type": "section",
@@ -771,6 +775,7 @@ def prepare_reports(title, header, reports, to_truncate=True):
 if __name__ == "__main__":
     runner_status = os.environ.get("RUNNER_STATUS")
     runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
+    token_missing = not os.environ.get('ACCESS_REPO_INFO_TOKEN')
     setup_status = os.environ.get("SETUP_STATUS")
 
     runner_not_available = True if runner_status is not None and runner_status != "success" else False
