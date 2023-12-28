@@ -12,33 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import collections
-import json
-import math
 import os
-import re
-import time
-from fnmatch import fnmatch
-from typing import Dict
+import unittest
+from unittest.mock import patch
 
-import requests
-from slack_sdk import WebClient
+from utils.notification_service import Message
+class TestErrorOut(unittest.TestCase):
+    @patch.dict(os.environ, {"OFFLINE_RUNNERS": ""})
+    def test_error_out_no_offline_runners(self):
+        Message.error_out("Test Title")
+        # Add assertions here to verify the expected behavior
 
+    @patch.dict(os.environ, {"OFFLINE_RUNNERS": "['runner1', 'runner2']"})
+    def test_error_out_with_offline_runners(self):
+        Message.error_out("Test Title")
+        # Add assertions here to verify the expected behavior
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
-
-
-def handle_test_results(test_results):
-    expressions = test_results.split(" ")
-
-    failed = 0
-    success = 0
-
-    # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
-    # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
-
-    for i, expression in enumerate(expressions):
+if __name__ == "__main__":
+    unittest.main()
         if "failed" in expression:
             failed += int(expressions[i - 1])
         if "passed" in expression:
