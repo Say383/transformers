@@ -522,7 +522,12 @@ class Message:
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
+            offline_runners_file_path = os.path.join(os.environ.get("GITHUB_WORKSPACE", ""), 'offline_runners.txt')
+            if os.path.exists(offline_runners_file_path) and os.path.getsize(offline_runners_file_path) > 0:
+                with open(offline_runners_file_path, 'r') as f:
+                    offline_runners = json.load(f)
+            else:
+                result = '{}'
                 offline_runners = json.loads(result)
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
