@@ -1,6 +1,7 @@
 import argparse
 import json
 import subprocess
+import os
 
 
 def get_runner_status(target_runners, token):
@@ -21,6 +22,9 @@ def get_runner_status(target_runners, token):
                 offline_runners.append(runner)
 
     # save the result so we can report them on Slack
+    if not os.path.isfile("offline_runners.txt"):
+        with open("offline_runners.txt", "w") as fp:
+            fp.write('[]')
     with open("offline_runners.txt", "w") as fp:
         fp.write(json.dumps(offline_runners))
 
