@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 import subprocess
 
 
@@ -21,8 +22,12 @@ def get_runner_status(target_runners, token):
                 offline_runners.append(runner)
 
     # save the result so we can report them on Slack
-    with open("offline_runners.txt", "w") as fp:
-        fp.write(json.dumps(offline_runners))
+    if os.path.isfile("offline_runners.txt"):
+        with open("offline_runners.txt", "w") as fp:
+            fp.write(json.dumps(offline_runners))
+    else:
+        print("Error: 'offline_runners.txt' file does not exist.")
+        exit(1)
 
     if len(offline_runners) > 0:
         failed = "\n".join([x["name"] for x in offline_runners])
@@ -48,5 +53,9 @@ if __name__ == "__main__":
         "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
+
+    if args.token is None or args.token.strip() == '':
+        print("Error: No token provided. Please provide a valid token using the --token argument.")
+        exit(1)
 
     get_runner_status(args.target_runners, args.token)
