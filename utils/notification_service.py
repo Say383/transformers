@@ -564,8 +564,11 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
+        slack_channel = os.environ.get("CI_SLACK_REPORT_CHANNEL_ID")
+        if slack_channel is None:
+            raise ValueError("Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable.")
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel=slack_channel,
             text=text,
             blocks=payload,
         )
@@ -577,8 +580,11 @@ class Message:
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
+        slack_channel = os.environ.get("CI_SLACK_REPORT_CHANNEL_ID")
+        if slack_channel is None:
+            raise ValueError("Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable.")
         self.thread_ts = client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel=slack_channel,
             blocks=payload,
             text=text,
         )
@@ -643,7 +649,7 @@ class Message:
                     print(json.dumps({"blocks": blocks}))
 
                     client.chat_postMessage(
-                        channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                        channel=os.environ.get("CI_SLACK_REPORT_CHANNEL_ID", "Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable"),
                         text=f"Results for {job}",
                         blocks=blocks,
                         thread_ts=self.thread_ts["ts"],
@@ -666,7 +672,7 @@ class Message:
                     print(json.dumps({"blocks": blocks}))
 
                     client.chat_postMessage(
-                        channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                        channel=os.environ.get("CI_SLACK_REPORT_CHANNEL_ID", "Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable"),
                         text=f"Results for {job}",
                         blocks=blocks,
                         thread_ts=self.thread_ts["ts"],
