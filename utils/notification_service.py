@@ -1030,3 +1030,14 @@ if __name__ == "__main__":
     if message.n_failures or ci_event != "push":
         message.post()
         message.post_reply()
+runner_status = os.environ.get("RUNNER_STATUS")
+if runner_status is None:
+    raise ValueError("RUNNER_STATUS environment variable is not set")
+
+runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
+if runner_env_status is None:
+    raise ValueError("RUNNER_ENV_STATUS environment variable is not set")
+
+setup_status = os.environ.get("SETUP_STATUS")
+if setup_status is None:
+    raise ValueError("SETUP_STATUS environment variable is not set")
