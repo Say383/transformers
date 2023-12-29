@@ -564,6 +564,9 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
+        if os.environ.get("CI_SLACK_REPORT_CHANNEL_ID") is None:
+            raise ValueError("CI_SLACK_REPORT_CHANNEL_ID environment variable is not set")
+
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
@@ -576,6 +579,9 @@ class Message:
         print(json.dumps({"blocks": json.loads(payload)}))
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+
+        if os.environ.get("CI_SLACK_REPORT_CHANNEL_ID") is None:
+            raise ValueError("CI_SLACK_REPORT_CHANNEL_ID environment variable is not set")
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
