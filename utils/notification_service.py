@@ -182,7 +182,7 @@ class Message:
             "accessory": {
                 "type": "button",
                 "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}",
             },
         }
 
@@ -202,7 +202,7 @@ class Message:
             "accessory": {
                 "type": "button",
                 "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}",
             },
         }
 
@@ -211,7 +211,7 @@ class Message:
         # If something goes wrong, let's avoid the CI report failing to be sent.
         button_text = "Check warnings (Link not found)"
         # Use the workflow run link
-        job_link = f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+        job_link = f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}"
         if "Extract warnings in CI artifacts" in github_actions_job_links:
             button_text = "Check warnings"
             # Use the actual job link
@@ -421,7 +421,7 @@ class Message:
             output_dir = os.path.join(os.getcwd(), "previous_reports")
             os.makedirs(output_dir, exist_ok=True)
             prev_tables = get_last_daily_ci_reports(
-                artifact_names=artifact_names, output_dir=output_dir, token=os.environ["ACCESS_REPO_INFO_TOKEN"]
+                artifact_names=artifact_names, output_dir=output_dir, token=os.environ.get('ACCESS_REPO_INFO_TOKEN', 'Missing ACCESS_REPO_INFO_TOKEN environment variable')
             )
 
             # if the last run produces artifact named `test_failure_tables`
@@ -554,7 +554,7 @@ class Message:
             "accessory": {
                 "type": "button",
                 "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}",
             },
         }
         blocks.extend([error_block_1, error_block_2])
