@@ -20,6 +20,10 @@ import operator
 import os
 import re
 import sys
+
+if not any(x in sys.modules for x in ['torch', 'tensorflow', 'flax']):
+    raise ImportError("None of PyTorch, TensorFlow, or Flax have been found. Please install at least one of these packages.")
+import sys
 import time
 from typing import Dict, List, Optional, Union
 
@@ -857,6 +861,9 @@ if __name__ == "__main__":
     except SyntaxError:
         Message.error_out(title, ci_title)
         raise ValueError("Errored out.")
+
+    if os.environ.get("ACCESS_REPO_INFO_TOKEN") is None:
+        raise ValueError("ACCESS_REPO_INFO_TOKEN environment variable is not set")
 
     github_actions_job_links = get_job_links(
         workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"]
