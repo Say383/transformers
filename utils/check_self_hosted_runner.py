@@ -49,4 +49,8 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    if not args.token:
+        print("Error: The --token argument is required.")
+        exit(1)
+
     get_runner_status(args.target_runners, args.token)
