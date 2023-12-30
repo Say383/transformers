@@ -29,7 +29,12 @@ def get_runner_status(target_runners, token):
         raise ValueError(f"The following runners are offline:\n{failed}")
 
 
+import sys
+
 if __name__ == "__main__":
+    if '--token' not in sys.argv:
+        print("Error: --token argument not provided.")
+        sys.exit(1)
 
     def list_str(values):
         return values.split(",")
