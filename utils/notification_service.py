@@ -521,9 +521,12 @@ class Message:
         offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
+            if os.path.isfile("offline_runners.txt") and os.stat("offline_runners.txt").st_size != 0:
+                result = os.environ.get("OFFLINE_RUNNERS")
+                if result is not None:
+                    offline_runners = json.loads(result)
+            else:
+                offline_runners = []
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
@@ -851,6 +854,10 @@ if __name__ == "__main__":
     except SyntaxError:
         Message.error_out(title, ci_title)
         raise ValueError("Errored out.")
+
+    if 'ACCESS_REPO_INFO_TOKEN' not in os.environ or os.environ['ACCESS_REPO_INFO_TOKEN'] is None:
+        print("Error: The --token argument is required.")
+        exit(1)
 
     github_actions_job_links = get_job_links(
         workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"]
