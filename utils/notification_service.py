@@ -855,6 +855,10 @@ if __name__ == "__main__":
         Message.error_out(title, ci_title)
         raise ValueError("Errored out.")
 
+    if 'ACCESS_REPO_INFO_TOKEN' not in os.environ or os.environ['ACCESS_REPO_INFO_TOKEN'] is None:
+        print("Error: The --token argument is required.")
+        exit(1)
+
     github_actions_job_links = get_job_links(
         workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"]
     )
