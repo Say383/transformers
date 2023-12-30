@@ -521,6 +521,10 @@ class Message:
         offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
+            offline_runners_file = "offline_runners.txt"
+            if not os.path.isfile(offline_runners_file):
+                print("The 'offline_runners.txt' file does not exist.")
+                return
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
                 offline_runners = json.loads(result)
