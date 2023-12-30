@@ -45,8 +45,14 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token", 
+        default=None, 
+        type=str, 
+        required=True, 
+        help="A token that has actions:read permission."
     )
     args = parser.parse_args()
+    if args.token is None:
+        raise ValueError("The token argument is required.")
 
     get_runner_status(args.target_runners, args.token)
