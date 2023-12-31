@@ -352,6 +352,11 @@ if __name__ == "__main__":
     # Link to the GitHub Action job
     doc_test_results["job_link"] = github_actions_job_links.get("run_doctests")
 
+    # Check if 'doc_tests_gpu_test_reports' key exists in the available_artifacts
+    if "doc_tests_gpu_test_reports" not in available_artifacts:
+        print("Error: 'doc_tests_gpu_test_reports' key not found in available artifacts.")
+        exit(1)
+
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
     if "stats" in artifact:
