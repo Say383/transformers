@@ -509,7 +509,9 @@ class Message:
         return json.dumps(blocks)
 
     @staticmethod
-    def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False):
+    def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False, offline_runners=None):
+        if offline_runners is None:
+            offline_runners = []
         blocks = []
         title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
         blocks.append(title_block)
