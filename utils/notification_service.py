@@ -694,6 +694,8 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
 
 def retrieve_available_artifacts():
+    _available_artifacts = {}
+
     class Artifact:
         def __init__(self, name: str, single_gpu: bool = False, multi_gpu: bool = False):
             self.name = name
@@ -708,6 +710,9 @@ def retrieve_available_artifacts():
             self.paths.append({"name": self.name, "path": path, "gpu": gpu})
 
     _available_artifacts: Dict[str, Artifact] = {}
+
+    # Ensure 'doc_tests_gpu_test_reports' key always exists in artifacts
+    _available_artifacts['doc_tests_gpu_test_reports'] = Artifact('doc_tests_gpu_test_reports')
 
     directories = filter(os.path.isdir, os.listdir())
     for directory in directories:
