@@ -146,6 +146,8 @@ You are not required to read the following guidelines before opening an issue. H
    cd transformers
    pip install .
    ```
+
+   Please remember to always provide the `--token` argument when calling the `check_self_hosted_runner.py` script. This argument is necessary for authentication with the GitHub API to check the status of the self-hosted runners. Without this token, the script will not execute properly and will result in an error.
    ````
 
    If it's a command line with a long argument list, please consider breaking it down using backslashes and new lines. Here is an example of a good command line quote:
