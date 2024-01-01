@@ -4,6 +4,10 @@ import subprocess
 
 
 def get_runner_status(target_runners, token):
+    if not target_runners:
+        with open("offline_runners.txt", "w") as fp:
+            fp.write('[]')
+        return []
     offline_runners = []
 
     cmd = (
@@ -22,7 +26,7 @@ def get_runner_status(target_runners, token):
 
     # save the result so we can report them on Slack
     with open("offline_runners.txt", "w") as fp:
-        fp.write(json.dumps(offline_runners))
+        fp.write(json.dumps(offline_runners) if offline_runners else '[]')
 
     if len(offline_runners) > 0:
         failed = "\n".join([x["name"] for x in offline_runners])
@@ -48,5 +52,9 @@ if __name__ == "__main__":
         "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
+
+    if args.token is None:
+        print('Error: No token provided. Exiting...')
+        exit(1)
 
     get_runner_status(args.target_runners, args.token)
