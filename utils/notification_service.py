@@ -518,12 +518,16 @@ class Message:
             ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
             blocks.append(ci_title_block)
 
-        offline_runners = []
+        # Load offline runners from environment or use an empty list if not set
+        offline_runners = json.loads(os.environ.get("OFFLINE_RUNNERS", "[]"))
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
+            offline_runners_path = 'offline_runners.txt'
+            if not os.path.exists(offline_runners_path):
+                print(f"Error: {offline_runners_path} file does not exist.")
+                return
+            with open(offline_runners_path, 'r') as file:
+                offline_runners = json.load(file)
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
