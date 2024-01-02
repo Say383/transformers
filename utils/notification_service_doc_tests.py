@@ -18,6 +18,7 @@ import math
 import os
 import re
 import time
+import sys
 from fnmatch import fnmatch
 from typing import Dict
 
@@ -346,6 +347,10 @@ if __name__ == "__main__":
 
     # Link to the GitHub Action job
     doc_test_results["job_link"] = github_actions_job_links.get("run_doctests")
+
+    if "doc_tests_gpu_test_reports" not in available_artifacts:
+        print("Error: 'doc_tests_gpu_test_reports' not found in available artifacts.")
+        sys.exit(1)
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
