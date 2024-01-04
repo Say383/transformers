@@ -518,12 +518,13 @@ class Message:
             ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
             blocks.append(ci_title_block)
 
-        offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
+            if result:
                 offline_runners = json.loads(result)
+            else:
+                offline_runners = []
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
