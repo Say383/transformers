@@ -16,6 +16,9 @@ import ast
 import collections
 import functools
 import json
+from json import JSONDecodeError
+import os
+import logging
 import operator
 import os
 import re
@@ -522,8 +525,12 @@ class Message:
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
+            try:
                 offline_runners = json.loads(result)
+            except JSONDecodeError as e:
+                logging.error("Failed to decode JSON from result: %s", result)
+            raise ValueError("Failed to decode JSON from result")
+                offline_runners = {}
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
