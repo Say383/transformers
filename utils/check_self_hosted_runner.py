@@ -35,6 +35,7 @@ if __name__ == "__main__":
         return values.split(",")
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--token","-t",type=str,required=True,help="A token that has actions:read permission.")
     # Required parameters
     parser.add_argument(
         "--target_runners",
