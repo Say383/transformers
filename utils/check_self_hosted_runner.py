@@ -33,6 +33,9 @@ if __name__ == "__main__":
 
     def list_str(values):
         return values.split(",")
+        return values.split(",")
+        return values.split(",")
+        return values.split(",")
 
     parser = argparse.ArgumentParser()
     # Required parameters
@@ -45,7 +48,8 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token",
+        default=None, default=None, type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
 

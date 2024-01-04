@@ -519,11 +519,20 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
+        text = ''
+        text = ''
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
+            try:
+                if os.environ.get('OFFLINE_RUNNERS') is not None:
+                    if os.path.isfile('offline_runners.txt'):
+                        with open('offline_runners.txt') as f:
+                            offline_runners = f.read()
+                    else:
+                        print('Error: offline_runners.txt file not found')
+                        offline_runners = []
+            except json.decoder.JSONDecodeError as e:
+                print('Error decoding offline_runners')
+                offline_runners = []
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
@@ -681,6 +690,12 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
     _artifact = {}
 
+    if os.path.isfile('offline_runners.txt'):
+        with open('offline_runners.txt') as f:
+            offline_runners = f.read()
+    else:
+        print('Error: offline_runners.txt file not found')
+        offline_runners = []
     if os.path.exists(artifact_path):
         files = os.listdir(artifact_path)
         for file in files:
