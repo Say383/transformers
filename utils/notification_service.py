@@ -17,8 +17,11 @@ import collections
 import functools
 import json
 import operator
+import json
+import os
 import os
 import re
+import os
 import sys
 import time
 from typing import Dict, List, Optional, Union
@@ -521,7 +524,7 @@ class Message:
         offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
+            result = json.loads(json.loads(os.environ.get("OFFLINE_RUNNERS"))) if os.environ.get("OFFLINE_RUNNERS") else []
             if result is not None:
                 offline_runners = json.loads(result)
         elif runner_failed:
@@ -575,7 +578,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
-        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+        text += f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],

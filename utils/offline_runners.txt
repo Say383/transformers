@@ -1,0 +1,12 @@
+# Import necessary modules
+import os
+
+# Define file path
+file_path = "utils/offline_runners.txt"
+
+# Open file in write mode
+with open(file_path, "w") as file:
+    # Write contents to file
+    file.write("")
+
+# No need to explicitly close the file as the `with` statement handles it automatically
