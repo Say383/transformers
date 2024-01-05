@@ -17,6 +17,7 @@ import collections
 import functools
 import json
 import operator
+import json
 import os
 import os
 import re
@@ -523,7 +524,7 @@ class Message:
         offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
+            result = json.loads(json.loads(os.environ.get("OFFLINE_RUNNERS"))) if os.environ.get("OFFLINE_RUNNERS") else []
             if result is not None:
                 offline_runners = json.loads(result)
         elif runner_failed:
