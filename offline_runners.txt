@@ -1,0 +1,10 @@
+import os
+import sys
+
+def create_offline_runners_file():
+    file_path = os.path.join(os.path.dirname(__file__), "offline_runners.txt")
+    with open(file_path, "w") as file:
+        file.write("Put your necessary data here")
+
+if __name__ == "__main__":
+    create_offline_runners_file()
