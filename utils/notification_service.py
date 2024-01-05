@@ -13,10 +13,15 @@
 # limitations under the License.
 
 import ast
+import os
 import collections
 import functools
+import os
 import json
 import operator
+import os
+import os
+import os
 import os
 import re
 import sys
@@ -780,6 +785,9 @@ if __name__ == "__main__":
     org = "huggingface"
     repo = "transformers"
     repository_full_name = f"{org}/{repo}"
+
+    # Add an import statement for the `os` module
+    import os
 
     # This env. variable is set in workflow file (under the job `send_results`).
     ci_event = os.environ["CI_EVENT"]
