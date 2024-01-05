@@ -1,4 +1,4 @@
-# Copyright 2020 The HuggingFace Team. All rights reserved.
+import json# Copyright 2020 The HuggingFace Team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,10 +13,18 @@
 # limitations under the License.
 
 import ast
+import json
 import os
+import json
+import json
+import json
+import json
+import json
+import json
 import collections
 import functools
 import os
+import json
 import json
 import operator
 import os
