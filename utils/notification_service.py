@@ -15,7 +15,9 @@
 import ast
 import collections
 import functools
-import json
+import json as json_parser
+import json as json_parser
+import json as json
 import operator
 import os
 import re
@@ -539,8 +541,14 @@ class Message:
             },
         }
 
-        text = ""
-        if len(offline_runners) > 0:
+        _result = json.loads(result) if result else {}
+        offline_runners = []
+        if _result:
+            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n{text}\n\n"
+        _result = json.loads(result) if result else {}
+        offline_runners = []
+        if _result:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
