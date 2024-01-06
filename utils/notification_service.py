@@ -560,6 +560,9 @@ class Message:
                 "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
             },
         }
+        print("Sending the following payload")
+        print(json.dumps({"blocks": blocks}))
+        
         blocks.extend([error_block_1, error_block_2])
 
         payload = json.dumps(blocks)
