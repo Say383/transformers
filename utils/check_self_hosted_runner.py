@@ -45,7 +45,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token", default="YOUR_DEFAULT_TOKEN_VALUE", type=str, required=False, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
 
