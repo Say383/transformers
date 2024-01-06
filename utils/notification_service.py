@@ -637,7 +637,21 @@ class Message:
             {"type": "section", "text": {"type": "mrkdwn", "text": failure_text}},
         ]
 
-    def post_reply(self):
+        MAX_ERROR_TEXT = 3000 - len("[Truncated]")
+
+        failure_text = ""
+        for idx, error in enumerate(failures):
+            new_text = failure_text + f'*{error["line"]}*\n_{error["trace"]}_\n\n'
+            if len(new_text) > MAX_ERROR_TEXT:
+                failure_text = failure_text + "[Truncated]"
+                break
+            failure_text = new_text
+
+        title = job_name
+        if device is not None:
+            title += f" ({device}-gpu)"
+
+        content = {"type": "section", "text": {"type": "mrkdwn", "text": text}}
         if self.thread_ts is None:
             raise ValueError("Can only post reply if a post has been made.")
 
