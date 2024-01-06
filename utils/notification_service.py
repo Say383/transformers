@@ -374,7 +374,7 @@ class Message:
         model_header = "Single PT |  Multi PT | Single TF |  Multi TF |     Other | Category\n"
         sorted_model_reports = sorted(model_reports, key=lambda s: s.split("| ")[-1])
         model_failures_report = prepare_reports(
-            title="These following model modules had failures", header=model_header, reports=sorted_model_reports
+            title="These following model modules had failures", header="", reports=sorted_model_reports
         )
 
         module_header = "Single |  Multi | Category\n"
@@ -396,11 +396,11 @@ class Message:
 
         model_failures_report = prepare_reports(
             title="These following model modules had failures",
-            header=model_header,
+            header="",
             reports=sorted_model_reports,
             to_truncate=False,
         )
-        file_path = os.path.join(os.getcwd(), "test_failure_tables/model_failures_report.txt")
+        file_path = os.path.join("mnt", "data", "test_failure_tables", "model_failures_report.txt")
         with open(file_path, "w", encoding="UTF-8") as fp:
             fp.write(model_failures_report)
 
@@ -681,7 +681,7 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
     _artifact = {}
 
-    if os.path.exists(artifact_path):
+    if artifact_path.split('.')[1] == 'json':
         files = os.listdir(artifact_path)
         for file in files:
             try:
