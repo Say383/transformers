@@ -694,7 +694,7 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
 
 def retrieve_available_artifacts():
-    offline_runners = "" 
+    offline_runners = ""
     class Artifact:
         def __init__(self, name: str, single_gpu: bool = False, multi_gpu: bool = False):
             self.name = name
