@@ -520,8 +520,11 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
+                    result = os.environ.get("OFFLINE_RUNNERS")
+        if result:
+            if (not result) or (result and len(result)==0) or (result and not [ch for ch in result if ch in ('[','{')]):
+                offline_runners = []
+            else:
                 try:
                     offline_runners = json.loads(result)
                 except (ValueError, TypeError):
