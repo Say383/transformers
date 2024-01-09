@@ -107,6 +107,25 @@ class Message:
 
         # Failures and success of the modeling tests
         self.n_model_success = sum(r["success"] for r in model_results.values())
+def handle_stacktraces(test_results):
+    # These files should follow the following architecture:
+    # === FAILURES ===
+    # <path>:<line>: Error ...
+    # <path>:<line>: Error ...
+    # <empty line>
+
+    total_stacktraces = test_results.split("\n")[1:-1]
+    stacktraces = []
+    for stacktrace in total_stacktraces:
+        try:
+            line = stacktrace[: stacktrace.index(" ")].split(":")[-2]
+            error_message = stacktrace[stacktrace.index(" ") :]
+
+            stacktraces.append(f"(line {line}) {error_message}")
+        except Exception:
+            stacktraces.append("Cannot retrieve error message.")
+
+    return stacktraces
         self.n_model_single_gpu_failures = sum(dicts_to_sum(r["failed"])["single"] for r in model_results.values())
         self.n_model_multi_gpu_failures = sum(dicts_to_sum(r["failed"])["multi"] for r in model_results.values())
 
