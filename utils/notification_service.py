@@ -99,6 +99,11 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict], List[Dict[str, Dict
 
 
 class Message:
+    def __init__(self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None):
+        self.title = title
+        self.ci_title = ci_title
+        self.model_results = model_results
+        self.additional_results = additional_results
     def __init__(
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
@@ -106,6 +111,8 @@ class Message:
         self.ci_title = ci_title
 
         # Failures and success of the modeling tests
+        self.model_results = model_results
+        self.additional_results = additional_results
         self.n_model_success = sum(r["success"] for r in model_results.values())
 def handle_stacktraces(test_results):
     # These files should follow the following architecture:
@@ -168,6 +175,9 @@ def handle_stacktraces(test_results):
         time_spent = [r["time_spent"].split(", ")[0] for r in all_results if len(r["time_spent"])]
         total_secs = 0
 
+        all_results = [*self.model_results.values(), *self.additional_results.values()]
+        time_spent = [r["time_spent"].split(", ")[0] for r in all_results if len(r["time_spent"])]
+        total_secs = 0
         for time in time_spent:
             time_parts = time.split(":")
 
@@ -899,7 +909,7 @@ if __name__ == "__main__":
             "success": 0,
             "time_spent": "",
             "failures": {},
-            "job_link": {},
+            "job_link": {}, "time_spent": "",
         }
         for model in models
         if f"run_all_tests_gpu_{model}_test_reports" in available_artifacts
@@ -993,7 +1003,7 @@ if __name__ == "__main__":
             "time_spent": "",
             "error": False,
             "failures": {},
-            "job_link": {},
+            "job_link": {}, "time_spent": "", "time_spent": "",
         }
         for key in additional_files.keys()
     }
