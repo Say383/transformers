@@ -17,6 +17,9 @@ import collections
 import functools
 import json
 import operator
+import json
+from json.decoder import JSONDecodeError
+
 import os
 import re
 import sys
