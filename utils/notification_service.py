@@ -504,7 +504,7 @@ class Message:
         print(json.dumps(offline_runners))
 
         print("Sending the following payload")
-        print(json.dumps({"blocks": blocks}))
+        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
