@@ -86,8 +86,8 @@ def handle_stacktraces(test_results):
     return stacktraces
 
 
-def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
-    if isinstance(objects, dict):
+def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict], List[Dict[str, Dict]]):
+    if isinstance(objects, dict) or isinstance(objects[0], dict):
         lists = objects.values()
     else:
         lists = objects
