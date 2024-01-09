@@ -18,6 +18,13 @@ import functools
 import json
 import operator
 import os
+
+offline_runners = []
+try:
+    with open("utils/offline_runners.txt", "r") as file:
+        offline_runners = file.read().splitlines()
+except FileNotFoundError:
+    pass
 import re
 import sys
 import time
