@@ -54,7 +54,7 @@ def handle_test_results(test_results):
 
     # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
     # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+    time_spent = expressions[-1].strip('=') if expressions[-1].startswith('=') else expressions[-1]
 
     for i, expression in enumerate(expressions):
         if "failed" in expression:
