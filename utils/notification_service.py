@@ -42,7 +42,7 @@ NON_MODEL_TEST_MODULES = [
     "pipelines",
     "sagemaker",
     "trainer",
-    "utils",
+    "utils", "doc_tests",
 ]
 
 
