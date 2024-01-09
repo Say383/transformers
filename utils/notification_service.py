@@ -1,4 +1,4 @@
-# Copyright 2020 The HuggingFace Team. All rights reserved.
+import os# Copyright 2020 The HuggingFace Team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -520,10 +520,15 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
+                    result = os.environ.get("OFFLINE_RUNNERS")
+        if result:
+            if (not result) or (result and len(result)==0) or (result and not [ch for ch in result if ch in ('[','{')]):
+                offline_runners = []
+            else:
+                try:
+                    offline_runners = json.loads(result)
+                except (ValueError, TypeError):
+                    offline_runners = []
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
