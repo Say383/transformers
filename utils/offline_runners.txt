@@ -1,0 +1,14 @@
+import os
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    try:
+        with open(file_path, "w") as file:
+            # Write any desired contents to the file
+            file.write("Offline Runner 1\n")
+            file.write("Offline Runner 2\n")
+            file.write("Offline Runner 3\n")
+    except Exception as e:
+        print(f"Error creating the file: {str(e)}")
+
+create_offline_runners_file()
