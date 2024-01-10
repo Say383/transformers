@@ -17,11 +17,9 @@ jobs:
         steps:
             - run: echo $CIRCLE_PROJECT_USERNAME
             - run: |
-                if [ "$CIRCLE_PROJECT_USERNAME" = "huggingface" ]; then
-                    exit 0
-                else
-                    echo "The CI is running under $CIRCLE_PROJECT_USERNAME personal account. Please follow https://support.circleci.com/hc/en-us/articles/360008097173-Troubleshooting-why-pull-requests-are-not-triggering-jobs-on-my-organization- to fix it."; exit -1
-                fi
+                    if [ "$CIRCLE_PROJECT_USERNAME" = "huggingface" ]; then
+                        exit 0
+                    fi
     # Fetch the tests to run
     fetch_tests:
         working_directory: ~/transformers
