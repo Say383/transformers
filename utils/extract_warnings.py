@@ -79,7 +79,8 @@ def extract_warnings(artifact_dir, targets):
 if __name__ == "__main__":
 
     def list_str(values):
-        return values.split(",")
+        if values is None:
+            return []
 
     parser = argparse.ArgumentParser()
     # Required parameters
