@@ -345,15 +345,15 @@ if __name__ == "__main__":
     }
 
     # Link to the GitHub Action job
-    doc_test_results["job_link"] = github_actions_job_links.get("run_doctests")
+    doc_test_results["job_link"] = github_actions_job_links.get("run_doctests", None)
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
     if "stats" in artifact:
         failed, success, time_spent = handle_test_results(artifact["stats"])
-        doc_test_results["failures"] = failed
+        doc_test_results["failures"] = failed if failed else 0
         doc_test_results["success"] = success
-        doc_test_results["time_spent"] = time_spent[1:-1] + ", "
+        doc_test_results["time_spent"] = time_spent[1:-1] if time_spent else None
 
         all_failures = extract_first_line_failure(artifact["failures_short"])
         for line in artifact["summary_short"].split("\n"):
@@ -375,6 +375,6 @@ if __name__ == "__main__":
                         doc_test_results[category]["failures"][test] = failure
                         break
 
-    message = Message("🤗 Results of the doc tests.", doc_test_results)
-    message.post()
-    message.post_reply()
+    message = Message("🤗 Results of the doc tests.", doc_test_results if all(doc_test_results.values()) else {})
+    message.post() if all(doc_test_results.values()) else Message.error_out()
+    message.post_reply() if all(doc_test_results.values()) else Message.error_out()
