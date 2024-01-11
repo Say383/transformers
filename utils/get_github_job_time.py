@@ -23,6 +23,25 @@ def extract_time_from_single_job(job):
     job_info["completed_at"] = end
     job_info["duration"] = duration_in_min
 
+    # Return the extracted time information for the job
+    try:
+        start_time = job["started_at"]
+        end_time = job["completed_at"]
+        # Parse the start and end times into datetime objects
+        start_datetime = date_parser.parse(start_time)
+        end_datetime = date_parser.parse(end_time)
+        # Calculate duration in minutes
+        duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+        # Save job information in a dictionary
+        job_info = {
+            "started_at": start_time,
+            "completed_at": end_time,
+            "duration": duration_in_min
+        }
+    except (KeyError, ValueError, TypeError) as e:
+        # Log the error and return an empty dictionary
+        print(f"Error extracting time info from job: {e}")
+        return {}
     return job_info
 
 
