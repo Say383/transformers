@@ -226,7 +226,7 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(args.output_dir or './', exist_ok=True)
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
