@@ -7,7 +7,8 @@ import traceback
 import zipfile
 from collections import Counter
 
-import requests
+import requests, logging
+import requests.exceptions
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -22,6 +23,7 @@ def get_job_links(workflow_run_id, token=None):
     job_links = {}
 
     try:
+        logging.info('Trying to fetch job links.')
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -48,6 +50,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     artifacts = {}
 
     try:
+        logging.info('Trying to fetch artifacts.')
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
