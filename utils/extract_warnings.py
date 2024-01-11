@@ -12,7 +12,7 @@ from transformers import logging
 logger = logging.get_logger(__name__)
 
 
-def extract_warnings_from_single_artifact(artifact_path, targets):
+def extract_warnings_from_single_artifact(artifact_path, targets, from_gh=False):
     """Extract warnings from a downloaded artifact (in .zip format)"""
     selected_warnings = set()
     buffer = []
@@ -56,7 +56,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                             continue
                         with z.open(filename) as fp:
                             parse_line(fp)
-        except Exception:
+        except Exception as e:
             logger.warning(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
@@ -130,5 +130,8 @@ if __name__ == "__main__":
     # extract warnings from artifacts
     selected_warnings = extract_warnings(args.output_dir, args.targets)
     selected_warnings = sorted(selected_warnings)
+    output_file_path = os.path.join(args.output_dir, "selected_warnings.json")
+    with open(output_file_path, "w", encoding="UTF-8") as fp:
+        json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
