@@ -21,17 +21,16 @@ def get_job_links(workflow_run_id, token=None):
     result = requests.get(url, headers=headers).json()
     job_links = {}
 
-    try:
-        job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+    reduced_by_error = reduce_by_error(errors)
+    reduced_by_model = reduce_by_model(errors)
 
-        for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
-            job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
+    s1 = make_github_table(reduced_by_error)
+    s2 = make_github_table_per_model(reduced_by_model)
 
-        return job_links
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
+        fp.write(s1)
+    with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
+        fp.write(s2)
 
     return {}
 
@@ -268,6 +267,7 @@ if __name__ == "__main__":
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
 
+    s1 = reduced_by_error = reduce_by_error(errors)
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
 
