@@ -4,7 +4,7 @@ import os
 import time
 import zipfile
 
-from get_ci_error_statistics import download_artifact, get_artifacts_links
+from get_ci_error_statistics import download_artifact, get_artifacts_links, handle_download_exception
 
 from transformers import logging
 
