@@ -75,7 +75,12 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
     result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    import logging
+    logger = logging.getLogger(__name__)
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        logger.exception("An error occurred while downloading artifact:")
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
@@ -226,7 +231,12 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    import logging
+    logger = logging.getLogger(__name__)
+    try:
+        os.makedirs(args.output_dir, exist_ok=True)
+    except OSError as e:
+        logger.exception("An error occurred while creating the output directory:")
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
