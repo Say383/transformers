@@ -72,6 +72,7 @@ class Message:
         self.n_tests = self.n_success + self.n_failures
 
         # Failures and success of the modeling tests
+        self.error_messages = []
         self.doc_test_results = doc_test_results
 
     @property
