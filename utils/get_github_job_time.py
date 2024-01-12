@@ -69,7 +69,7 @@ if __name__ == "__main__":
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
     args = parser.parse_args()
 
-    job_time = get_job_time(args.workflow_run_id)
+    job_time = dict(sorted(get_job_time(args.workflow_run_id).items(), key=lambda item: item[1]["duration"], reverse=True))
     job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
 
     for k, v in job_time.items():
