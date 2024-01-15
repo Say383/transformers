@@ -539,6 +539,18 @@ class Message:
             },
         }
 
+        if result is not None:
+            try:
+                offline_runners = json.loads(result)
+            except json.JSONDecodeError:
+                offline_runners = []
+
+        if result is not None:
+            try:
+                offline_runners = json.loads(result)
+            except json.JSONDecodeError:
+                offline_runners = []
+
         text = ""
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
