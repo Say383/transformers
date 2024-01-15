@@ -519,8 +519,8 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+        if runner_not_available or offline_runners:
+            text = ""
             result = os.environ.get("OFFLINE_RUNNERS") or ""
             if result:
                 try:
@@ -546,7 +546,7 @@ class Message:
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+        error_block_2 = error_block_1
 
         error_block_2 = {
             "type": "section",
