@@ -200,7 +200,11 @@ def make_github_table(reduced_by_error):
     for error in reduced_by_error:
         count = reduced_by_error[error]["count"]
         line = f"| {count} | {error[:100]} |  |"
+        try:
         lines.append(line)
+    except Exception as e:
+        print(f'Error generating table line: {e}')
+        return ''
 
     return "\n".join(lines)
 
@@ -273,7 +277,15 @@ def make_github_table_per_model(reduced_by_model):
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
         lines.append(line)
 
+    try:
+    try:
     return "\n".join(lines)
+except Exception as e:
+    print(f'Error generating final table: {e}')
+    return ''
+except Exception as e:
+    print(f'Error generating final table: {e}')
+    return ''
 
 
 if __name__ == "__main__":
