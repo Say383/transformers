@@ -1,6 +1,8 @@
 import argparse
 import json
 import subprocess
+import json
+import subprocess
 
 
 def get_runner_status(target_runners, token):
