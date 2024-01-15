@@ -529,7 +529,7 @@ class Message:
         elif setup_failed:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
-            text = "💔 There was an issue running the tests. 😭"
+            text = "There was an issue running the tests. 😭"
 
         error_block_1 = {
             "type": "header",
