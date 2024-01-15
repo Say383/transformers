@@ -1,0 +1,14 @@
+dependency1==version1
+dependency2==version2
+dependency3==version3
+...
+```
+
+Replace `dependency1`, `dependency2`, etc. with the actual names of the dependencies, and `version1`, `version2`, etc. with the desired versions of each dependency.
+
+For example, if the required dependencies are `numpy`, `torch`, and `transformers`, the `requirements.txt` file would look like this:
+
+```
+numpy==1.19.5
+torch==1.9.0
+transformers==4.11.3
