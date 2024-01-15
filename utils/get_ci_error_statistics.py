@@ -33,7 +33,7 @@ def get_job_links(workflow_run_id, token=None):
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
-    return {}
+    return job_links
 
 
 def get_artifacts_links(worflow_run_id, token=None):
@@ -59,7 +59,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
-    return {}
+    return artifacts
 
 
 def download_artifact(artifact_name, artifact_url, output_dir, token):
