@@ -1,6 +1,8 @@
 import argparse
 import json
 import subprocess
+import json
+import subprocess
 
 
 def get_runner_status(target_runners, token):
@@ -45,7 +47,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token", default=None, type=str, required=True, help="A token that has actions:read permission.", nargs='?'
     )
     args = parser.parse_args()
 
