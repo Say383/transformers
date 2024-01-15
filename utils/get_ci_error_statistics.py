@@ -145,7 +145,7 @@ def get_all_errors(artifact_dir, job_links=None):
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+def reduce_by_error(logs, error_filter=None, error_handling=lambda e: None):
     """count each error"""
 
     counter = Counter()
