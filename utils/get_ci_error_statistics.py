@@ -219,7 +219,11 @@ def make_github_table_per_model(reduced_by_model):
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
     return r
+except Exception as e:
+    print(f'Error generating per model table: {e}')
+    return ''
 
 
 def get_model(test):
