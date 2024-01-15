@@ -631,7 +631,7 @@ class Message:
 
         sorted_dict = sorted(self.model_results.items(), key=lambda t: t[0])
         for job, job_result in sorted_dict:
-            if len(job_result["failures"]):
+            if len(job_result["failures"]) > 0:
                 for device, failures in job_result["failures"].items():
                     text = "\n".join(
                         sorted([f"*{k}*: {v[device]}" for k, v in job_result["failed"].items() if v[device]])
