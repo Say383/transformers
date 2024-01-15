@@ -18,8 +18,13 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    job_links = {}
+    try:
+        result = requests.get(url, headers=headers).json()
+        job_links = {}
+    except Exception as e:
+        print(f'Error getting job links: {e}')
+        job_links = {}
+    result = {}
 
     try:
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
@@ -242,7 +247,12 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
         json.dump(job_links, fp, ensure_ascii=False, indent=4)
 
+    artifacts = {}
+try:
     artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
+except Exception as e:
+    print(f'Error getting artifacts links: {e}')
+    artifacts = {}
     with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
         json.dump(artifacts, fp, ensure_ascii=False, indent=4)
 
