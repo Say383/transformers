@@ -261,7 +261,11 @@ except Exception as e:
         # Be gentle to GitHub
         time.sleep(1)
 
-    errors = get_all_errors(args.output_dir, job_links=job_links)
+    try:
+        errors = get_all_errors(args.output_dir, job_links=job_links)
+    except Exception as e:
+        print(f'Error when extracting errors: {e}')
+        errors = []
 
     # `e[1]` is the error
     counter = Counter()
