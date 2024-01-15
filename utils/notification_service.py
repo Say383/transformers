@@ -539,9 +539,9 @@ class Message:
             },
         }
 
-        offline_runners = [] if os.environ.get("OFFLINE_RUNNERS") == "" else json.loads(os.environ.get("OFFLINE_RUNNERS"))
-        offline_runners = [] if os.environ.get("OFFLINE_RUNNERS") == "" else json.loads(os.environ.get("OFFLINE_RUNNERS"))
-        offline_runners = [] if os.environ.get("OFFLINE_RUNNERS") == "" else json.loads(os.environ.get("OFFLINE_RUNNERS"))
+        offline_runners = [] if os.getenv("OFFLINE_RUNNERS") == "" else json.loads(os.getenv("OFFLINE_RUNNERS"))
+        offline_runners = [] if os.getenv("OFFLINE_RUNNERS") == "" else json.loads(os.getenv("OFFLINE_RUNNERS"))
+        offline_runners = [] if os.getenv("OFFLINE_RUNNERS") == "" else json.loads(os.getenv("OFFLINE_RUNNERS"))
         text = ""
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
