@@ -518,7 +518,13 @@ class Message:
             ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
             blocks.append(ci_title_block)
 
-        offline_runners = []
+        try:
+            result = os.environ.get("OFFLINE_RUNNERS")
+            offline_runners = json.loads(result) if result else []
+        except json.JSONDecodeError:
+            offline_runners = []
+        except Exception:
+            offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
