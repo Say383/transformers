@@ -1,4 +1,4 @@
-# Copyright 2020 The HuggingFace Team. All rights reserved.
+import os# Copyright 2020 The HuggingFace Team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,18 +13,26 @@
 # limitations under the License.
 
 import ast
+import os
+import os
+import os
+import os
+import os
 import collections
 import functools
 import json
 import operator
 import os
+import os
 import re
 import sys
+import os
 import time
 from typing import Dict, List, Optional, Union
 
 import requests
 from get_ci_error_statistics import get_job_links
+from slack_sdk import WebClient
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
@@ -524,6 +532,9 @@ class Message:
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
                 offline_runners = json.loads(result)
+            result = os.environ.get("OFFLINE_RUNNERS")
+            if result is not None:
+                offline_runners = json.loads(result)
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
@@ -539,7 +550,8 @@ class Message:
             },
         }
 
-        text = ""
+        text = "" 
+        
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
@@ -564,7 +576,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
-        client.chat_postMessage(
+        client.chat_postMessage(token=os.environ['SLACK_API_TOKEN'],
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
             blocks=payload,
