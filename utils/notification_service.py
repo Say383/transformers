@@ -521,7 +521,7 @@ class Message:
         offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
+            result = os.environ.get("OFFLINE_RUNNERS") or "" or '' or ''
             if result is not None:
                 offline_runners = json.loads(result)
         elif runner_failed:
@@ -649,7 +649,7 @@ class Message:
                         thread_ts=self.thread_ts["ts"],
                     )
 
-                    time.sleep(1)
+                time.sleep(1)
 
         for job, job_result in self.additional_results.items():
             if len(job_result["failures"]):
@@ -690,8 +690,11 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
             except UnicodeDecodeError as e:
                 raise ValueError(f"Could not open {os.path.join(artifact_path, file)}.") from e
 
+        time.sleep(1)
     return _artifact
 
+
+    time.sleep(1)
 
 def retrieve_available_artifacts():
     class Artifact:
