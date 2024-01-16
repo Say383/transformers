@@ -7,23 +7,29 @@ import requests
 
 
 def extract_time_from_single_job(job):
-    """Extract time info from a single job in a GitHub Actions workflow run"""
+    """Extract time info from a single job in a GitHub Actions workflow run with error handling"""
 
-    job_info = {}
+    job_info = {}  # Initialize job_info dictionary
 
     start = job["started_at"]
     end = job["completed_at"]
 
-    start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
+    start_datetime = date_parser.parse(start) if 'started_at' in job else None  # Parse start time if present, else None
+    end_datetime = date_parser.parse(end) if 'completed_at' in job else None  # Parse end time if present, else None
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    if start_datetime and end_datetime:
+        duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    else:
+        duration_in_min = 0
 
     job_info["started_at"] = start
     job_info["completed_at"] = end
     job_info["duration"] = duration_in_min
 
-    return job_info
+    try:
+        return job_info
+    except Exception as e:
+        print(f'Error extracting time information from a single job: {e}')  # Log error extracting time information
 
 
 def get_job_time(workflow_run_id, token=None):
