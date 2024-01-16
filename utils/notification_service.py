@@ -526,7 +526,7 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            text = "💔 CI runners are not available! Tests are not run. 😭 Contact your team administrator to verify the Slack API credentials."
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
                 offline_runners = json.loads(result)
