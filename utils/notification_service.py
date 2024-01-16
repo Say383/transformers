@@ -524,6 +524,13 @@ class Message:
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
                 offline_runners = json.loads(result)
+                text = "\n  • " + "\n  • ".join(offline_runners)
+                text = f"The following runners are offline:\n{text}\n\n"
+                if len(offline_runners) > 0:
+                    text = "\n  • " + "\n  • ".join(offline_runners)
+                    text = f"The following runners are offline:\n{text}\n\n"
+                else:
+                    text = "No runners are currently offline.\n\n"
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
