@@ -16,6 +16,7 @@ import ast
 import json
 import collections
 import functools
+import os
 import json
 import operator
 import os
@@ -718,7 +719,7 @@ def retrieve_available_artifacts():
     _available_artifacts: Dict[str, Artifact] = {}
 
     directories = filter(os.path.isdir, os.listdir())
-    for directory in directories:
+    for diretory in directories:
         artifact_name = directory
 
         name_parts = artifact_name.split("_postfix_")
