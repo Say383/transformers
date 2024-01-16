@@ -25,6 +25,7 @@ from typing import Dict, List, Optional, Union
 
 import requests
 from get_ci_error_statistics import get_job_links
+import re
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
@@ -669,7 +670,6 @@ class Message:
                         channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
                         text=f"Results for {job}",
                         blocks=blocks,
-                        thread_ts=self.thread_ts["ts"],
                     )
 
                     time.sleep(1)
@@ -724,8 +724,7 @@ def retrieve_available_artifacts():
                 _available_artifacts[artifact_name].single_gpu = True
             else:
                 _available_artifacts[artifact_name] = Artifact(artifact_name, single_gpu=True)
-
-            _available_artifacts[artifact_name].add_path(directory, gpu="single")
+                _available_artifacts[artifact_name].add_path(directory, gpu="single")
 
         elif artifact_name.startswith("multi-gpu"):
             artifact_name = artifact_name[len("multi-gpu") + 1 :]
@@ -782,7 +781,7 @@ if __name__ == "__main__":
     repository_full_name = f"{org}/{repo}"
 
     # This env. variable is set in workflow file (under the job `send_results`).
-    ci_event = os.environ["CI_EVENT"]
+    ci_event = os.environ.get("CI_EVENT")
 
     # To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
     pr_number_re = re.compile(r"\(#(\d+)\)$")
