@@ -19,6 +19,10 @@ import json
 import operator
 import os
 import re
+
+def check_dependencies():
+    # check the presence of PyTorch, TensorFlow, and Flax
+    pass
 import sys
 import time
 from typing import Dict, List, Optional, Union
