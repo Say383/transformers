@@ -112,6 +112,7 @@ if __name__ == "__main__":
         pass
     else:
         os.makedirs(args.output_dir, exist_ok=True)
+    # Add error handling and logging
 
         # get download links
         artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
