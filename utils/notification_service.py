@@ -13,12 +13,15 @@
 # limitations under the License.
 
 import ast
+import json
 import collections
 import functools
 import json
 import operator
 import os
 import re
+import json
+import json
 import sys
 import time
 from typing import Dict, List, Optional, Union
@@ -538,6 +541,11 @@ class Message:
                 "text": text,
             },
         }
+
+        try:
+            offline_runners = json.loads(result)
+        except json.JSONDecodeError:
+            offline_runners = []
 
         text = ""
         if len(offline_runners) > 0:
