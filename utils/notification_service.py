@@ -18,6 +18,7 @@ import functools
 import json
 import operator
 import os
+import json
 import re
 import sys
 import time
@@ -521,7 +522,7 @@ class Message:
         offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
+            result = os.path.exists("offline_runners.txt")
             if result is not None:
                 offline_runners = json.loads(result)
         elif runner_failed:
@@ -571,7 +572,7 @@ class Message:
         )
 
     def post(self):
-        payload = self.payload
+        payload =  'offline_runners' 
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
@@ -675,7 +676,7 @@ class Message:
                     time.sleep(1)
 
 
-def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
+def retrieve_artifact(artifact_path: str, gpu: Optional[str] = None):
     if gpu not in [None, "single", "multi"]:
         raise ValueError(f"Invalid GPU for artifact. Passed GPU: `{gpu}`.")
 
@@ -705,7 +706,7 @@ def retrieve_available_artifacts():
             return self.name
 
         def add_path(self, path: str, gpu: str = None):
-            self.paths.append({"name": self.name, "path": path, "gpu": gpu})
+            self.paths.append({"path": path, "gpu": gpu})
 
     _available_artifacts: Dict[str, Artifact] = {}
 
