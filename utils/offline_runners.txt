@@ -1,0 +1,10 @@
+import os
+
+file_path = "utils/offline_runners.txt"
+
+# Step 1: Open the file in write mode
+with open(file_path, "w") as file:
+    # Step 2: Write the desired contents to the file
+    file.write("This is the content of the offline_runners.txt file.")
+
+# Step 3: Close the file (this is done automatically with the 'with' statement)
