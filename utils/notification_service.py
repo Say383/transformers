@@ -519,7 +519,7 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
+        if runner_not_available or not text:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
@@ -539,7 +539,9 @@ class Message:
             },
         }
 
-        text = ""
+        
+        if len(offline_runners) > 0 and not text:
+            text = f"The following runners are offline:\n• " + "\n• ".join(offline_runners)
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
@@ -568,6 +570,7 @@ class Message:
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
             blocks=payload,
+            blocks=payload,
         )
 
     def post(self):
@@ -575,7 +578,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
-        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+        text = f"💔 Error in running the tests 🙁" if self.n_failures else "All tests passed."
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
