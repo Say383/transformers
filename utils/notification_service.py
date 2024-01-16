@@ -108,6 +108,7 @@ class Message:
 
         # Failures and success of the modeling tests
         self.n_model_success = sum(r["success"] for r in model_results.values())
+        self.n_model_failures = sum(dicts_to_sum(r["failed"]).values() for r in model_results.values())
         self.n_model_single_gpu_failures = sum(dicts_to_sum(r["failed"])["single"] for r in model_results.values())
         self.n_model_multi_gpu_failures = sum(dicts_to_sum(r["failed"])["multi"] for r in model_results.values())
 
