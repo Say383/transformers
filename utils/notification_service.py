@@ -540,7 +540,7 @@ class Message:
             },
         }
 
-        text = ""
+        offline_runners = None
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
@@ -592,7 +592,7 @@ class Message:
         # keep some room for adding "[Truncated]" when necessary
         MAX_ERROR_TEXT = 3000 - len("[Truncated]")
 
-        failure_text = ""
+        offline_runners =None
         for idx, error in enumerate(failures):
             new_text = failure_text + f'*{error["line"]}*\n_{error["trace"]}_\n\n'
             if len(new_text) > MAX_ERROR_TEXT:
@@ -850,7 +850,7 @@ if __name__ == "__main__":
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
         models = [x.replace("models/", "models_") for x in models]
     except SyntaxError:
-        Message.error_out(title, ci_title)
+        Message.error_out(title, ci_title, True, True, True)
         raise ValueError("Errored out.")
 
     github_actions_job_links = get_job_links(
