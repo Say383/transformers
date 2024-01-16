@@ -1,0 +1,30 @@
+# utils/offline_runners.txt
+
+content = '{"offline_runners": []}'
+
+with open("utils/offline_runners.txt", "w") as file:
+    file.write(content)
+```
+
+```python
+# test_utils.py
+
+import os
+import unittest
+
+class TestUtils(unittest.TestCase):
+    def test_create_offline_runners_file(self):
+        # Arrange
+        expected_content = '{"offline_runners": []}'
+
+        # Act
+        os.system("python utils/offline_runners.txt")
+
+        # Assert
+        self.assertTrue(os.path.exists("utils/offline_runners.txt"))
+        with open("utils/offline_runners.txt", "r") as file:
+            actual_content = file.read()
+        self.assertEqual(actual_content, expected_content)
+
+if __name__ == "__main__":
+    unittest.main()
