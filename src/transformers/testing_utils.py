@@ -16,7 +16,7 @@ import collections
 import contextlib
 import doctest
 import functools
-import importlib
+import importlib, importlib.util
 import inspect
 import logging
 import multiprocessing
