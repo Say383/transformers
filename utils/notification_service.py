@@ -586,7 +586,7 @@ class Message:
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
-            text=text,
+            blocks=payload,
         )
 
     def get_reply_blocks(self, job_name, job_result, failures, device, text):
