@@ -90,8 +90,6 @@ def handle_stacktraces(test_results):
             stacktraces.append("Cannot retrieve error message.")
 
     return stacktraces
-
-
 def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
     if isinstance(objects, dict):
         lists = objects.values()
