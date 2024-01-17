@@ -103,65 +103,8 @@ class Message:
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
         self.title = title
-        self.ci_title = ci_title
-
-        # Failures and success of the modeling tests
-        self.n_model_success = sum(r["success"] for r in model_results.values())
-        self.n_model_single_gpu_failures = sum(dicts_to_sum(r["failed"])["single"] for r in model_results.values())
-        self.n_model_multi_gpu_failures = sum(dicts_to_sum(r["failed"])["multi"] for r in model_results.values())
-
-        # Some suites do not have a distinction between single and multi GPU.
-        self.n_model_unknown_failures = sum(dicts_to_sum(r["failed"])["unclassified"] for r in model_results.values())
-        self.n_model_failures = (
-            self.n_model_single_gpu_failures + self.n_model_multi_gpu_failures + self.n_model_unknown_failures
-        )
-
-        # Failures and success of the additional tests
-        self.n_additional_success = sum(r["success"] for r in additional_results.values())
-
-        all_additional_failures = dicts_to_sum([r["failed"] for r in additional_results.values()])
-        self.n_additional_single_gpu_failures = all_additional_failures["single"]
-        self.n_additional_multi_gpu_failures = all_additional_failures["multi"]
-        self.n_additional_unknown_gpu_failures = all_additional_failures["unclassified"]
-        self.n_additional_failures = (
-            self.n_additional_single_gpu_failures
-            + self.n_additional_multi_gpu_failures
-            + self.n_additional_unknown_gpu_failures
-        )
-
-        # Results
-        self.n_failures = self.n_model_failures + self.n_additional_failures
-        self.n_success = self.n_model_success + self.n_additional_success
-        self.n_tests = self.n_failures + self.n_success
-
-        self.model_results = model_results
-        self.additional_results = additional_results
-
-        self.thread_ts = None
-
-        if selected_warnings is None:
-            selected_warnings = []
-        self.selected_warnings = selected_warnings
-
-    @property
-    def time(self) -> str:
-        all_results = [*self.model_results.values(), *self.additional_results.values()]
-        time_spent = [r["time_spent"].split(", ")[0] for r in all_results if len(r["time_spent"])]
-        total_secs = 0
-
-        for time in time_spent:
-            time_parts = time.split(":")
-
-            # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
-            if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
-
-            hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
-            total_secs += hours * 3600 + minutes * 60 + seconds
-
-        hours, minutes, seconds = total_secs // 3600, (total_secs % 3600) // 60, total_secs % 60
-        return f"{int(hours)}h{int(minutes)}m{int(seconds)}s"
-
+        if not offline_runners:
+            offline_runners = []
     @property
     def header(self) -> Dict:
         return {"type": "header", "text": {"type": "plain_text", "text": self.title}}
