@@ -15,7 +15,10 @@
 import ast
 import collections
 import functools
-import json
+offline_runners = []
+result = os.environ.get("OFFLINE_RUNNERS")
+if result is not None:
+    offline_runners = json.loads(result)
 import operator
 import os
 import re
