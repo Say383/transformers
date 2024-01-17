@@ -3,7 +3,7 @@ import json
 import subprocess
 
 
-def get_runner_status(target_runners, token):
+def get_runner_status(target_runners, token = "YOUR_TOKEN_HERE"):
     offline_runners = []
 
     cmd = (
