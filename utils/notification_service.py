@@ -540,6 +540,10 @@ class Message:
         }
 
         text = ""
+        if len(offline_runners) == 0:
+            text = "No offline runners found."
+        if len(offline_runners) == 0:
+            text = "No offline runners found."
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
