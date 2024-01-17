@@ -17,7 +17,7 @@ def get_runner_status(target_runners, token):
     runners = status["runners"]
     for runner in runners:
         if runner["name"] in target_runners:
-            if runner["status"] == "offline":
+            if (token is None or token == '') and runner["status"] == "offline":
                 offline_runners.append(runner)
 
     # save the result so we can report them on Slack
