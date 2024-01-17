@@ -10,9 +10,14 @@ def get_runner_status(target_runners, token):
         f'curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer {token}"'
         " https://api.github.com/repos/huggingface/transformers/actions/runners"
     )
-    output = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-    o = output.stdout.decode("utf-8")
-    status = json.loads(o)
+    try:
+        output = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, check=True)
+        o = output.stdout.decode("utf-8")
+        status = json.loads(o)
+    except subprocess.CalledProcessError as e:
+        raise ValueError(f"Failed to get runner status from the API. Error: {e}")
+    except json.JSONDecodeError as e:
+        raise ValueError("Failed to decode the response from the API.")
 
     runners = status["runners"]
     for runner in runners:
