@@ -58,6 +58,8 @@ def extract_first_line_failure(failures_short_lines):
         elif in_error and not line.split(" ")[0].isdigit():
             failures[file] = line
             in_error = False
+        else:
+            logger.error(f"Invalid line format: {line}")
 
     return failures
 
@@ -377,4 +379,6 @@ if __name__ == "__main__":
 
     message = Message("🤗 Results of the doc tests.", doc_test_results)
     message.post()
+        except Exception as e:
+            logger.error(f"An error occurred during the doc tests: {e}")
     message.post_reply()
