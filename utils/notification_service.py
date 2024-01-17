@@ -13,12 +13,17 @@
 # limitations under the License.
 
 import ast
+import sys
 import collections
+import json
 import functools
+import json
 import json
 import operator
 import os
+import json
 import re
+import json
 import sys
 import time
 from typing import Dict, List, Optional, Union
@@ -415,8 +420,12 @@ class Message:
             fp.write(module_failures_report)
 
         target_workflow = "huggingface/transformers/.github/workflows/self-scheduled.yml@refs/heads/main"
-        if os.environ.get("CI_WORKFLOW_REF") == target_workflow:
-            # Get the last previously completed CI's failure tables
+        ci_url = None
+        ci_title = os.environ.get("CI_TITLE_PUSH")
+        if ci_title:
+            ci_event = os.environ.get("CI_EVENT")
+            ci_detail_url = f"https://api.github.com/repos/{repository_full_name}/commits/{commit_number}"
+            ci_details = requests.get(ci_detail_url).json()
             artifact_names = ["test_failure_tables"]
             output_dir = os.path.join(os.getcwd(), "previous_reports")
             os.makedirs(output_dir, exist_ok=True)
@@ -843,14 +852,15 @@ if __name__ == "__main__":
         Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
         exit(0)
 
+    # Add the missing --token argument error message
     arguments = sys.argv[1:][0]
     try:
         models = ast.literal_eval(arguments)
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
         models = [x.replace("models/", "models_") for x in models]
     except SyntaxError:
-        Message.error_out(title, ci_title)
-        raise ValueError("Errored out.")
+        Message.error_out(title, ci_title, False, False, False)
+        raise ValueError("Missing `--token` argument.")
 
     github_actions_job_links = get_job_links(
         workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"]
@@ -925,6 +935,8 @@ if __name__ == "__main__":
                         model_results[model]["failures"][artifact_path["gpu"]].append(
                             {"line": line, "trace": stacktraces.pop(0)}
                         )
+
+                    # TODO: add a new except block to catch the JSONDecodeError and display a user-friendly error message
 
                         if re.search("test_modeling_tf_", line):
                             model_results[model]["failed"]["TensorFlow"][artifact_path["gpu"]] += 1
