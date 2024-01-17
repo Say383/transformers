@@ -575,7 +575,7 @@ class Message:
         print(json.dumps({"blocks": blocks}))
 
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
             blocks=payload,
         )
@@ -886,7 +886,7 @@ if __name__ == "__main__":
     # - Time spent: as a comma-separated list of elapsed time
 
     modeling_categories = [
-        "- PyTorch",
+"- PyTorch",
         "- TensorFlow",
         "- Flax",
         "- Tokenizers",
@@ -898,6 +898,7 @@ if __name__ == "__main__":
     ]
     # - Failures: as a line-break separated list of errors
     model_results = {
+        model_results = {
         model: {
             "failed": {m: {"unclassified": 0, "single": 0, "multi": 0} for m in modeling_categories},
             "success": 0,
@@ -922,8 +923,8 @@ if __name__ == "__main__":
         job_name_prefix = "Nightly CI"
 
     for model in model_results.keys():
-        for artifact_path in available_artifacts[f"run_all_tests_gpu_{model}_test_reports"].paths:
-            artifact = retrieve_artifact(artifact_path["path"], artifact_path["gpu"])
+for artifact_path in available_artifacts[f"run_all_tests_gpu_{model}_test_reports"].paths:
+        artifact = retrieve_artifact(artifact_path["path"], artifact_path["gpu"])
             if "stats" in artifact:
                 # Link to the GitHub Action job
                 # The job names use `matrix.folder` which contain things like `models/bert` instead of `models_bert`
@@ -964,7 +965,7 @@ if __name__ == "__main__":
                             model_results[model]["failed"]["Tokenizers"][artifact_path["gpu"]] += 1
 
                         elif re.search("test_pipelines", line):
-                            model_results[model]["failed"]["Pipelines"][artifact_path["gpu"]] += 1
+        model_results[model]["failed"]["Pipelines"][artifact_path["gpu"]] += 1
 
                         elif re.search("test_trainer", line):
                             model_results[model]["failed"]["Trainer"][artifact_path["gpu"]] += 1
