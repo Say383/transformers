@@ -101,6 +101,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--from_gh",
         action="store_true",
+        required=False,
         help="If running from a GitHub action workflow and collecting warnings from its artifacts.",
     )
 
@@ -129,6 +130,11 @@ if __name__ == "__main__":
 
     # extract warnings from artifacts
     selected_warnings = extract_warnings(args.output_dir, args.targets)
-    selected_warnings = sorted(selected_warnings)
+    try:
+        selected_warnings = sorted(selected_warnings)
+        with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
+            json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
+    except Exception as e:
+        print(f'Failed to write selected warnings to file. Error: {e}')
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
