@@ -369,13 +369,13 @@ contains the example docstring to the [documentation_tests.txt](../utils/documen
 
 ### For Python files
 
-Run all the tests in the docstrings of a given file with the following command, here is how we test the modeling file of Wav2Vec2 for instance:
+Run all the tests in the docstrings of a given file with the following command. Here is an example of how to test the modeling file of Wav2Vec2:
 
 ```bash
 pytest --doctest-modules src/transformers/models/wav2vec2/modeling_wav2vec2.py -sv --doctest-continue-on-failure
 ```
 
-If you want to isolate a specific docstring, just add `::` after the file name then type the whole path of the function/class/method whose docstring you want to test. For instance, here is how to just test the forward method of `Wav2Vec2ForCTC`:
+If you want to isolate a specific docstring, just add `::` after the file name, then specify the path of the function/class/method docstring you want to test. For example, to test only the forward method of `Wav2Vec2ForCTC`:.
 
 ```bash
 pytest --doctest-modules src/transformers/models/wav2vec2/modeling_wav2vec2.py::transformers.models.wav2vec2.modeling_wav2vec2.Wav2Vec2ForCTC.forward -sv --doctest-continue-on-failure
@@ -391,7 +391,7 @@ pytest --doctest-modules docs/source/quicktour.md -sv --doctest-continue-on-fail
 
 ### Writing doctests
 
-Here are a few tips to help you debug the doctests and make them pass:
+Here are a few tips to help you debug the doctests and make them pass, along with troubleshooting tips for common issues:
 
 - The outputs of the code need to match the expected output **exactly**, so make sure you have the same outputs. In particular doctest will see a difference between single quotes and double quotes, or a missing parenthesis. The only exceptions to that rule are:
   * whitespace: one give whitespace (space, tabulation, new line) is equivalent to any number of whitespace, so you can add new lines where there are spaces to make your output more readable.
