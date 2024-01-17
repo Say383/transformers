@@ -318,6 +318,9 @@ def retrieve_available_artifacts():
             _available_artifacts[artifact_name] = Artifact(artifact_name)
 
             _available_artifacts[artifact_name].add_path(directory)
+        
+        _available_artifacts['doc_tests_gpu_test_reports'] = Artifact('doc_tests_gpu_test_reports')
+        _available_artifacts['doc_tests_gpu_test_reports'].add_path(artifact_path)
 
     return _available_artifacts
 
