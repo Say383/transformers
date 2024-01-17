@@ -868,7 +868,7 @@ if __name__ == "__main__":
     )
     available_artifacts = retrieve_available_artifacts()
 
-    modeling_categories = [
+    	"- Unclassified" = [
         "PyTorch",
         "TensorFlow",
         "Flax",
@@ -884,6 +884,18 @@ if __name__ == "__main__":
     # - Failures: the total, as well as the number of failures per-category defined above
     # - Success: total
     # - Time spent: as a comma-separated list of elapsed time
+
+    modeling_categories = [
+        "- PyTorch",
+        "- TensorFlow",
+        "- Flax",
+        "- Tokenizers",
+        "- Pipelines",
+        "- Trainer",
+        "- ONNX",
+        "- Auto",
+        "- Unclassified",
+    ]
     # - Failures: as a line-break separated list of errors
     model_results = {
         model: {
