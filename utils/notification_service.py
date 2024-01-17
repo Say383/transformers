@@ -40,6 +40,7 @@ NON_MODEL_TEST_MODULES = [
     "benchmark",
     "deepspeed",
     "extended",
+from slack_sdk import WebClient
     "fixtures",
     "generation",
     "onnx",
