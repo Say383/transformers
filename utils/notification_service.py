@@ -17,6 +17,7 @@ import argparse
 import ast
 import sys
 import requests
+import os
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
 import sys
@@ -118,6 +119,7 @@ class Message:
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None, token: str = None
     ):
         self.title = title
+        os.environ['TRANSFORMERS_CACHE'] = '/writable/directory'
         self.ci_title = ci_title
 
         # Failures and success of the modeling tests
