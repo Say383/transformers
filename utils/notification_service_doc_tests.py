@@ -272,7 +272,9 @@ def get_job_links():
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}").json()
+            result = requests.get(url + f"&page={i + 2}")
+            result.raise_for_status()
+            result = result.json()
             jobs.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return jobs
