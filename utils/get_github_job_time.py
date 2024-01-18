@@ -23,7 +23,11 @@ def extract_time_from_single_job(job):
     job_info["completed_at"] = end
     job_info["duration"] = duration_in_min
 
-    return job_info
+    try:
+        return job_info
+    except Exception as e:
+        print(f'Error extracting time info from a single job: {e}')
+        return {}
 
 
 def get_job_time(workflow_run_id, token=None):
@@ -34,7 +38,11 @@ def get_job_time(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    try:
+        result = requests.get(url, headers=headers).json()
+    except Exception as e:
+        print(f'Error extracting time info for all jobs: {e}')
+        return {}
     job_time = {}
 
     try:
