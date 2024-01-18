@@ -70,6 +70,8 @@ class Message:
         self.n_success = doc_test_results["success"]
         self.n_failures = doc_test_results["failures"]
         self.n_tests = self.n_success + self.n_failures
+        self.n_failures = doc_test_results["failures"]
+        self.n_tests = self.n_success + self.n_failures
 
         # Failures and success of the modeling tests
         self.doc_test_results = doc_test_results
