@@ -543,6 +543,16 @@ class Message:
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
+        if os.path.exists('offline_runners.txt'):
+            with open('offline_runners.txt', 'r') as fp:
+                offline_runners = json.loads(fp.read())
+        else:
+            offline_runners = []
+        if len(offline_runners) > 0:
+            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n{text}\n\n"
+        else:
+            text = ""
         text += "🙏 Let's fix it ASAP! 🙏"
 
         error_block_2 = {
