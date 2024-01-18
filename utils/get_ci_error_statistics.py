@@ -18,7 +18,11 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    try:
+        result = requests.get(url, headers=headers)
+    except Exception:
+        print(f"Unknown error, could not fetch links from {url}:\n{traceback.format_exc()}")
+        result = {'jobs': []}.json()
     job_links = {}
 
     try:
