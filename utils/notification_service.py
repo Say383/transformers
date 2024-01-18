@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import argparse
-import argparse
 import ast
 import sys
 import requests
 import os
+import importlib
+from typing import Dict, List, Union
+from importlib.metadata import version
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
 import sys
@@ -116,7 +118,7 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
 
 class Message:
     def __init__(
-        self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None, token: str = None
+        self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
         self.title = title
         os.environ['TRANSFORMERS_CACHE'] = '/writable/directory'
