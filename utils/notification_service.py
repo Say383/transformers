@@ -13,11 +13,13 @@
 # limitations under the License.
 
 import argparse
+from slack_sdk.errors import SlackApiError
 import ast
 import sys
 import requests
 import os
 import importlib
+from slack_sdk.errors import SlackApiError
 from typing import Dict, List, Union
 from importlib.metadata import version
 from get_ci_error_statistics import get_job_links
@@ -698,7 +700,7 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
     if gpu not in [None, "single", "multi"]:
         raise ValueError(f"Invalid GPU for artifact. Passed GPU: `{gpu}`.")
 
-    _artifact = {}
+        _artifact = {}
 
     if os.path.exists(artifact_path):
         files = os.listdir(artifact_path)
