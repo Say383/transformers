@@ -6,27 +6,33 @@ import dateutil.parser as date_parser
 import requests
 
 
-def extract_time_from_single_job(job):
+def extract_time_from_single_job(job, logger=None):
     """Extract time info from a single job in a GitHub Actions workflow run"""
 
     job_info = {}
 
-    start = job["started_at"]
-    end = job["completed_at"]
+    try:
+        start = job["started_at"]
+        end = job["completed_at"]
 
-    start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
+        start_datetime = date_parser.parse(start)
+        end_datetime = date_parser.parse(end)
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+        duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
 
-    job_info["started_at"] = start
-    job_info["completed_at"] = end
-    job_info["duration"] = duration_in_min
+        job_info["started_at"] = start
+        job_info["completed_at"] = end
+        job_info["duration"] = duration_in_min
+    except Exception as e:
+        if logger:
+            logger.error(f"Error extracting time info from a single job: {str(e)}")
+        else:
+            print(f"Error extracting time info from a single job: {str(e)}")
 
     return job_info
 
 
-def get_job_time(workflow_run_id, token=None):
+def get_job_time(workflow_run_id, token=None, logger=None):
     """Extract time info for all jobs in a GitHub Actions workflow run"""
 
     headers = None
@@ -34,8 +40,15 @@ def get_job_time(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
     job_time = {}
+
+    try:
+        result = requests.get(url, headers=headers).json()
+    except Exception as e:
+        if logger:
+            logger.error(f"Error fetching job info: {str(e)}")
+        else:
+            print(f"Error fetching job info: {str(e)}")
 
     try:
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
