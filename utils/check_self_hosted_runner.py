@@ -31,7 +31,7 @@ def get_runner_status(target_runners, token):
 
 if __name__ == "__main__":
 
-    def list_str(values):
+    def list_str(values: str):
         return values.split(",")
 
     parser = argparse.ArgumentParser()
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token, required=True,", default=None, type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
 
