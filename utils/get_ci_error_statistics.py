@@ -189,12 +189,12 @@ def reduce_by_model(logs, error_filter=None):
 
 
 def make_github_table(reduced_by_error):
-    header = "| no. | error | status |"
+    header = "| no. | error | count |"
     sep = "|-:|:-|:-|"
     lines = [header, sep]
     for error in reduced_by_error:
         count = reduced_by_error[error]["count"]
-        line = f"| {count} | {error[:100]} |  |"
+        line = f"| {count} | {error[:100]} | {count} |"
         lines.append(line)
 
     return "\n".join(lines)
@@ -265,7 +265,7 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
 
-    reduced_by_error = reduce_by_error(errors)
+    reduced_by_error = reduce_by_error(errors, error_filter=None)
     reduced_by_model = reduce_by_model(errors)
 
     s1 = make_github_table(reduced_by_error)
