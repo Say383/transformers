@@ -3,6 +3,7 @@ import json
 import math
 import os
 import time
+import logging
 import traceback
 import zipfile
 from collections import Counter
@@ -227,6 +228,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     os.makedirs(args.output_dir, exist_ok=True)
+    logging.basicConfig(filename=os.path.join(args.output_dir, 'error.log'), level=logging.ERROR)
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
