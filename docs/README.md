@@ -338,15 +338,15 @@ The syntax for Example docstrings can look as follows:
     >>> model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
 
     >>> # audio file is decoded on the fly
-    >>> inputs = processor(dataset[0]["audio"]["array"], sampling_rate=sampling_rate, return_tensors="pt")
-    >>> with torch.no_grad():
-    ...     logits = model(**inputs).logits
-    >>> predicted_ids = torch.argmax(logits, dim=-1)
-
-    >>> # transcribe speech
-    >>> transcription = processor.batch_decode(predicted_ids)
-    >>> transcription[0]
-    'MISTER QUILTER IS THE APOSTLE OF THE MIDDLE CLASSES AND WE ARE GLAD TO WELCOME HIS GOSPEL'
+    ```python
+    inputs = processor(dataset[0]["audio"]["array"], sampling_rate=sampling_rate, return_tensors="pt")
+    with torch.no_grad():
+        logits = model(**inputs).logits
+    predicted_ids = torch.argmax(logits, dim=-1)
+    
+    # transcribe speech
+    transcription = processor.batch_decode(predicted_ids)
+    transcription[0]
     ```
 ```
 
