@@ -16,6 +16,7 @@ import ast
 import collections
 import functools
 import json
+import json
 import operator
 import os
 import re
@@ -520,14 +521,20 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            text = ""
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
-                offline_runners = json.loads(result)
+                try:
+                    offline_runners = json.loads(result)
+                except json.decoder.JSONDecodeError:
+                    # Handle the case when the value is not in the expected format
+                    offline_runners = []
+            else:
+                text = "💔 CI runners are not available! Tests are not run. 😭"
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
-            text = "💔 Setup job failed. Tests are not run. 😭"
+            text = "💔 Setup job failed! Tests are not run. 😭"
         else:
             text = "💔 There was an issue running the tests. 😭"
 
@@ -649,7 +656,7 @@ class Message:
                         thread_ts=self.thread_ts["ts"],
                     )
 
-                    time.sleep(1)
+        time.sleep(1)
 
         for job, job_result in self.additional_results.items():
             if len(job_result["failures"]):
