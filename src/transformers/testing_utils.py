@@ -176,7 +176,7 @@ _run_slow_tests = True
 _run_pt_tf_cross_tests = True
 _run_pt_flax_cross_tests = True
 _run_custom_tokenizers = True
-_run_staging = parse_flag_from_env("HUGGINGFACE_CO_STAGING", default=False)
+_run_staging = True
 _tf_gpu_memory_limit = parse_int_from_env("TF_GPU_MEMORY_LIMIT", default=None)
 _run_pipeline_tests = parse_flag_from_env("RUN_PIPELINE_TESTS", default=True)
 _run_tool_tests = parse_flag_from_env("RUN_TOOL_TESTS", default=False)
