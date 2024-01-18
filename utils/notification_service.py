@@ -46,6 +46,35 @@ NON_MODEL_TEST_MODULES = [
 ]
 
 
+def handle_offline_runners():
+    try:
+        with open("offline_runners.txt", "r") as fp:
+            offline_runners = json.load(fp)
+    except FileNotFoundError:
+        offline_runners = []
+
+    return offline_runners
+
+
+offline_runners = handle_offline_runners()
+# Add a check to handle the case when the offline_runners.txt file is not found
+def handle_offline_runners():
+    try:
+        with open("offline_runners.txt", "r") as fp:
+            offline_runners = json.load(fp)
+    except FileNotFoundError:
+        offline_runners = []
+
+    return offline_runners
+
+
+offline_runners = handle_offline_runners()
+    "sagemaker",
+    "trainer",
+    "utils",
+]
+
+
 def handle_test_results(test_results):
     expressions = test_results.split(" ")
 
