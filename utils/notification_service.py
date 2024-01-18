@@ -539,10 +539,19 @@ class Message:
             },
         }
 
+        result = os.environ.get('OFFLINE_RUNNERS')
+        if result is not None:
+          try:
+              offline_runners = json.loads(result)
+          except json.decoder.JSONDecodeError:
+              offline_runners = []
+        else:
+          offline_runners = []
+
         text = ""
         if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
-            text = f"The following runners are offline:\n{text}\n\n"
+          text = "\n  • " + "\n  • ".join(offline_runners)
+          text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
 
         error_block_2 = {
