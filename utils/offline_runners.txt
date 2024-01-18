@@ -1,0 +1,11 @@
+import os
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    content = "This is the content of the offline_runners file."
+
+    with open(file_path, "w") as file:
+        file.write(content)
+
+# Create the offline_runners.txt file
+create_offline_runners_file()
