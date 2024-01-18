@@ -44,8 +44,11 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 # read the file
                 if filename != "warnings.txt":
                     continue
-                with open(file_path) as fp:
-                    parse_line(fp)
+                try:
+                    with open(file_path) as fp:
+                        parse_line(fp)
+                except Exception as e:
+                    logger.warning(f'Failed to open file {file_path}: {e}')
     else:
         try:
             with zipfile.ZipFile(artifact_path) as z:
@@ -128,7 +131,11 @@ if __name__ == "__main__":
             time.sleep(1)
 
     # extract warnings from artifacts
+try:
     selected_warnings = extract_warnings(args.output_dir, args.targets)
+except Exception as e:
+    logger.error(f'Failed to extract warnings: {e}')
+    selected_warnings = []
     selected_warnings = sorted(selected_warnings)
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
