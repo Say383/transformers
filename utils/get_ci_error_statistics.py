@@ -120,9 +120,9 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
 
     job_link = None
     if job_name and job_links:
-        job_link = job_links.get(job_name, None)
+    job_link = job_links.get(job_name, None)
 
-    # A list with elements of the form (line of error, error, failed test)
+    # A list with elements of the form (line of error, error, failed test, job link)
     result = [x + [y] + [job_link] for x, y in zip(errors, failed_tests)]
 
     return result
@@ -164,6 +164,28 @@ def get_model(test):
         test = None
 
     return test
+
+
+def reduce_by_model(logs, error_filter=None):
+    """count each error per model"""
+
+    logs = [(x[0], x[1], get_model(x[2])) for x in logs]
+    logs = [x for x in logs if x[2] is not None]
+    tests = {x[2] for x in logs}
+
+    r = {}
+    for test in tests:
+        counter = Counter()
+        # count by errors in `test`
+        counter.update([x[1] for x in logs if x[2] == test])
+        counts = counter.most_common()
+        error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
+        n_errors = sum(error_counts.values())
+        if n_errors > 0:
+            r[test] = {"count": n_errors, "errors": error_counts}
+
+    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    return r
 
 
 def reduce_by_model(logs, error_filter=None):
