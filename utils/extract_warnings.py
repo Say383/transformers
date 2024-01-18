@@ -106,29 +106,118 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    from_gh = args.from_gh
-    if from_gh:
-        # The artifacts have to be downloaded using `actions/download-artifact@v3`
-        pass
-    else:
-        os.makedirs(args.output_dir, exist_ok=True)
+    def get_warnings(workflow_run_id, token=None, targets=None):
+        job_links = get_job_links(workflow_run_id, token=token)
+        artifacts = get_artifacts_links(workflow_run_id, token=token)
+        job_time = get_job_time(workflow_run_id, token=token)
+        selected_warnings = extract_warnings(workflow_run_id, targets=targets)
+    
+        return selected_warnings
+def list_str(values):
+    return values.split(",")
 
-        # get download links
-        artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
-        with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
-            json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+parser = argparse.ArgumentParser()
+# Required parameters
+parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
+parser.add_argument(
+    "--output_dir",
+    type=str,
+    required=True,
+    help="Where to store the downloaded artifacts and other result files.",
+)
+parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
+# optional parameters
+parser.add_argument(
+    "--targets",
+    default="DeprecationWarning,UserWarning,FutureWarning",
+    type=list_str,
+    help="Comma-separated list of target warning(s) which we want to extract.",
+)
+parser.add_argument(
+    "--from_gh",
+    action="store_true",
+    help="If running from a GitHub action workflow and collecting warnings from its artifacts.",
+)
 
-        # download artifacts
-        for idx, (name, url) in enumerate(artifacts.items()):
-            print(name)
-            print(url)
-            print("=" * 80)
-            download_artifact(name, url, args.output_dir, args.token)
-            # Be gentle to GitHub
-            time.sleep(1)
+args = parser.parse_args()
 
-    # extract warnings from artifacts
-    selected_warnings = extract_warnings(args.output_dir, args.targets)
-    selected_warnings = sorted(selected_warnings)
-    with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
-        json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
+from_gh = args.from_gh
+if from_gh:
+    # The artifacts have to be downloaded using `actions/download-artifact@v3`
+    pass
+else:
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    # get download links
+    artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
+    with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
+        json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+
+    # download artifacts
+    for idx, (name, url) in enumerate(artifacts.items()):
+        print(name)
+        print(url)
+        print("=" * 80)
+        download_artifact(name, url, args.output_dir, args.token)
+        # Be gentle to GitHub
+        time.sleep(1)
+
+# extract warnings from artifacts
+selected_warnings = extract_warnings(args.output_dir, args.targets)
+selected_warnings = sorted(selected_warnings)
+with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
+    json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
+def list_str(values):
+    return values.split(",")
+
+parser = argparse.ArgumentParser()
+# Required parameters
+parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
+parser.add_argument(
+    "--output_dir",
+    type=str,
+    required=True,
+    help="Where to store the downloaded artifacts and other result files.",
+)
+parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
+# optional parameters
+parser.add_argument(
+    "--targets",
+    default="DeprecationWarning,UserWarning,FutureWarning",
+    type=list_str,
+    help="Comma-separated list of target warning(s) which we want to extract.",
+)
+parser.add_argument(
+    "--from_gh",
+    action="store_true",
+    help="If running from a GitHub action workflow and collecting warnings from its artifacts.",
+)
+
+args = parser.parse_args()
+
+from_gh = args.from_gh
+if from_gh:
+    # The artifacts have to be downloaded using `actions/download-artifact@v3`
+    pass
+else:
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    # get download links
+    artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
+    with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
+        json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+
+    # download artifacts
+    for idx, (name, url) in enumerate(artifacts.items()):
+        print(name)
+        print(url)
+        print("=" * 80)
+        download_artifact(name, url, args.output_dir, args.token)
+        # Be gentle to GitHub
+        time.sleep(1)
+
+# extract warnings from artifacts
+selected_warnings = extract_warnings(args.output_dir, args.targets)
+selected_warnings = sorted(selected_warnings)
+with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
+    json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
