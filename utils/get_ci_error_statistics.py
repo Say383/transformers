@@ -8,6 +8,10 @@ import zipfile
 from collections import Counter
 
 import requests
+import urllib
+import zipfile
+from collections import Counter
+import json
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -37,6 +41,23 @@ def get_job_links(workflow_run_id, token=None):
 
 
 def get_artifacts_links(worflow_run_id, token=None):
+    headers = None
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
+    result = requests.get(url, headers=headers).json()
+    artifacts = {}
+    try:
+        artifacts.update({artifact['name']: artifact['archive_download_url'] for artifact in result['artifacts']})
+        pages_to_iterate_over = math.ceil((result['total_count'] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            artifacts.update({artifact['name']: artifact['archive_download_url'] for artifact in result['artifacts']})
+
+        return artifacts
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
     """Get all artifact links from a workflow run"""
 
     headers = None
@@ -156,6 +177,14 @@ def reduce_by_error(logs, error_filter=None):
 
 
 def get_model(test):
+    """Get the model name from a test method"""
+    test = test.split("::")[0]
+    if test.startswith("tests/models/"):
+        test = test.split("/")[2]
+    else:
+        test = None
+
+    return test
     """Get the model name from a test method"""
     test = test.split("::")[0]
     if test.startswith("tests/models/"):
