@@ -257,10 +257,14 @@ if __name__ == "__main__":
     counter = Counter()
     counter.update([e[1] for e in errors])
 
+try:
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
         print(item)
+except Exception as e:
+    print(f'Error occurred: {str(e)}')
+    traceback.print_exc()
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
