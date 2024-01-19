@@ -483,94 +483,18 @@ class Message:
 
     @property
     def payload(self) -> str:
-        blocks = [self.header]
-
-        if self.ci_title:
-            blocks.append(self.ci_title_section)
-
-        if self.n_model_failures > 0 or self.n_additional_failures > 0:
-            blocks.append(self.failures)
-
-        if self.n_model_failures > 0:
-            blocks.append(self.category_failures)
-            for block in self.model_failures:
-                if block["text"]["text"]:
-                    blocks.append(block)
-
-        if self.n_additional_failures > 0:
-            blocks.append(self.additional_failures)
-
-        if self.n_model_failures == 0 and self.n_additional_failures == 0:
-            blocks.append(self.no_failures)
-
-        if len(self.selected_warnings) > 0:
-            blocks.append(self.warnings)
-
-        return json.dumps(blocks)
-
-    @staticmethod
-    def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False):
-        blocks = []
-        title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
-        blocks.append(title_block)
-
-        if ci_title:
-            ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
-            blocks.append(ci_title_block)
-
-        offline_runners = []
-        if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
-        elif runner_failed:
-            text = "💔 CI runners have problems! Tests are not run. 😭"
-        elif setup_failed:
-            text = "💔 Setup job failed. Tests are not run. 😭"
-        else:
-            text = "💔 There was an issue running the tests. 😭"
-
-        error_block_1 = {
-            "type": "header",
-            "text": {
-                "type": "plain_text",
-                "text": text,
-            },
-        }
-
-        text = ""
-        if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
-            text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
-
-        error_block_2 = {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": text,
-            },
-            "accessory": {
-                "type": "button",
-                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-            },
-        }
-        blocks.extend([error_block_1, error_block_2])
-
-        payload = json.dumps(blocks)
-
-        print("Sending the following payload")
-        print(json.dumps({"blocks": blocks}))
-
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
-            text=text,
             blocks=payload,
         )
 
     def post(self):
+        payload = self.payload
+
+        self.thread_ts = client.chat_postMessage(
+            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            blocks=payload,
+        )
         payload = self.payload
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
