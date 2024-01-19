@@ -42,6 +42,12 @@ def get_artifacts_links(worflow_run_id, token=None):
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching job links:\n{e}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching job links:\n{e}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching job links:\n{e}")
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
     result = requests.get(url, headers=headers).json()
