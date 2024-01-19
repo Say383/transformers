@@ -22,7 +22,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
             if isinstance(line, bytes):
                 line = line.decode("UTF-8")
             if "warnings summary (final)" in line:
-                continue
+                raise Exception('Error parsing line in the artifact')
             # This means we are outside the body of a warning
             elif not line.startswith(" "):
                 # process a single warning and move it to `selected_warnings`.
@@ -56,7 +56,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                             continue
                         with z.open(filename) as fp:
                             parse_line(fp)
-        except Exception:
+        except Exception as e:
             logger.warning(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
