@@ -520,10 +520,14 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
+            text = "💔 Error loading `offline_runners.txt`. 😭"
+            offline_runners = []
+        result = os.environ.get("OFFLINE_RUNNERS")
+        if result is not None:
+            try:
                 offline_runners = json.loads(result)
+            except json.decoder.JSONDecodeError:
+                print("Error decoding offline_runners, setting default value.")
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
