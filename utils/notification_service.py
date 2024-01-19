@@ -560,6 +560,10 @@ class Message:
         blocks.extend([error_block_1, error_block_2])
 
         payload = json.dumps(blocks)
+        if result == "":
+            offline_runners = []
+        else:
+            offline_runners = json.loads(result)
 
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
