@@ -134,7 +134,7 @@ class Message:
     @property
     def category_failures(self) -> Dict:
         line_length = 40
-        category_failures = {k: v["failed"] for k, v in doc_test_results.items() if isinstance(v, dict)}
+        category_failures = {k: v["failed"] for k, v in self.doc_test_results.items() if isinstance(v, dict)}
 
         report = ""
         for category, failures in category_failures.items():
@@ -169,7 +169,6 @@ class Message:
 
         if self.n_failures == 0:
             blocks.append(self.no_failures)
-
         return json.dumps(blocks)
 
     @staticmethod
