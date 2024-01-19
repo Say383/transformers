@@ -69,9 +69,11 @@ def extract_warnings(artifact_dir, targets):
 
     selected_warnings = set()
 
-    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
-    for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+    files = [f for f in os.listdir(artifact_dir) if f.endswith('.zip')]
+    for file in files:
+        artifact_zip_path = os.path.join(artifact_dir, file)
+        with zipfile.ZipFile(artifact_zip_path) as z:
+            selected_warnings.update(extract_warnings_from_single_artifact(artifact_zip_path, targets))
 
     return selected_warnings
 
@@ -112,7 +114,8 @@ if __name__ == "__main__":
         pass
     else:
         os.makedirs(args.output_dir, exist_ok=True)
-
+def list_str(values):
+    return values.split(",")
         # get download links
         artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
         with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
