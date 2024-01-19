@@ -483,56 +483,18 @@ class Message:
 
     @property
     def payload(self) -> str:
-        blocks = [self.header]
-
-        if self.ci_title:
-            blocks.append(self.ci_title_section)
-
-        if self.n_model_failures > 0 or self.n_additional_failures > 0:
-            blocks.append(self.failures)
-
-        if self.n_model_failures > 0:
-            blocks.append(self.category_failures)
-            for block in self.model_failures:
-                if block["text"]["text"]:
-                    blocks.append(block)
-
-        if self.n_additional_failures > 0:
-            blocks.append(self.additional_failures)
-
-        except FileNotFoundError:
-            runner_not_available = False
-            text = "💔 There was an issue running the tests. 😭"
-        if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
-            text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
-
-        error_block_2 = {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": text,
-            },
-            "accessory": {
-                "type": "button",
-                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-            },
-        }
-        blocks.extend([error_block_1, error_block_2])
-
-        payload = json.dumps(blocks)
-
-
-
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
-            text=text,
             blocks=payload,
         )
 
     def post(self):
+        payload = self.payload
+
+        self.thread_ts = client.chat_postMessage(
+            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            blocks=payload,
+        )
         payload = self.payload
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
