@@ -56,8 +56,9 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                             continue
                         with z.open(filename) as fp:
                             parse_line(fp)
-        except Exception:
-            logger.warning(
+        except Exception as e:
+            if logger is not None:
+                logger.warning(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
 
@@ -125,8 +126,11 @@ if __name__ == "__main__":
             print("=" * 80)
             try:
                 logger.info(f'Downloading artifact: {name}')
+                logger.info(f'Downloading artifact: {name}')
                 download_artifact(name, url, args.output_dir, args.token)
             except Exception as e:
+                if logger is not None:
+                    logger.error(f'Error occurred during artifact download: {str(e)}')
                 logger.error(f'Error occurred during artifact download: {str(e)}')
             time.sleep(1)
             # Be gentle to GitHub
