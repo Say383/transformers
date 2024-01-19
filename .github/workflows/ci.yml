@@ -1,0 +1,51 @@
+name: Continuous Integration
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  TRANSFORMERS_IS_CI: yes
+  CI_SLACK_BOT_TOKEN: ${{ secrets.CI_SLACK_BOT_TOKEN }}
+  CI_SLACK_CHANNEL_ID: ${{ secrets.CI_SLACK_CHANNEL_ID }}
+  CI_SLACK_CHANNEL_ID_DAILY: ${{ secrets.CI_SLACK_CHANNEL_ID_DAILY }}
+  CI_SLACK_CHANNEL_DUMMY_TESTS: ${{ secrets.CI_SLACK_CHANNEL_DUMMY_TESTS }}
+  CI_SLACK_REPORT_CHANNEL_ID: ${{ secrets.CI_SLACK_REPORT_CHANNEL_ID }}
+  ACCESS_REPO_INFO_TOKEN: ${{ secrets.ACCESS_REPO_INFO_TOKEN }}
+  CI_EVENT: runner status check
+  RUNNER_STATUS: failure
+  OFFLINE_RUNNERS: ""  # Set a valid value for OFFLINE_RUNNERS here
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          python -m pytest tests/
+
+      - name: Send Slack notification
+        run: |
+          python utils/notification_service.py
+
+      - name: Check self-hosted runners
+        run: |
+          python utils/check_self_hosted_runner.py --target_runners single-gpu-ci-runner-docker,multi-gpu-ci-runner-docker,single-gpu-scheduled-ci-runner-docker,multi-scheduled-scheduled-ci-runner-docker,single-gpu-doctest-ci-runner-docker --token ${{ secrets.CHECK_SELF_HOSTED_RUNNER_TOKEN }}
