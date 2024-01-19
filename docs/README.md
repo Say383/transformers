@@ -67,8 +67,7 @@ doc-builder preview {package_name} {path_to_docs}
 For example:
 
 ```bash
-doc-builder preview transformers docs/source/en/
-```
+doc-builder preview transformers docs/README.md
 
 The docs will be viewable at [http://localhost:3000](http://localhost:3000). You can also preview the docs once you have opened a PR. You will see a bot add a comment to a link where the documentation with your changes lives.
 
@@ -326,6 +325,7 @@ The syntax for Example docstrings can look as follows:
     Example:
 
     ```python
+# doctest: +SKIP
     >>> from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
     >>> from datasets import load_dataset
     >>> import torch
@@ -337,13 +337,15 @@ The syntax for Example docstrings can look as follows:
     >>> processor = Wav2Vec2Processor.from_pretrained("facebook/wav2vec2-base-960h")
     >>> model = Wav2Vec2ForCTC.from_pretrained("facebook/wav2vec2-base-960h")
 
-    >>> # audio file is decoded on the fly
+    >>> # doctest: +SKIP
+    # audio file is decoded on the fly
     >>> inputs = processor(dataset[0]["audio"]["array"], sampling_rate=sampling_rate, return_tensors="pt")
     >>> with torch.no_grad():
     ...     logits = model(**inputs).logits
     >>> predicted_ids = torch.argmax(logits, dim=-1)
 
-    >>> # transcribe speech
+    >>> # doctest: +SKIP
+    # transcribe speech
     >>> transcription = processor.batch_decode(predicted_ids)
     >>> transcription[0]
     'MISTER QUILTER IS THE APOSTLE OF THE MIDDLE CLASSES AND WE ARE GLAD TO WELCOME HIS GOSPEL'
