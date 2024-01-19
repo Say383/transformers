@@ -1,9 +1,13 @@
 import argparse
 import math
 import traceback
+import logging
+import sys
 
 import dateutil.parser as date_parser
 import requests
+
+logger = logging.getLogger(__name__)
 
 
 def extract_time_from_single_job(job):
@@ -34,8 +38,11 @@ def get_job_time(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    job_time = {}
+    try:
+        result = requests.get(url, headers=headers).json()
+        job_time = {}
+    except Exception as e:
+        logger.error(f'An error occurred: {e}', exc_info=True)
 
     try:
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
