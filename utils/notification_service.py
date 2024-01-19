@@ -520,7 +520,7 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            text = "💔 Error loading `offline_runners.txt`. 😭"
             offline_runners = []
         result = os.environ.get("OFFLINE_RUNNERS")
         if result is not None:
