@@ -24,9 +24,45 @@ import time
 from typing import Dict, List, Optional, Union
 
 import requests
+
+# The command:
+# Run pip install slack_sdk
+# yielded the following error:
+# ##[error]Process completed with exit code 1.
+
+# Here are the logs:
+# Defaulting to user installation because normal site-packages is not writeable
+# Successfully installed slack_sdk-3.26.2
+# Unknown error, could not fetch links. 'jobs'
+# Traceback (most recent call last):
+# File \
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
+
+# The command:
+# Run pip install slack_sdk
+# yielded the following error:
+# ##[error]Process completed with exit code 1.
+
+# Here are the logs:
+# Defaulting to user installation because normal site-packages is not writeable
+# Successfully installed slack_sdk-3.26.2
+# Unknown error, could not fetch links. 'jobs'
+# Traceback (most recent call last):
+# File \
+
+# The command:
+# Run pip install slack_sdk
+# yielded the following error:
+# ##[error]Process completed with exit code 1.
+
+# Here are the logs:
+# Defaulting to user installation because normal site-packages is not writeable
+# Successfully installed slack_sdk-3.26.2
+# Unknown error, could not fetch links. 'jobs'
+# Traceback (most recent call last):
+# File \
 
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
