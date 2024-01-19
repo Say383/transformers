@@ -1,0 +1,12 @@
+import json
+
+# Step 2: Create a new file named `offline_runners.txt`
+with open("offline_runners.txt", "w") as file:
+    # Step 3: Populate the file with a valid JSON array
+    data = ["runner1", "runner2", "runner3"]
+    json_data = json.dumps(data)
+
+    # Step 4: Write the JSON array to the `offline_runners.txt` file
+    file.write(json_data)
+
+# Step 5: Commit the changes with the commit message "feat/fix: the commit message"
