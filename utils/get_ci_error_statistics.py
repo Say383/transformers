@@ -24,7 +24,7 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers).json() or {}
     job_links = {}
 
     try:
@@ -37,7 +37,7 @@ def get_job_links(workflow_run_id, token=None):
 
         return job_links
     except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        logging.error(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
 
@@ -63,7 +63,7 @@ def get_artifacts_links(worflow_run_id, token=None):
 
         return artifacts
     except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        logging.error(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
 
@@ -151,7 +151,7 @@ def reduce_by_error(logs, error_filter=None):
 
     counter = Counter()
     counter.update([x[1] for x in logs])
-    counts = counter.most_common()
+    counts = counter.most_common(30)
     r = {}
     for error, count in counts:
         if error_filter is None or error not in error_filter:
@@ -212,7 +212,7 @@ def make_github_table_per_model(reduced_by_model):
     lines = [header, sep]
     for model in reduced_by_model:
         count = reduced_by_model[model]["count"]
-        error, _count = list(reduced_by_model[model]["errors"].items())[0]
+        error, _count = next(iter(reduced_by_model[model]["errors"].items()))
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
         lines.append(line)
 
