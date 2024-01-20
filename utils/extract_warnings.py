@@ -93,7 +93,7 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     # optional parameters
     parser.add_argument(
-        "--targets",
+        "--from_gh",
         default="DeprecationWarning,UserWarning,FutureWarning",
         type=list_str,
         help="Comma-separated list of target warning(s) which we want to extract.",
