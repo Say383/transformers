@@ -81,8 +81,11 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
-    with open(file_path, "wb") as fp:
-        fp.write(response.content)
+    try:
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
+    except Exception as e:
+        print(f'Error writing artifact to file: {e}')
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
