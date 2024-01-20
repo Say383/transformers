@@ -36,7 +36,8 @@ def get_job_links(workflow_run_id, token=None):
         print(f'Error fetching job links: {e}')
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
-    return {}
+    except Exception as e:
+        print(f'Error fetching artifacts: {e}')
 
 
 def get_artifacts_links(worflow_run_id, token=None):
