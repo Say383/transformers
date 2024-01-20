@@ -20,6 +20,7 @@ def get_job_links(workflow_run_id, token=None):
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
     job_links = {}
+    # Add error handling for fetching job links.
 
     try:
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
@@ -30,7 +31,9 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        # Improve error message for better debugging
+        print(f'Error fetching job links: {e}')
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -228,13 +231,17 @@ if __name__ == "__main__":
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    _job_links = get_job_links(args.workflow_run_id, token=args.token)
+    try:
+        _job_links = get_job_links(args.workflow_run_id, token=args.token)
+    except Exception as e:
+        print(f'Error fetching job links: {e}')
     job_links = {}
     # To deal with `workflow_call` event, where a job name is the combination of the job names in the caller and callee.
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
     if _job_links:
         for k, v in _job_links.items():
             # This is how GitHub actions combine job names.
+        # Add error handling for combining job names.
             if " / " in k:
                 index = k.find(" / ")
                 k = k[index + len(" / ") :]
@@ -251,7 +258,10 @@ if __name__ == "__main__":
         # Be gentle to GitHub
         time.sleep(1)
 
-    errors = get_all_errors(args.output_dir, job_links=job_links)
+    try:
+        errors = get_all_errors(args.output_dir, job_links=job_links)
+    except Exception as e:
+        print(f'Error getting all errors: {e}')
 
     # `e[1]` is the error
     counter = Counter()
