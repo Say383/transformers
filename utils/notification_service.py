@@ -523,7 +523,10 @@ class Message:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
-                offline_runners = json.loads(result)
+                try:
+                    offline_runners = json.loads(result)
+                except ValueError:
+                    pass
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
@@ -681,14 +684,17 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
     _artifact = {}
 
-    if os.path.exists(artifact_path):
-        files = os.listdir(artifact_path)
-        for file in files:
-            try:
-                with open(os.path.join(artifact_path, file)) as f:
-                    _artifact[file.split(".")[0]] = f.read()
-            except UnicodeDecodeError as e:
-                raise ValueError(f"Could not open {os.path.join(artifact_path, file)}.") from e
+    try:
+        if os.path.exists(artifact_path):
+            files = os.listdir(artifact_path)
+            for file in files:
+                try:
+                    with open(os.path.join(artifact_path, file)) as f:
+                        _artifact[file.split(".")[0]] = f.read()
+                except UnicodeDecodeError as e:
+                    raise ValueError(f"Could not open {os.path.join(artifact_path, file)}.") from e
+    except Exception as e:
+        raise ValueError("Failed to retrieve artifact.") from e
 
     return _artifact
 
