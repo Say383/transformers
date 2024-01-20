@@ -1,0 +1,5 @@
+utils/offline_runners.txt:
+
+This file will be created and written with the information of the offline runners. If there are no offline runners, the file will be empty.
+
+Commit message: "feat/fix: Create utils/offline_runners.txt and write offline runners information"
