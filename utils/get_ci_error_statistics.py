@@ -48,8 +48,13 @@ def get_artifacts_links(worflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    artifacts = {}
+    try:
+        result = requests.get(url, headers=headers)
+        result.raise_for_status()
+        artifacts = result.json()
+    except Exception as e:
+        print(f"Error occurred while fetching artifacts links: {e}")
+        artifacts = {}
 
     try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
