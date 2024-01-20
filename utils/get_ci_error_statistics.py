@@ -168,7 +168,7 @@ def reduce_by_error(logs, error_filter=None):
 
 def get_model(test):
     """Get the model name from a test method"""
-    test = test.split("::")[0]
+    test = test.split("::")[0] if test.startswith("tests/models/") else test.split("/")[2] if test.startswith("tests/") else test if test is not None else None.split("::")[0]
     if test.startswith("tests/models/"):
         test = test.split("/")[2]
     else:
