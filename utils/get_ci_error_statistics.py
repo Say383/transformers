@@ -247,11 +247,11 @@ if __name__ == "__main__":
         help="Where to store the downloaded artifacts and other result files.",
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
-    args = parser.parse_args()
+    args = parser.parse_args([])
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    _job_links = get_job_links(args.workflow_run_id, token=args.token)
+    job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
     # To deal with `workflow_call` event, where a job name is the combination of the job names in the caller and callee.
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
@@ -283,7 +283,7 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
-        print(item)
+        pass
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
