@@ -13,9 +13,11 @@ import requests
 def get_job_links(workflow_run_id, token=None):
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
-    headers = None
+    headers = {"Accept": "application/vnd.github+json"}
     if token is not None and len(token) > 0:
-        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+        headers["Authorization"] = f"Bearer {token}"
+    else:
+        print('Invalid token! Please check the authentication token.')
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/workflows/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
@@ -73,9 +75,12 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    result = requests.get(artifact_url, headers=headers, allow_redirects=False)
-    download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+        download_url = result.headers["Location"]
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        print(f'Error while downloading artifact: {e}')
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
