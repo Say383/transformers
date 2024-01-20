@@ -172,7 +172,7 @@ def parse_int_from_env(key, default=None):
     return _value
 
 
-_run_slow_tests = parse_flag_from_env("RUN_SLOW", default=False)
+_run_slow_tests = parse_flag_from_env("RUN_SLOW", default=True)
 _run_pt_tf_cross_tests = parse_flag_from_env("RUN_PT_TF_CROSS_TESTS", default=True)
 _run_pt_flax_cross_tests = parse_flag_from_env("RUN_PT_FLAX_CROSS_TESTS", default=True)
 _run_custom_tokenizers = parse_flag_from_env("RUN_CUSTOM_TOKENIZERS", default=False)
