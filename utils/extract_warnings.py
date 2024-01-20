@@ -4,7 +4,23 @@ import os
 import time
 import zipfile
 
-from get_ci_error_statistics import download_artifact, get_artifacts_links
+import os
+
+import requests
+
+
+def download_artifacts(artifact_urls, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+
+    for url in artifact_urls:
+        response = requests.get(url)
+        artifact_name = url.split("/")[-1]
+        output_path = os.path.join(output_dir, artifact_name)
+
+        with open(output_path, "wb") as f:
+            f.write(response.content)
+
+    return "Artifacts downloaded successfully."
 
 from transformers import logging
 
@@ -38,35 +54,15 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 buffer.append(line)
 
     if from_gh:
-        for filename in os.listdir(artifact_path):
-            file_path = os.path.join(artifact_path, filename)
-            if not os.path.isdir(file_path):
-                # read the file
-                if filename != "warnings.txt":
-                    continue
-                with open(file_path) as fp:
-                    parse_line(fp)
+        download_artifacts([artifact_path], artifact_path)
     else:
-        try:
-            with zipfile.ZipFile(artifact_path) as z:
-                for filename in z.namelist():
-                    if not os.path.isdir(filename):
-                        # read the file
-                        if filename != "warnings.txt":
-                            continue
-                        with z.open(filename) as fp:
-                            parse_line(fp)
-        except Exception:
-            logger.warning(
-                f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
-            )
+        download_artifacts([artifact_path], args.output_dir)
 
     return selected_warnings
 
 
 def extract_warnings(artifact_dir, targets):
     """Extract warnings from all artifact files"""
-
     selected_warnings = set()
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
