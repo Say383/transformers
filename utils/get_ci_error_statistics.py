@@ -187,7 +187,20 @@ def reduce_by_model(logs, error_filter=None):
     r = {}
     for test in tests:
         counter = Counter()
-        # count by errors in `test`
+        #         # Count errors per model
+        logs = [x for x in logs if x[2] is not None]
+        tests = {x[2] for x in logs}
+
+        r = {}
+        for test in tests:
+            counter = Counter()
+            # count by errors in `test`
+            counter.update([x[1] for x in logs if x[2] == test])
+            counts = counter.most_common()
+            error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
+            n_errors = sum(error_counts.values())
+            if n_errors > 0:
+                r[test] = {
         counter.update([x[1] for x in logs if x[2] == test])
         counts = counter.most_common()
         error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
