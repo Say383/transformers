@@ -32,9 +32,12 @@ def get_job_time(workflow_run_id, token=None):
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
+    all_jobs = result['jobs']
     job_time = {}
 
     try:
@@ -67,5 +70,6 @@ if __name__ == "__main__":
     job_time = get_job_time(args.workflow_run_id)
     job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
 
-    for k, v in job_time.items():
-        print(f'{k}: {v["duration"]}')
+    job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
+for k, v in job_time.items():
+    print(f'{k}: {v["duration"]}')
