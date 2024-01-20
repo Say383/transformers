@@ -40,7 +40,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
 
     headers = None
-    if token is not None:
+    if token is not None and len(token) > 0:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
