@@ -99,25 +99,28 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
-                if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
+                if filename in ["error_log.txt"]:
                     with z.open(filename) as f:
                         for line in f:
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
                                 try:
-                                    # `error_line` is the place where `error` occurs
-                                    error_line = line[: line.index(": ")]
-                                    error = line[line.index(": ") + len(": ") :]
+                                    # Read the error_log.txt file and extract error information
+                                    error_line = line
+                                    error = line
                                     errors.append([error_line, error])
                                 except Exception:
                                     # skip un-related lines
                                     pass
-                            elif filename == "summary_short.txt" and line.startswith("FAILED "):
+                            # Extract failed tests from the error_log.txt file
+                            elif filename == "error_log.txt":
                                 # `test` is the test method that failed
-                                test = line[len("FAILED ") :]
+                                if line.startswith("FAILED "):
+                                    test = line[len("FAILED ") :]
                                 failed_tests.append(test)
+                            # Extract the job name from the job_name.txt file
                             elif filename == "job_name.txt":
-                                job_name = line
+                                job_name = line.strip()
 
     if len(errors) != len(failed_tests):
         raise ValueError(
