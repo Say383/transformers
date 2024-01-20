@@ -1,0 +1,15 @@
+import json
+
+file_path = "utils/offline_runners.txt"
+
+def create_offline_runners_file():
+    data = {
+        "runner1": "offline",
+        "runner2": "offline",
+        "runner3": "offline"
+    }
+
+    json_string = json.dumps(data)
+
+    with open(file_path, "w") as file:
+        file.write(json_string)
