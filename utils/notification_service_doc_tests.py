@@ -67,7 +67,7 @@ class Message:
         self.title = title
 
         self._time_spent = doc_test_results["time_spent"].split(",")[0]
-        self.n_success = doc_test_results["success"]
+        self.n_success = doc_test_results.get("success", 0)
         self.n_failures = doc_test_results["failures"]
         self.n_tests = self.n_success + self.n_failures
 
@@ -213,6 +213,8 @@ class Message:
     def get_reply_blocks(self, job_name, job_link, failures, text):
         failures_text = ""
         for key, value in failures.items():
+        except Exception as e:
+            print("Unknown error, could not fetch links.", e)
             value = value[:200] + " [Truncated]" if len(value) > 250 else value
             failures_text += f"*{key}*\n_{value}_\n\n"
 
