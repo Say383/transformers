@@ -14,7 +14,7 @@
 
 import collections
 import contextlib
-import doctest
+import doctest, collections
 import functools
 import importlib
 import inspect
