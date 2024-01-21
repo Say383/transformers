@@ -195,8 +195,6 @@ def reduce_by_model(logs, error_filter=None):
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
-
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
