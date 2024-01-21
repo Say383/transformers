@@ -114,7 +114,8 @@ if __name__ == "__main__":
     else:
         os.makedirs(args.output_dir, exist_ok=True)
 
-        # get download links
+        # # get download links
+        artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
         artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
         with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
             json.dump(artifacts, fp, ensure_ascii=False, indent=4)
