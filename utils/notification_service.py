@@ -519,6 +519,12 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
+        try:
+            with open("offline_runners.txt") as f:
+                offline_runners = f.read()
+        except FileNotFoundError:
+            offline_runners = []
+
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
