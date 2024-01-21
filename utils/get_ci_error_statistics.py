@@ -204,7 +204,7 @@ def make_github_table(reduced_by_error):
         line = f"| {count} | {error[:100]} |  |"
         lines.append(line)
 
-    return "\n".join(lines)
+    return "\n".join(lines) if reduced_by_error else ""
 
 
 def make_github_table_per_model(reduced_by_model):
