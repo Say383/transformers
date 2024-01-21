@@ -11,13 +11,13 @@ def extract_time_from_single_job(job):
 
     job_info = {}
 
-    start = job["started_at"]
-    end = job["completed_at"]
+    start = job.get("started_at", "")
+    end = job.get("completed_at", "")
 
-    start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
+    start_datetime = date_parser.parse(start) if start else None
+    end_datetime = date_parser.parse(end) if end else None
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0) if start and end else None
 
     job_info["started_at"] = start
     job_info["completed_at"] = end
