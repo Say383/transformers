@@ -203,7 +203,10 @@ def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
     counter = Counter()
-    counter.update([x[1] for x in logs])
+    counter.update(        try:
+            counter.update([x[1] for x in logs])
+        except Exception as e:
+            print(f'Error occurred when updating counter with test errors:\n{e}'))
     counts = counter.most_common()
     r = {}
     for error, count in counts:
