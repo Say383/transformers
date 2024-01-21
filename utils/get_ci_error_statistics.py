@@ -20,6 +20,7 @@ def get_job_links(workflow_run_id, token=None):
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
     job_links = {}
+    # Add specific error handling here
 
     try:
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
