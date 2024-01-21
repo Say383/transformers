@@ -129,7 +129,7 @@ if __name__ == "__main__":
             # Be gentle to GitHub
             time.sleep(1)
     # extract warnings from artifacts
-    selected_warnings = extract_warnings(args.output_dir, targets=args.targets)
+    selected_warnings = extract_warnings(args.output_dir, targets=args.targets) # Pass targets argument
     selected_warnings = sorted(selected_warnings)
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
