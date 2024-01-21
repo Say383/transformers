@@ -128,7 +128,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
         )
 
     job_link = None
-    if job_name and job_links:
+    if job_name and job_links is not None:
         job_link = job_links.get(job_name, None)
 
     # A list with elements of the form (line of error, error, failed test)
