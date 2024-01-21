@@ -141,7 +141,8 @@ class TrainCommand(BaseTransformersCLICommand):
         return self.run_torch()
 
     def run_torch(self):
-        raise NotImplementedError
+        self.logger.error('Training for the specified task is not implemented.')
+        raise NotImplementedError('Training for the specified task is not implemented.')
 
     def run_tf(self):
         self.pipeline.fit(
