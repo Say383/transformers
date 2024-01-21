@@ -839,10 +839,6 @@ if __name__ == "__main__":
     else:
         ci_title = ""
 
-    if runner_not_available or runner_failed or setup_failed:
-        Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
-        
-
     arguments = sys.argv[1:][0]
     try:
         models = ast.literal_eval(arguments)
@@ -851,6 +847,12 @@ if __name__ == "__main__":
     except SyntaxError:
         Message.error_out(title, ci_title)
         raise ValueError("Errored out.")
+    except ValueError as e:
+        error_message = f"Failed to parse the arguments: {e}"
+        Message.error_out(title, ci_title, setup_failed=True)
+    except ValueError as e:
+        error_message = f"Failed to parse the arguments: {e}"
+        Message.error_out(title, ci_title, setup_failed=True)
 
     github_actions_job_links = get_job_links(
         workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"]
