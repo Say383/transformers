@@ -75,7 +75,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     but it can't be used to download directly. We need to get a redirect URL first.
     See https://docs.github.com/en/rest/actions/artifacts#download-an-artifact
     """
-    headers = None
+    if token is not None:
+        headers = {'Accept': 'application/vnd.github+json', 'Authorization': f'Bearer {token}'}
+    else:
+        headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
