@@ -1,31 +1,3 @@
-import argparse
-import math
-import traceback
-
-import dateutil.parser as date_parser
-import requests
-
-
-def extract_time_from_single_job(job):
-    """Extract time info from a single job in a GitHub Actions workflow run"""
-
-    job_info = {}
-
-    start = job["started_at"]
-    end = job["completed_at"]
-
-    start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
-
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
-
-    job_info["started_at"] = start
-    job_info["completed_at"] = end
-    job_info["duration"] = duration_in_min
-
-    return job_info
-
-
 def get_job_time(workflow_run_id, token=None):
     """Extract time info for all jobs in a GitHub Actions workflow run"""
 
@@ -47,6 +19,11 @@ def get_job_time(workflow_run_id, token=None):
 
         return job_time
     except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        return {}
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     except Exception as e:
