@@ -30,7 +30,7 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except KeyError as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -255,7 +255,7 @@ if __name__ == "__main__":
 
     # `e[1]` is the error
     counter = Counter()
-    counter.update([e[1] for e in errors])
+            # Remove the print statement for the top 30 most common test errors as it is no longer needed.
 
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
