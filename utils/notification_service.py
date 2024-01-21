@@ -681,7 +681,7 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
     _artifact = {}
 
-    if os.path.exists(artifact_path):
+    if artifact_path and os.path.exists(artifact_path):
         files = os.listdir(artifact_path)
         for file in files:
             try:
