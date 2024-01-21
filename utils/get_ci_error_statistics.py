@@ -228,18 +228,24 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def reduce_by_model_safe(logs, error_filter=None):
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
     logs = [x for x in logs if x[2] is not None]
     tests = {x[2] for x in logs}
 
+    try:
     r = {}
+    
+    for test in tests:
     for test in tests:
         counter = Counter()
         # count by errors in `test`
-        counter.update([x[1] for x in logs if x[2] == test])
+                counter.update([x[1] for x in logs if x[2] == test])
+except Exception as e:
+    print(f'Error occurred when counting errors per model:
+{e}')
         counts = counter.most_common()
         error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
         n_errors = sum(error_counts.values())
