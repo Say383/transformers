@@ -127,7 +127,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     failed_tests = []
     job_name = None
 
-    with zipfile.ZipFile(artifact_zip_path) as z:
+    try:
+        with zipfile.ZipFile(artifact_zip_path) as z:
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
@@ -137,7 +138,18 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                         for line in f:
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
-                                try:
+                                    try:
+                                for line in f:
+                                    line = line.decode("UTF-8").strip()
+                                    if filename == "failures_line.txt":
+                                        try:
+                                            # `error_line` is the place where `error` occurs
+                                            error_line = line[: line.index(": ")]
+                                            error = line[line.index(": ") + len(": ") :]
+                                            errors.append([error_line, error])
+                                        except Exception as e:
+                                            raise ValueError(f"Error occurred when extracting errors from {artifact_zip_path}:
+{traceback.format_exc()}")
                                     # `error_line` is the place where `error` occurs
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
