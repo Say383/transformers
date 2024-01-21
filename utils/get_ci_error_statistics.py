@@ -42,7 +42,10 @@ def get_job_links(workflow_run_id, token=None):
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
 
-    headers = None
+    if token is not None:
+        headers = {'Accept': 'application/vnd.github+json', 'Authorization': f'Bearer {token}'}
+    else:
+        headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
