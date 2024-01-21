@@ -84,7 +84,7 @@ class Message:
 
             # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
             if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
+                total_secs = hours * 3600 + minutes * 60 + seconds
 
             hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
             total_secs += hours * 3600 + minutes * 60 + seconds
@@ -350,7 +350,7 @@ if __name__ == "__main__":
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
     if "stats" in artifact:
-        failed, success, time_spent = handle_test_results(artifact["stats"])
+        failed, success, time_spent, seconds = handle_test_results(artifact["stats"])
         doc_test_results["failures"] = failed
         doc_test_results["success"] = success
         doc_test_results["time_spent"] = time_spent[1:-1] + ", "
