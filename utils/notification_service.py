@@ -539,7 +539,13 @@ class Message:
             },
         }
 
-        text = ""
+        if runner_not_available:
+            try:
+                _error_file_path = 'utils/offline_runners.txt'
+                with open(_error_file_path) as _error_fp:
+                  offline_runners = json.load(_error_fp)
+            except FileNotFoundError:
+                message = '💔 CI runners are not available! Tests are not run. 😭' ""
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
