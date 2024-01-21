@@ -54,6 +54,29 @@ def get_artifacts_links(worflow_run_id, token=None):
         for i in range(pages_to_iterate_over):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+    try:
+        artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+
+    return {}
+    try:
+        artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        return {}
+
+    return {}
 
         return artifacts
     except Exception:
