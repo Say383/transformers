@@ -157,7 +157,7 @@ def reduce_by_error(logs, error_filter=None):
     counts = counter.most_common()
     r = {}
     for error, count in counts:
-        if error_filter is None or error not in error_filter:
+        if error_filter is None or not error_filter or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
