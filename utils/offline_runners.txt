@@ -1,0 +1,44 @@
+import os
+
+def check_if_file_exists(file_path: str) -> bool:
+    """
+    Check if a file exists at the given file path.
+
+    Args:
+        file_path (str): The path to the file.
+
+    Returns:
+        bool: True if the file exists, False otherwise.
+    """
+    return os.path.isfile(file_path)
+
+def create_file(file_path: str) -> None:
+    """
+    Create a new file at the given file path.
+
+    Args:
+        file_path (str): The path to the file.
+    """
+    with open(file_path, "w") as file:
+        pass
+
+def write_to_file(file_path: str, content: str) -> None:
+    """
+    Write the given content to the file at the specified file path.
+
+    Args:
+        file_path (str): The path to the file.
+        content (str): The content to write to the file.
+    """
+    with open(file_path, "w") as file:
+        file.write(content)
+
+# Check if the file exists
+file_path = "utils/offline_runners.txt"
+if not check_if_file_exists(file_path):
+    # Create the file if it does not exist
+    create_file(file_path)
+
+# Write the contents to the file
+content = "This is the content of the offline_runners.txt file."
+write_to_file(file_path, content)
