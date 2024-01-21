@@ -10,7 +10,7 @@ from collections import Counter
 import requests
 
 
-def get_job_links(workflow_run_id, token=None): # Specify parameter default value for token
+def get_job_links(workflow_run_id, token=None):
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
     if token is not None:
@@ -207,7 +207,9 @@ def make_github_table(reduced_by_error):
     return "\n".join(lines) if reduced_by_error else ""
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(reduced_by_model): # Add condition to check if reduced_by_model is empty
+    if not reduced_by_model:
+        return ''
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
