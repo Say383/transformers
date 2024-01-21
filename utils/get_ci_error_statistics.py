@@ -107,8 +107,16 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
     result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
-    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        print(f"Error occurred when getting artifact download URL:
+{traceback.format_exc()}")
+    try:
+        file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+    except Exception as e:
+        print(f"Error occurred when creating file path:
+{traceback.format_exc()}")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
 
@@ -124,7 +132,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
             if not os.path.isdir(filename):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
-                    with z.open(filename) as f:
+                    try:
+                        with z.open(filename) as f:
                         for line in f:
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
@@ -133,7 +142,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
+                                except Exception as e:
                                     # skip un-related lines
                                     pass
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
