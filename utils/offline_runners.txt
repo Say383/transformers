@@ -1,0 +1,11 @@
+import json
+import os
+
+def save_offline_runners(offline_runners):
+    json_data = json.dumps(offline_runners)
+    file_path = os.path.join('utils', 'offline_runners.txt')
+    with open(file_path, 'w') as file:
+        file.write(json_data)
+
+offline_runners = [...]  # Replace with the actual list of offline runners
+save_offline_runners(offline_runners)
