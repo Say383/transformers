@@ -56,13 +56,13 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\nError message: {e}")
 
     return {}
 
 
-def download_artifact(artifact_name, artifact_url, output_dir, token):
+def download_artifact(artifact_name, artifact_url, output_dir, token): # Modified to download a GitHub Action artifact from a URL
     """Download a GitHub Action artifact from a URL.
 
     The URL is of the form `https://api.github.com/repos/huggingface/transformers/actions/artifacts/{ARTIFACT_ID}/zip`,
