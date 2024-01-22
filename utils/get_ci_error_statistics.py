@@ -52,7 +52,10 @@ def get_artifacts_links(worflow_run_id, token=None):
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            result = requests.get(url + f"&page={i + 2}", headers=headers)
+        if result.status_code != 200:
+            print(f'Failed to fetch artifacts! Status code: {result.status_code}')
+            return {}
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
