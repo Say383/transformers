@@ -18,6 +18,8 @@ import math
 import os
 import re
 import time
+import logging
+logger = logging.getLogger(__name__)
 from fnmatch import fnmatch
 from typing import Dict
 
