@@ -68,33 +68,65 @@ class Message:
 
         self._time_spent = doc_test_results["time_spent"].split(",")[0]
         self.n_success = doc_test_results["success"]
-        self.n_failures = doc_test_results["failures"]
-        self.n_tests = self.n_success + self.n_failures
+    @staticmethod
+    def error_out():
+        payload = [
+            {
+                "type": "section",
+                "text": {
+                    "type": "plain_text",
+                    "text": "There was an issue running the tests.",
+                },
+                "accessory": {
+                    "type": "button",
+                    "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
+                    "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                },
+            }
+        ]
 
-        # Failures and success of the modeling tests
-        self.doc_test_results = doc_test_results
+        print("Sending the following payload")
+        print(json.dumps({"blocks": json.loads(payload)}))
 
-    @property
-    def time(self) -> str:
-        time_spent = [self._time_spent]
-        total_secs = 0
+        client.chat_postMessage(
+            channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
+            text="There was an issue running the tests.",
+            blocks=payload,
+        )
 
-        for time in time_spent:
-            time_parts = time.split(":")
+    def post(self):
+        print("Sending the following payload")
+        print(json.dumps({"blocks": json.loads(self.payload)}))
 
-            # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
-            if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
+        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
-            hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
-            total_secs += hours * 3600 + minutes * 60 + seconds
+        self.thread_ts = client.chat_postMessage(
+            channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
+            blocks=self.payload,
+            text=text,
+        )
 
-        hours, minutes, seconds = total_secs // 3600, (total_secs % 3600) // 60, total_secs % 60
-        return f"{int(hours)}h{int(minutes)}m{int(seconds)}s"
+    def get_reply_blocks(self, job_name, job_link, failures, text):
+        failures_text = ""
+        for key, value in failures.items():
+            value = value[:200] + " [Truncated]" if len(value) > 250 else value
+            failures_text += f"*{key}*\n_{value}_\n\n"
 
-    @property
-    def header(self) -> Dict:
-        return {"type": "header", "text": {"type": "plain_text", "text": self.title}}
+        title = job_name
+        content = {"type": "section", "text": {"type": "mrkdwn", "text": text}}
+
+        if job_link is not None:
+            content["accessory"] = {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "GitHub Action job", "emoji": True},
+                "url": job_link,
+            }
+
+        return [
+            {"type": "header", "text": {"type": "plain_text", "text": title.upper(), "emoji": True}},
+            content,
+            {"type": "section", "text": {"type": "mrkdwn", "text": failures_text}},
+        ]
 
     @property
     def no_failures(self) -> Dict:
