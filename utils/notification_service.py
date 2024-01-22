@@ -564,7 +564,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
-        raise slack_sdk.errors.SlackApiError(message=msg, response=self, slack_auth_error=True)
+        raise slack_sdk.errors.SlackApiError(message=msg, response=self)
 
     def post(self):
         payload = self.payload
