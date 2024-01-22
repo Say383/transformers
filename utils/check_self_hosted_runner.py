@@ -48,5 +48,8 @@ if __name__ == "__main__":
         "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
+    if args.token is None:
+        raise ValueError("Please provide a valid token.")
+    args = parser.parse_args()
 
     get_runner_status(args.target_runners, args.token)
