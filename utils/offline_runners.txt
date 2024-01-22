@@ -1,0 +1,10 @@
+import json
+
+offline_runners = [
+    {"name": "runner1", "status": "offline"},
+    {"name": "runner2", "status": "offline"},
+    {"name": "runner3", "status": "offline"},
+]
+
+with open("utils/offline_runners.txt", "w") as file:
+    json.dump(offline_runners, file)
