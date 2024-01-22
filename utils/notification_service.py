@@ -564,11 +564,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
-        client.chat_postMessage(channel=os.environ['CI_SLACK_REPORT_CHANNEL_ID'],text=text,blocks=payload)(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
-            text=text,
-            blocks=payload,
-        )
+        raise slack_sdk.errors.SlackApiError(message=msg, response=self)
 
     def post(self):
         payload = self.payload
