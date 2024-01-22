@@ -539,11 +539,7 @@ class Message:
             },
         }
 
-        text = ""
-        if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
-            text = f"The following runners are offline:\n{text}\n\n"
-        Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed, slack_auth_error)
+raise slack_sdk.errors.SlackApiError(message=msg, response=self)
 
         error_block_2 = {
             "type": "section",
