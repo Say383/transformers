@@ -12,7 +12,7 @@ from transformers import logging
 logger = logging.get_logger(__name__)
 
 
-def extract_warnings_from_single_artifact(artifact_path, targets):
+def extract_warnings_from_single_artifact(artifact_path, targets, from_gh=False):
     """Extract warnings from a downloaded artifact (in .zip format)"""
     selected_warnings = set()
     buffer = []
