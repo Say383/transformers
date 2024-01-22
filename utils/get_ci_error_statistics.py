@@ -8,6 +8,7 @@ import zipfile
 from collections import Counter
 
 import requests
+from get_github_job_time import get_job_time, extract_time_from_single_job
 
 
 def get_job_links(workflow_run_id, token=None):
