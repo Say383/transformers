@@ -736,7 +736,6 @@ def retrieve_available_artifacts():
                 _available_artifacts[artifact_name] = Artifact(artifact_name, multi_gpu=True)
 
             _available_artifacts[artifact_name].add_path(directory, gpu="multi")
-        else:
             if artifact_name not in _available_artifacts:
                 _available_artifacts[artifact_name] = Artifact(artifact_name)
 
@@ -801,6 +800,19 @@ if __name__ == "__main__":
         ci_url = f"https://github.com/{repository_full_name}/commit/{ci_sha}"
 
     if ci_title is not None:
+        if ci_url is None:
+            raise ValueError(
+                "When a title is found (`ci_title`), it means a `push` event or a `workflow_run` even (triggered by "
+                "another `push` event), and the commit SHA has to be provided in order to create the URL to the "
+                "commit page."
+            )
+
+        ci_title = ci_title.strip().split("\n")[0].strip()
+
+        # Retrieve the PR title and author login to complete the report
+        commit_number = ci_url.split("/")[-1]
+        ci_detail_url = f"https://api.github.com/repos/{repository_full_name}/commits/{commit_number}"
+        ci_details = requests.get(ci_detail_url).json()
         if ci_url is None:
             raise ValueError(
                 "When a title is found (`ci_title`), it means a `push` event or a `workflow_run` even (triggered by "
