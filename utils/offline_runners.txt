@@ -1,0 +1,40 @@
+import os
+import json
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    content = ""
+
+    write_to_file(file_path, content)
+
+def write_to_file(file_path, content):
+    with open(file_path, "w") as file:
+        file.write(content)
+
+create_offline_runners_file()
+```
+
+Unit tests:
+
+```python
+import os
+
+def test_create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    content = ""
+
+    create_offline_runners_file()
+
+    assert os.path.exists(file_path)
+
+def test_write_to_file():
+    file_path = "utils/offline_runners.txt"
+    content = "Runner 1\nRunner 2\nRunner 3"
+
+    write_to_file(file_path, content)
+
+    with open(file_path, "r") as file:
+        assert file.read() == content
+
+test_create_offline_runners_file()
+test_write_to_file()
