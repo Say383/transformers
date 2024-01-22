@@ -5,6 +5,9 @@ import os
 import time
 import traceback
 import zipfile
+import json
+import math
+import requests
 from collections import Counter
 
 import requests
@@ -22,7 +25,7 @@ def get_job_links(workflow_run_id, token=None):
     job_links = {}
 
     try:
-        job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
+        job_links.update({job['name']: job['html_url'] for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
