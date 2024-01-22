@@ -17,7 +17,7 @@ def extract_time_from_single_job(job):
     start_datetime = date_parser.parse(start)
     end_datetime = date_parser.parse(end)
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    duration_in_min = int((end_datetime - start_datetime).total_seconds() / 60)
 
     job_info["started_at"] = start
     job_info["completed_at"] = end
@@ -46,8 +46,8 @@ def get_job_time(workflow_run_id, token=None):
             job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
 
         return job_time
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\nError message: {e}")
 
     return {}
 
