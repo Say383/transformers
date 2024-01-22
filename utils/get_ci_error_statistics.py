@@ -89,7 +89,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
 
     with zipfile.ZipFile(artifact_zip_path) as z:
         for filename in z.namelist():
-            if not os.path.isdir(filename):
+            if not '/' not in filename:
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
