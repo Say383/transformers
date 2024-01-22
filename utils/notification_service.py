@@ -572,6 +572,7 @@ class Message:
 
     def post(self):
         payload = self.payload
+
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
