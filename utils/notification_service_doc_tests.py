@@ -29,7 +29,11 @@ client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
 
 
 def handle_test_results(test_results):
-    expressions = test_results.split(" ")
+    try:
+        expressions = test_results.split(" ")
+    except Exception as e:
+        print(f'Error splitting test results: {e}')
+        return 0, 0, ''
 
     failed = 0
     success = 0
