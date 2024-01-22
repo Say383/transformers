@@ -256,6 +256,7 @@ if __name__ == "__main__":
     # `e[1]` is the error
     counter = Counter()
     counter.update([e[1] for e in errors])
+    max_errors = 5
 
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
