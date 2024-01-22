@@ -29,6 +29,16 @@ def get_job_links(workflow_run_id, token=None):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
+        # To deal with `workflow_call` event, where a job name is the combination of the job names in the caller and callee.
+        # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
+        if job_links:
+            for k, v in job_links.items():
+                # This is how GitHub actions combine job names.
+                if " / " in k:
+                    index = k.find(" / ")
+                    k = k[index + len(" / ") :]
+                job_links[k] = v
+
         return job_links
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
