@@ -788,7 +788,12 @@ if __name__ == "__main__":
     pr_number_re = re.compile(r"\(#(\d+)\)$")
 
     title = f"🤗 Results of the {ci_event} tests."
-    # Add Commit/PR title with a link for push CI
+    # Add a check to handle the case when the `OFFLINE_RUNNERS` variable is empty.
+    result = os.environ.get('OFFLINE_RUNNERS')
+    if result is not None:
+        offline_runners = json.loads(result)
+    else:
+        offline_runners = []
     # (check the title in 2 env. variables - depending on the CI is triggered via `push` or `workflow_run` event)
     ci_title_push = os.environ.get("CI_TITLE_PUSH")
     ci_title_workflow_run = os.environ.get("CI_TITLE_WORKFLOW_RUN")
