@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import collections, os, re, time, requests
-import json
+import json, re
 import math
 import os
 import re
