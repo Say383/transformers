@@ -539,7 +539,7 @@ class Message:
             },
         }
 
-        text = ""
+        text = "Unfortunately, there are no offline runners."
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
