@@ -532,6 +532,9 @@ class Message:
         )
 
     def post(self):
+        for k, v in self.model_results.items():
+            if k in NON_MODEL_TEST_MODULES:
+                pass
         payload = self.payload
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
