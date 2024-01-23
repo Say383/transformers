@@ -943,7 +943,9 @@ def get_tests_dir(append_path=None):
 # into:
 # final message
 # it can handle a single string or a multiline buffer
-def apply_print_resets(buf):
+def apply_print_resets(buf,discard_previous=True):
+    if discard_previous:
+        return ''.join(buf.split('\r')[-1])
     return re.sub(r"^.*\r", "", buf, 0, re.M)
 
 
