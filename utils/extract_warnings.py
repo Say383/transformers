@@ -132,3 +132,9 @@ if __name__ == "__main__":
     selected_warnings = sorted(selected_warnings)
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
+    except Exception as e:
+        logger.error(f"Error occurred while downloading artifacts: {e}")
+    except Exception as e:
+        logger.error(f"Error occurred while downloading artifacts: {e}")
+    except Exception as e:
+        logger.error(f"Error occurred while downloading artifacts: {e}")
