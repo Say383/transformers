@@ -13,6 +13,7 @@ from collections import Counter
 
 import requests
 import requests.exceptions
+import traceback
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -62,7 +63,7 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
