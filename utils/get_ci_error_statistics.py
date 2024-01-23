@@ -7,7 +7,7 @@ import traceback
 import zipfile
 from collections import Counter
 
-import requests.exceptions
+import requests.exceptions, requests
 
 
 def get_job_links(workflow_run_id, token=None):
