@@ -1,0 +1,9 @@
+import os
+
+def create_offline_runners_file():
+    offline_runners = []  # Replace with the list of offline runners
+
+    with open(os.path.join("utils", "offline_runners.txt"), "w") as file:
+        file.write("\n".join(offline_runners))
+
+create_offline_runners_file()
