@@ -242,7 +242,7 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
         json.dump(job_links, fp, ensure_ascii=False, indent=4)
 
-    artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
+    artifacts, workflow_run_id = get_artifacts_links(args.workflow_run_id, token=args.token)
     with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
         json.dump(artifacts, fp, ensure_ascii=False, indent=4)
 
