@@ -1,4 +1,5 @@
-import requests, requests.exceptions, requests.exceptions, requests
+import requests, requests.exceptions
+import os
 import argparse
 import json
 import math
