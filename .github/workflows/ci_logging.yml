@@ -1,0 +1,43 @@
+name: CI Logging
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.x
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run modified scripts
+        run: python run_modified_scripts.py
+
+      - name: Log errors and exceptions
+        run: python log_errors_and_exceptions.py
+```
+
+The contents of the new file `utils/logging_utils.py`:
+
+```python
+import logging
+
+def log_error(error_message):
+    logging.error(error_message)
+
+def log_exception(exception_message):
+    logging.exception(exception_message)
