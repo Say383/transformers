@@ -543,7 +543,11 @@ class Message:
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+        if len(offline_runners) > 0:
+            text = f"The following runners are offline:\n  • " + "\n  • ".join(offline_runners)
+            text = f"It's crucial to fix the following runners ASAP:\n{text}\n🙏 Let's fix it ASAP! 🙏"
+        else:
+            text = "🙏 Let's fix it ASAP! 🙏"
 
         error_block_2 = {
             "type": "section",
