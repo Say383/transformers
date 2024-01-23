@@ -539,11 +539,15 @@ class Message:
             },
         }
 
-        text = ""
-        if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
-            text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+        # Add a check for `offline_runners.txt` file
+        offline_runners_file = "offline_runners.txt"
+        text = "\n🙏 Let's fix it ASAP! 🙏"
+        if os.path.isfile(offline_runners_file):
+            with open(offline_runners_file, 'r') as file:
+                offline_runners = file.readlines() if file else []
+            text = f"The following runners are offline:\n  • " + "\n  • ".join(offline_runners)
+        else:
+            offline_runners = []
 
         error_block_2 = {
             "type": "section",
