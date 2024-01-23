@@ -6,13 +6,13 @@ import subprocess
 def get_runner_status(target_runners, token):
     offline_runners = []
 
-    cmd = (
-        f'curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer {token}"'
-        " https://api.github.com/repos/huggingface/transformers/actions/runners"
-    )
-    output = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
-    o = output.stdout.decode("utf-8")
-    status = json.loads(o)
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": f"Bearer {token}",
+    }
+    url = "https://api.github.com/repos/huggingface/transformers/actions/runners"
+    response = requests.get(url, headers=headers)
+    status = response.json()
 
     runners = status["runners"]
     for runner in runners:
@@ -50,3 +50,5 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     get_runner_status(args.target_runners, args.token)
+    if response.status_code != 200:
+        raise ValueError("Failed to retrieve runner status.")
