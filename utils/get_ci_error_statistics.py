@@ -97,7 +97,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
                                 try:
-                                    # `error_line` is the place where `error` occurs
+                                    # `error_line` and `error` are the place and description of the error
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
