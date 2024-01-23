@@ -1,0 +1,8 @@
+import json
+
+offline_runners = [...]  # Replace with the actual list of offline runners
+
+file_path = "utils/offline_runners.txt"
+
+with open(file_path, "w") as file:
+    file.write(json.dumps(offline_runners))
