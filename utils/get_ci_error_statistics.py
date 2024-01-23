@@ -1,6 +1,6 @@
-import requests, requests.exceptions, os, traceback
+import requests, requests.RequestException, os, traceback
 import os
-import argparse
+import argparse, os, traceback, zipfile, requests.RequestException
 import traceback
 import traceback
 import json
