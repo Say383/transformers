@@ -101,9 +101,9 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
+                                except Exception as e:
                                     # skip un-related lines
-                                    pass
+                                    print(f'Failed to process {filename}: {e}')
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
                                 # `test` is the test method that failed
                                 test = line[len("FAILED ") :]
