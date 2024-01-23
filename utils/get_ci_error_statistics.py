@@ -1,4 +1,4 @@
-import requests, requests.exceptions
+import requests, requests.exceptions, os, traceback
 import os
 import argparse
 import traceback
@@ -36,6 +36,7 @@ def get_job_links(workflow_run_id, token=None):
 
         return job_links
     except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
