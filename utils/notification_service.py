@@ -769,7 +769,7 @@ def prepare_reports(title, header, reports, to_truncate=True):
 
 
 if __name__ == "__main__":
-    runner_status = os.environ.get("RUNNER_STATUS")
+    runner_status = os.environ.get("RUNNER_STATUS", "success")
     runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
     setup_status = os.environ.get("SETUP_STATUS")
 
