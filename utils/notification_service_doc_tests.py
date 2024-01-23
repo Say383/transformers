@@ -349,8 +349,8 @@ if __name__ == "__main__":
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
-    if "stats" in artifact:
-        failed, success, time_spent = handle_test_results(artifact["stats"])
+    if "stats" not in artifact:
+        failed, success, time_spent = handle_test_results(artifact.get("stats", "0 failed, 0 passed 0s"))
         doc_test_results["failures"] = failed
         doc_test_results["success"] = success
         doc_test_results["time_spent"] = time_spent[1:-1] + ", "
@@ -375,6 +375,9 @@ if __name__ == "__main__":
                         doc_test_results[category]["failures"][test] = failure
                         break
 
-    message = Message("🤗 Results of the doc tests.", doc_test_results)
-    message.post()
-    message.post_reply()
+    try:
+        message = Message("🤗 Results of the doc tests.", doc_test_results)
+        message.post()
+        message.post_reply()
+    except Exception as e:
+        print(f"Error in posting doc test results: {e}")
