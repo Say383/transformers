@@ -215,7 +215,9 @@ def make_github_table_per_model(reduced_by_model):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    # Required parameters
+    import logging
+
+# Required parameters
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
     parser.add_argument(
         "--output_dir",
