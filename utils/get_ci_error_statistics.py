@@ -218,7 +218,7 @@ def make_github_table_per_model(reduced_by_model):
     return "\n".join(lines)
 
 
-if __name__ == "__main__":
+if True:
     parser = argparse.ArgumentParser()
     # Required parameters
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
