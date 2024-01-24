@@ -72,6 +72,7 @@ class Message:
         self.n_tests = self.n_success + self.n_failures
 
         # Failures and success of the modeling tests
+        self.job_link = doc_test_results.get('job_link')
         self.doc_test_results = doc_test_results
 
     @property
@@ -206,7 +207,7 @@ class Message:
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
-            blocks=self.payload,
+            blocks=self.payload + [{'type': 'section', 'text': {'type': 'mrkdwn', 'text': f'GitHub Action job: {self.job_link}'}},],
             text=text,
         )
 
@@ -218,6 +219,12 @@ class Message:
 
         title = job_name
         content = {"type": "section", "text": {"type": "mrkdwn", "text": text}}
+        if job_link is not None:
+            content["accessory"] = {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "GitHub Action job", "emoji": True},
+                "url": job_link,
+            }
 
         if job_link is not None:
             content["accessory"] = {
