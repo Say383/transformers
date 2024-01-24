@@ -30,8 +30,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{e}")
 
     return {}
 
@@ -56,8 +56,8 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{e}")
 
     return {}
 
@@ -75,7 +75,12 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
     result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(e)
+        return
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
