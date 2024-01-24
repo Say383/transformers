@@ -1,0 +1,8 @@
+import os
+
+# Define the file path
+file_path = os.path.join("utils", "offline_runners.txt")
+
+# Create the new file and write the contents
+with open(file_path, "w") as file:
+    file.write("")
