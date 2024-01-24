@@ -69,7 +69,7 @@ def extract_warnings(artifact_dir, targets):
 
     selected_warnings = set()
 
-    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
+    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
         selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
 
@@ -111,6 +111,13 @@ if __name__ == "__main__":
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
         pass
     else:
+        time.sleep(1)
+
+        # extract warnings from artifacts
+        selected_warnings = extract_warnings(args.output_dir, args.targets)
+        selected_warnings = sorted(selected_warnings)
+        with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
+            json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
         os.makedirs(args.output_dir, exist_ok=True)
 
         # get download links
