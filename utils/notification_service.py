@@ -519,7 +519,7 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
+        if runner_not_available or runner_failed or setup_failed:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             if result is not None:
