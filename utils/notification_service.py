@@ -523,8 +523,8 @@ class Message:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
-                offline_runners = json.loads(result) if result else []
-            except json.decoder.JSONDecodeError:
+                offline_runners = json.loads(result)
+            except json.JSONDecodeError:
                 offline_runners = []
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
