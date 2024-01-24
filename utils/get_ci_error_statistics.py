@@ -30,8 +30,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        logger.warning(f"Error occurred while fetching job links:\n{traceback.format_exc()}")
 
     return {}
 
@@ -56,8 +56,8 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        logger.warning(f"Error occurred while fetching artifact links:\n{traceback.format_exc()}")
 
     return {}
 
@@ -76,9 +76,12 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
-    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
-    with open(file_path, "wb") as fp:
-        fp.write(response.content)
+    try:
+        file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
+    except Exception as e:
+        logger.warning(f"Error occurred while downloading artifact {artifact_name}:\n{traceback.format_exc()}")
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
@@ -93,18 +96,26 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
-                        for line in f:
-                            line = line.decode("UTF-8").strip()
-                            if filename == "failures_line.txt":
-                                try:
-                                    # `error_line` is the place where `error` occurs
-                                    error_line = line[: line.index(": ")]
-                                    error = line[line.index(": ") + len(": ") :]
-                                    errors.append([error_line, error])
-                                except Exception:
-                                    # skip un-related lines
-                                    pass
-                            elif filename == "summary_short.txt" and line.startswith("FAILED "):
+                        try:
+                            for line in f:
+                                line = line.decode("UTF-8").strip()
+                                if filename == "failures_line.txt":
+                                    try:
+                                        # `error_line` is the place where `error` occurs
+                                        error_line = line[: line.index(": ")]
+                                        error = line[line.index(": ") + len(": ") :]
+                                        errors.append([error_line, error])
+                                    except Exception:
+                                        # skip un-related lines
+                                        pass
+                                elif filename == "summary_short.txt" and line.startswith("FAILED "):
+                                    # `test` is the test method that failed
+                                    test = line[len("FAILED ") :]
+                                    failed_tests.append(test)
+                                elif filename == "job_name.txt":
+                                    job_name = line
+                        except Exception as e:
+                            logger.warning(f"Error occurred while extracting errors from artifact {artifact_zip_path}:\n{traceback.format_exc()}")
                                 # `test` is the test method that failed
                                 test = line[len("FAILED ") :]
                                 failed_tests.append(test)
@@ -133,11 +144,16 @@ def get_all_errors(artifact_dir, job_links=None):
 
     errors = []
 
-    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
-    for p in paths:
-        errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+    try:
+        paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
+        for p in paths:
+            errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
 
-    return errors
+        return errors
+    except Exception as e:
+        logger.warning(f"Error occurred while extracting errors from artifacts:\n{traceback.format_exc()}")
+
+    return []
 
 
 def reduce_by_error(logs, error_filter=None):
