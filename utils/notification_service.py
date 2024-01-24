@@ -844,7 +844,7 @@ if __name__ == "__main__":
 
     if runner_not_available or runner_failed or setup_failed:
         Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
-        exit(0)
+        
 
     arguments = sys.argv[1:][0]
     try:
