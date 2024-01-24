@@ -34,6 +34,11 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                     buffer.clear()
                 continue
             else:
+    else:
+        logger.warning(
+            f"An unknown error occurred during the extraction process of {artifact_path}. This file is skipped."
+        )
+        return set()
                 line = line.strip()
                 buffer.append(line)
 
