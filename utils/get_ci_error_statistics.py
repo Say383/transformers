@@ -181,6 +181,7 @@ def reduce_by_model(logs, error_filter=None):
     tests = {x[2] for x in logs}
 
     r = {}
+        
     for test in tests:
         counter = Counter()
         # count by errors in `test`
