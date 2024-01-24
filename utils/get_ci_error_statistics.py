@@ -5,6 +5,7 @@ import os
 import time
 import traceback
 import zipfile
+import logging
 from collections import Counter
 
 import requests
