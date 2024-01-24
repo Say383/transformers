@@ -514,7 +514,7 @@ class Message:
         title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
         blocks.append(title_block)
 
-        if ci_title:
+        if ci_title is not None:
             ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
             blocks.append(ci_title_block)
 
