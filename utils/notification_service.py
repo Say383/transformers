@@ -24,6 +24,9 @@ import time
 from typing import Dict, List, Optional, Union
 
 import requests
+import ast
+import collections
+import functools
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
@@ -524,13 +527,11 @@ class Message:
             result = os.environ.get("OFFLINE_RUNNERS", "")
             if result:
                 offline_runners = json.loads(result)
-        elif runner_failed:
-            text = "💔 CI runners have problems! Tests are not run. 😭"
-        elif setup_failed:
-            text = "💔 Setup job failed. Tests are not run. 😭"
-        else:
-            text = "💔 There was an issue running the tests. 😭"
-
+                
+        if len(offline_runners) > 0:
+            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n{text}\n\n"
+        text += "🙏 Let's fix it ASAP! 🙏"
         error_block_1 = {
             "type": "header",
             "text": {
