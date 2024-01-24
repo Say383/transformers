@@ -531,6 +531,9 @@ class Message:
         else:
             text = "💔 There was an issue running the tests. 😭"
 
+        if len(offline_runners) == 0:
+            offline_runners = []
+
         error_block_1 = {
             "type": "header",
             "text": {
