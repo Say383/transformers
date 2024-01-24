@@ -103,7 +103,7 @@ class Message:
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
         self.title = title
-        self.ci_title = ci_title
+        self.ci_title = ci_title if ci_title else ""
 
         # Failures and success of the modeling tests
         self.n_model_success = sum(r["success"] for r in model_results.values())
@@ -786,6 +786,8 @@ if __name__ == "__main__":
 
     # This env. variable is set in workflow file (under the job `send_results`).
     ci_event = os.environ.get("CI_EVENT")
+    if ci_event is None:
+        ci_event = ""
     if ci_event is None:
         ci_event = ""
 
