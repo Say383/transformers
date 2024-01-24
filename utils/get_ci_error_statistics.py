@@ -274,8 +274,14 @@ if __name__ == "__main__":
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
 
-    s1 = make_github_table(reduced_by_error)
-    s2 = make_github_table_per_model(reduced_by_model)
+    try:
+        s1 = make_github_table(reduced_by_error)
+    except Exception as e:
+        logging.error(f'Error encountered while creating reduced_by_error table: {e}')
+    try:
+        s2 = make_github_table_per_model(reduced_by_model)
+    except Exception as e:
+        logging.error(f'Error encountered while creating reduced_by_model table: {e}')
 
     with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s1)
