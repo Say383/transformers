@@ -228,6 +228,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if not args.workflow_run_id or not args.output_dir:
+        logging.error('Missing workflow_run_id or output_dir')
         parser.print_usage()
         exit(1)
 
