@@ -522,8 +522,13 @@ class Message:
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
+            if result:
+                try:
+                    offline_runners = json.loads(result)
+                except (json.JSONDecodeError, ValueError):
+                    offline_runners = []
+            else:
+                offline_runners = []
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
@@ -773,9 +778,9 @@ if __name__ == "__main__":
     runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
     setup_status = os.environ.get("SETUP_STATUS")
 
-    runner_not_available = True if runner_status is not None and runner_status != "success" else False
-    runner_failed = True if runner_env_status is not None and runner_env_status != "success" else False
-    setup_failed = True if setup_status is not None and setup_status != "success" else False
+    runner_not_available = True if runner_status and runner_status != "success" else False if runner_status else False
+    runner_failed = True if runner_env_status and runner_env_status != "success" else False if runner_env_status else False
+    setup_failed = False if setup_status is None else True if setup_status != "success" else False 
 
     org = "huggingface"
     repo = "transformers"
