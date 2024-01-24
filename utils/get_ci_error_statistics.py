@@ -276,7 +276,13 @@ if True:
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
 
-    with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s1)
-    with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s2)
+    try:
+        with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
+            fp.write(s1)
+    except Exception as e:
+        print(f"Error encountered in saving error statistics (reduced_by_error.txt): {e}")
+    try:
+        with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
+            fp.write(s2)
+    except Exception as e:
+        print(f"Error encountered in saving error statistics (reduced_by_model.txt): {e}")
