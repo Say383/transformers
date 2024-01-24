@@ -218,15 +218,17 @@ def make_github_table_per_model(reduced_by_model):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Required parameters
-    parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
+    parser.add_argument("--workflow_run_id", type=str, help="A GitHub Actions workflow run id.")
     parser.add_argument(
         "--output_dir",
         type=str,
-        required=True,
         help="Where to store the downloaded artifacts and other result files.",
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
+
+    if not args.workflow_run_id or not args.output_dir:
+        parser.error('Missing or invalid command-line arguments. Please provide --workflow_run_id and --output_dir.')
 
     os.makedirs(args.output_dir, exist_ok=True)
 
