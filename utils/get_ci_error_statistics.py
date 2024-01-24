@@ -31,8 +31,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        logging.error(f'Unknown error, could not fetch links: {e}')
 
     return {}
 
