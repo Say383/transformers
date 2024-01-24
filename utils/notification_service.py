@@ -595,6 +595,9 @@ class Message:
         for idx, error in enumerate(failures):
             new_text = failure_text + f'*{error["line"]}*\n_{error["trace"]}_\n\n'
             if len(new_text) > MAX_ERROR_TEXT:
+                # `failure_text` here has length <= MAX_ERROR_TEXT
+                failure_text = failure_text + "[Truncated]"
+                break
                 # `failure_text` here has length <= 3000
                 failure_text = failure_text + "[Truncated]"
                 break
