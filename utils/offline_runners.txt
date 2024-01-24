@@ -1,0 +1,10 @@
+# Step 1: Import necessary modules and functions
+
+# No additional imports are required.
+
+# Step 2: Create the new file
+with open("utils/offline_runners.txt", "w") as file:
+    file.write("")
+
+# Step 3: Close the file
+# The file will be automatically closed when the `with` block is exited.
