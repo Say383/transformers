@@ -519,17 +519,12 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
-            result = os.environ.get("OFFLINE_RUNNERS")
-            if result is not None:
-                offline_runners = json.loads(result)
-        elif runner_failed:
-            text = "💔 CI runners have problems! Tests are not run. 😭"
-        elif setup_failed:
-            text = "💔 Setup job failed. Tests are not run. 😭"
+        text = ""
+        if offline_runners:
+            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n{text}\n\n"
         else:
-            text = "💔 There was an issue running the tests. 😭"
+            text = "🙏 Let's fix it ASAP! 🙏"
 
         error_block_1 = {
             "type": "header",
