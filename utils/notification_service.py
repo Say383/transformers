@@ -92,7 +92,7 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
     else:
         lists = objects
 
-    # Convert each dictionary to counter
+    # Convert each dictionary to a counter
     counters = map(collections.Counter, lists)
     # Sum all the counters
     return functools.reduce(operator.add, counters)
