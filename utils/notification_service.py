@@ -13,11 +13,15 @@ from os import environ
 # limitations under the License.
 
 import ast
+import importlib
+import sys
 import collections
 import functools
 import json
 import operator
 import os
+import importlib
+import sys
 import re
 import sys
 import time
@@ -769,6 +773,15 @@ def prepare_reports(title, header, reports, to_truncate=True):
 
 
 if __name__ == "__main__":
+    PYTHON_MODULES = ['torch', 'tensorflow', 'flax']
+    PYTHON_VERSION = f'{sys.version_info.major}.{sys.version_info.minor}'
+    for mod in PYTHON_MODULES:
+        try:
+            imported_module = importlib.import_module(mod)
+        except ModuleNotFoundError:
+            print(f'{mod} is not installed.')
+        else:
+            print(f'{mod} is installed and available.')
     runner_status = os.environ.get("RUNNER_STATUS")
     runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
     setup_status = os.environ.get("SETUP_STATUS")
