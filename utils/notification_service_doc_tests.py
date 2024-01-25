@@ -378,3 +378,4 @@ if __name__ == "__main__":
     message = Message("🤗 Results of the doc tests.", doc_test_results)
     message.post()
     message.post_reply()
+    message.post_reply()
