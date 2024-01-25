@@ -33,7 +33,7 @@ def get_job_time(workflow_run_id, token=None):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/timing?per_page=100"
     result = requests.get(url, headers=headers).json()
     job_time = {}
 
@@ -47,7 +47,7 @@ def get_job_time(workflow_run_id, token=None):
 
         return job_time
     except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        raise Exception('Unknown error occurred while fetching job time information')
 
     return {}
 
