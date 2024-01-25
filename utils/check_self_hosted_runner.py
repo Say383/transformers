@@ -34,7 +34,7 @@ if __name__ == "__main__":
     def list_str(values):
         return values.split(",")
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description="Check status of self-hosted runners.")
     # Required parameters
     parser.add_argument(
         "--target_runners",
