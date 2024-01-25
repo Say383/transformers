@@ -87,7 +87,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     failed_tests = []
     job_name = None
 
-    with zipfile.ZipFile(artifact_zip_path) as z:
+    with zipfile.ZipFile(artifact_zip_path, 'r') as z:
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
