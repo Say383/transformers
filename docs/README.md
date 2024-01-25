@@ -1,4 +1,4 @@
-<!---
+<!-- Troubleshooting and Fixing GitHub Actions Runs -->
 Copyright 2020 The HuggingFace Team. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,23 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Generating the documentation
+# Troubleshooting and Fixing GitHub Actions Runs
+
+## Analyzing and Fixing Errors
+
+When a GitHub Actions run fails, it's important to analyze the error logs to identify the cause of the failure and take appropriate actions to fix the issue. Here are the steps to troubleshoot and fix failing GitHub Actions runs:
+
+1. **Analyze Error Logs**: Examine the error logs to identify the specific error message or stack trace that caused the failure.
+
+2. **Identify the Cause**: Look for patterns or common errors in the logs to determine the root cause of the failure.
+
+3. **Take Appropriate Actions**: Once the cause of the failure is identified, take the necessary actions to fix the issue. This may involve updating code, configuration files, or dependencies.
+
+For error analysis and statistics, you can use the newly created files and functions:
+
+- [`get_ci_error_statistics`](./utils/get_ci_error_statistics.py)
+- [`extract_warnings`](./utils/extract_warnings.py)
+- [`notification_service_doc_tests`](./utils/notification_service_doc_tests.py)
 
 To generate the documentation, you first have to build it. Several packages are necessary to build the doc, 
 you can install them with the following command, at the root of the code repository:
