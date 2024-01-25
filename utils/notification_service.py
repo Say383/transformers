@@ -9,6 +9,8 @@
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 from os import environ
+
+# Access the Slack API token from your Slack app and set it as the environment variable CI_SLACK_BOT_TOKEN.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
@@ -33,7 +35,11 @@ from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+slack_token = os.environ.get("CI_SLACK_BOT_TOKEN")
+if slack_token:
+    client = WebClient(token=slack_token)
+else:
+    print("Error: Slack API token is missing or incorrect.")
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
