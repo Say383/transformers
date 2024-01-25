@@ -1,0 +1,8 @@
+# utils/offline_runners.txt
+
+# Contents of the offline_runners.txt file
+# Add the offline runners here, each on a new line
+runner1
+runner2
+runner3
+...
