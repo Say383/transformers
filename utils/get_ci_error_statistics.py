@@ -17,7 +17,7 @@ def get_job_links(workflow_run_id, token=None):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100" # Update the URL to handle the combination of the job names in the caller and callee.
     result = requests.get(url, headers=headers).json()
     job_links = {}
 
@@ -43,7 +43,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100" # Update the URL to handle the combination of the artifact names in the caller and callee.
     result = requests.get(url, headers=headers).json()
     artifacts = {}
 
@@ -81,7 +81,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         fp.write(response.content)
 
 
-def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
+def get_errors_from_single_artifact(artifact_zip_path, job_links=None): # Update the function signature to indicate that the artifact name may be a combination of the artifact names in the caller and callee.
     """Extract errors from a downloaded artifact (in .zip format)"""
     errors = []
     failed_tests = []
@@ -133,14 +133,14 @@ def get_all_errors(artifact_dir, job_links=None):
 
     errors = []
 
-    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
+    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")] # Update to handle the combination of the artifact names in the caller and callee.
     for p in paths:
         errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
 
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+def reduce_by_error(logs, error_filter=None): # Update the function signature to indicate that the error name may be a combination of the error names in the caller and callee.
     """count each error"""
 
     counter = Counter()
@@ -166,7 +166,7 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def reduce_by_model(logs, error_filter=None): # Update the function signature to indicate that the model name may be a combination of the model names in the caller and callee.
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
@@ -188,7 +188,7 @@ def reduce_by_model(logs, error_filter=None):
     return r
 
 
-def make_github_table(reduced_by_error):
+def make_github_table(reduced_by_error): # Update the function signature to indicate that the error name may be a combination of the error names in the caller and callee.
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
     lines = [header, sep]
@@ -200,7 +200,7 @@ def make_github_table(reduced_by_error):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(reduced_by_model): # Update the function signature to indicate that the model name may be a combination of the model names in the caller and callee.
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
