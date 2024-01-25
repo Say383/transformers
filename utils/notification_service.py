@@ -594,11 +594,11 @@ class Message:
         failure_text = ""
         for idx, error in enumerate(failures):
             new_text = failure_text + f'*{error["line"]}*\n_{error["trace"]}_\n\n'
-            if len(new_text) > MAX_ERROR_TEXT:
+            if len(new_text) > 3000 - len("[Truncated]"): 
                 # `failure_text` here has length <= 3000
                 failure_text = failure_text + "[Truncated]"
                 break
-            # `failure_text` here has length <= MAX_ERROR_TEXT
+            # `failure_text` here has length <= 3000
             failure_text = new_text
 
         title = job_name
