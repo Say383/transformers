@@ -33,10 +33,10 @@ try:
 
     print("Torch version:", torch.__version__)
     print("Cuda available:", torch.cuda.is_available())
-    print("Cuda version:", torch.version.cuda)
-    print("CuDNN version:", torch.backends.cudnn.version())
-    print("Number of GPUs available:", torch.cuda.device_count())
-    print("NCCL version:", torch.cuda.nccl.version())
+    print("Cuda version:", torch.version.cuda if torch.cuda.is_available() else None)
+    print("CuDNN version:", torch.backends.cudnn.version() if torch.cuda.is_available() else None)
+    print("Number of GPUs available:", torch.cuda.device_count() if torch.cuda.is_available() else 0)
+    print("NCCL version:", torch.cuda.nccl.version() if torch.cuda.is_available() else None)
 except ImportError:
     print("Torch version:", None)
 
@@ -52,6 +52,6 @@ try:
 
     print("TensorFlow version:", tf.__version__)
     print("TF GPUs available:", bool(tf.config.list_physical_devices("GPU")))
-    print("Number of TF GPUs available:", len(tf.config.list_physical_devices("GPU")))
+    print("Number of TF GPUs available:", len(tf.config.list_physical_devices("GPU")) if bool(tf.config.list_physical_devices("GPU")) else 0)
 except ImportError:
     print("TensorFlow version:", None)
