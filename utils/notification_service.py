@@ -8,16 +8,22 @@
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+from os import environ
+
+# Access the Slack API token from your Slack app and set it as the environment variable CI_SLACK_BOT_TOKEN.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
 import ast
+import importlib
+import sys
 import collections
 import functools
 import json
 import operator
 import os
+import importlib
+import sys
 import re
 import sys
 import time
@@ -29,7 +35,11 @@ from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+slack_token = os.environ.get("CI_SLACK_BOT_TOKEN")
+if slack_token:
+    client = WebClient(token=slack_token)
+else:
+    print("Error: Slack API token is missing or incorrect.")
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
@@ -54,7 +64,7 @@ def handle_test_results(test_results):
 
     # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
     # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+    time_spent = expressions[-1]
 
     for i, expression in enumerate(expressions):
         if "failed" in expression:
@@ -92,7 +102,7 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
     else:
         lists = objects
 
-    # Convert each dictionary to counter
+    # Convert each dictionary to a counter
     counters = map(collections.Counter, lists)
     # Sum all the counters
     return functools.reduce(operator.add, counters)
@@ -771,6 +781,15 @@ def prepare_reports(title, header, reports, to_truncate=True):
 
 
 if __name__ == "__main__":
+    PYTHON_MODULES = ['torch', 'tensorflow', 'flax']
+    PYTHON_VERSION = f'{sys.version_info.major}.{sys.version_info.minor}'
+    for mod in PYTHON_MODULES:
+        try:
+            imported_module = importlib.import_module(mod)
+        except ModuleNotFoundError:
+            print(f'{mod} is not installed.')
+        else:
+            print(f'{mod} is installed and available.')
     runner_status = os.environ.get("RUNNER_STATUS")
     runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
     setup_status = os.environ.get("SETUP_STATUS")
