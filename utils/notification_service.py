@@ -26,45 +26,6 @@ from typing import Dict, List, Optional, Union
 import requests
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
-from slack_sdk import WebClient
-
-
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
-
-NON_MODEL_TEST_MODULES = [
-    "benchmark",
-    "deepspeed",
-    "extended",
-    "fixtures",
-    "generation",
-    "onnx",
-    "optimization",
-    "pipelines",
-    "sagemaker",
-    "trainer",
-    "utils",
-]
-
-
-def handle_test_results(test_results):
-    expressions = test_results.split(" ")
-
-    failed = 0
-    success = 0
-
-    # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
-    # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
-
-    for i, expression in enumerate(expressions):
-        if "failed" in expression:
-            failed += int(expressions[i - 1])
-        if "passed" in expression:
-            success += int(expressions[i - 1])
-
-    return failed, success, time_spent
-
-
 def handle_stacktraces(test_results):
     # These files should follow the following architecture:
     # === FAILURES ===
@@ -573,6 +534,9 @@ class Message:
         )
 
     def post(self):
+        for k, v in self.model_results.items():
+            if k in NON_MODEL_TEST_MODULES:
+                pass
         payload = self.payload
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
