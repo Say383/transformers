@@ -1,0 +1,5 @@
+utils/offline_runners.txt:
+
+This file will be created with the information about the offline runners. It will be empty initially and will be populated by the `get_runner_status` function in the "utils/check_self_hosted_runner.py" file.
+
+Commit message: "feat/fix: Create offline_runners.txt file"
