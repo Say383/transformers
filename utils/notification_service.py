@@ -29,7 +29,7 @@ from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+client = WebClient(token="YOUR_SLACK_API_TOKEN")
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
@@ -532,6 +532,8 @@ class Message:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
             text = "💔 There was an issue running the tests. 😭"
+    if len(offline_runners) > 0:
+        text = f"The following runners are offline:\n  • " + "\n  • ".join(offline_runners) + "🙏 Let's fix it ASAP! 🙏"
 
         error_block_1 = {
             "type": "header",
@@ -566,8 +568,10 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
-        client.chat_postMessage(
+        client.chat_postMessage(channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+        message.post_reply()
+        message.post_reply()
             text=text,
             blocks=payload,
         )
@@ -577,7 +581,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
-        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+        text = f"Number of failures: {self.n_failures} out of {self.n_tests} tests," if self.n_failures else "All tests are passing."
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
@@ -1031,4 +1035,4 @@ if __name__ == "__main__":
     # send report only if there is any failure (for push CI)
     if message.n_failures or ci_event != "push":
         message.post()
-        message.post_reply()
+        # Remove the debug print statements for troubleshooting
