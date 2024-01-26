@@ -3,6 +3,8 @@ import json
 import math
 import os
 import time
+import logging
+from logging import basicConfig
 import traceback
 import zipfile
 from collections import Counter
@@ -73,7 +75,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+    try:
+        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
