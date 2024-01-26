@@ -363,7 +363,6 @@ class Message:
                 value["TensorFlow"]["multi"],
                 sum(value["other"].values()),
             ]
-
             if sum(device_report_values):
                 device_report = " | ".join([str(x).rjust(9) for x in device_report_values]) + " | "
                 report = f"{device_report}{key}"
