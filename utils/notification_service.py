@@ -31,6 +31,8 @@ from slack_sdk import WebClient
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
 
+import json
+
 NON_MODEL_TEST_MODULES = [
     "benchmark",
     "deepspeed",
@@ -97,6 +99,10 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
     # Sum all the counters
     return functools.reduce(operator.add, counters)
 
+
+import json
+
+import json
 
 class Message:
     def __init__(
