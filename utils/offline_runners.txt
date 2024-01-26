@@ -1,0 +1,7 @@
+# utils/offline_runners.txt
+
+# Create the file if it does not exist
+with open("utils/offline_runners.txt", "a+") as file:
+    file.seek(0)
+    if file.read(1) == "":
+        file.write("")
