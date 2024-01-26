@@ -1031,4 +1031,4 @@ if __name__ == "__main__":
     # send report only if there is any failure (for push CI)
     if message.n_failures or ci_event != "push":
         message.post()
-        message.post_reply()
+        # Remove the debug print statements for troubleshooting
