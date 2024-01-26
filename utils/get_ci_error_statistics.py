@@ -4,10 +4,10 @@ import math
 import os
 import time
 import traceback
-import zipfile
+import zipfile, os
 from collections import Counter
 
-import requests
+import requests, os
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -30,7 +30,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        print(f'An exception occurred: {str(e)}')
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -73,6 +74,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
+    artifact_url = f"https://api.github.com/repos/huggingface/transformers/actions/artifacts/{{ARTIFACT_ID}}/zip"
     result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
