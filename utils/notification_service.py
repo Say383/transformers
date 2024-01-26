@@ -18,6 +18,7 @@ import functools
 import json
 import operator
 import os
+import builtins
 import re
 import sys
 import time
@@ -678,6 +679,12 @@ class Message:
 
 
 def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
+    try:
+        with open("offline_runners.txt", "r") as fp:
+            failed = fp.read()
+    except builtins.FileNotFoundError:
+        failed = ""
+
     if gpu not in [None, "single", "multi"]:
         raise ValueError(f"Invalid GPU for artifact. Passed GPU: `{gpu}`.")
 
