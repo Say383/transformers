@@ -1,0 +1,25 @@
+import os
+import json
+
+def create_offline_runners_file():
+    file_path = os.path.join("utils", "offline_runners.txt")
+    content = "This is the content of the offline_runners.txt file."
+
+    try:
+        with open(file_path, "w") as file:
+            file.write(content)
+    except Exception as e:
+        print(f"Error creating the offline_runners.txt file: {str(e)}")
+
+# Unit tests
+def test_create_offline_runners_file():
+    create_offline_runners_file()
+
+    file_path = os.path.join("utils", "offline_runners.txt")
+    assert os.path.exists(file_path), "The offline_runners.txt file was not created."
+
+    with open(file_path, "r") as file:
+        content = file.read()
+        assert content == "This is the content of the offline_runners.txt file.", "Incorrect file content."
+
+test_create_offline_runners_file()
