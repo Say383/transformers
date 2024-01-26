@@ -3,6 +3,7 @@ import json
 import os
 import time
 import zipfile
+import logging
 
 from get_ci_error_statistics import download_artifact, get_artifacts_links
 
@@ -37,7 +38,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 line = line.strip()
                 buffer.append(line)
 
-    if from_gh:
+    if from_gh or not os.path.exists(artifact_path):
         for filename in os.listdir(artifact_path):
             file_path = os.path.join(artifact_path, filename)
             if not os.path.isdir(file_path):
@@ -46,7 +47,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                     continue
                 with open(file_path) as fp:
                     parse_line(fp)
-    else:
+    elif not from_gh and os.path.exists(artifact_path):
         try:
             with zipfile.ZipFile(artifact_path) as z:
                 for filename in z.namelist():
