@@ -1,0 +1,12 @@
+# utils/offline_runners.txt
+
+{
+  "runner1": {
+    "status": "offline",
+    "type": "single-gpu"
+  },
+  "runner2": {
+    "status": "offline",
+    "type": "multi-gpu"
+  }
+}
