@@ -19,6 +19,7 @@ import functools
 import importlib
 import inspect
 import logging
+from helpers import log_error
 import multiprocessing
 import os
 import re
