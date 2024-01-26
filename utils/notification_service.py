@@ -532,6 +532,8 @@ class Message:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
             text = "💔 There was an issue running the tests. 😭"
+    if len(offline_runners) > 0:
+        text = f"The following runners are offline:\n  • " + "\n  • ".join(offline_runners) + "🙏 Let's fix it ASAP! 🙏"
 
         error_block_1 = {
             "type": "header",
