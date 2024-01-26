@@ -568,6 +568,8 @@ class Message:
 
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+        message.post_reply()
+        message.post_reply()
             text=text,
             blocks=payload,
         )
