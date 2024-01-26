@@ -5,6 +5,7 @@ import time
 import zipfile
 
 from get_ci_error_statistics import download_artifact, get_artifacts_links
+import argparse, json, os, time, zipfile
 
 from transformers import logging
 
@@ -109,7 +110,25 @@ if __name__ == "__main__":
     from_gh = args.from_gh
     if from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
-        pass
+        if from_gh:
+            # The artifacts have to be downloaded using `actions/download-artifact@v3`
+            pass
+        else:
+            os.makedirs(args.output_dir, exist_ok=True)
+
+            # get download links
+            artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
+            with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
+                json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+
+            # download artifacts
+            for idx, (name, url) in enumerate(artifacts.items()):
+                print(name)
+                print(url)
+                print("=" * 80)
+                download_artifact(name, url, args.output_dir, args.token)
+                # Be gentle to GitHub
+                time.sleep(1)
     else:
         os.makedirs(args.output_dir, exist_ok=True)
 
