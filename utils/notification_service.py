@@ -19,6 +19,9 @@ import json
 import operator
 import os
 import re
+import torch
+import tensorflow as tf
+import flax
 import sys
 import time
 from typing import Dict, List, Optional, Union
@@ -29,7 +32,7 @@ from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+client = WebClient(token="YOUR_VALID_SLACK_API_TOKEN_HERE")
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
