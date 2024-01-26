@@ -1,0 +1,21 @@
+utils/offline_runners.txt:
+
+This file will be created with an empty initial content. It will be used to store the list of offline runners.
+
+notification_service.py:
+
+1. Update the `error_out` method:
+   - Add a new parameter `offline_runners_file` to the method signature.
+   - Read the list of offline runners from the `offline_runners.txt` file using the `offline_runners_file` parameter.
+   - Update the logic to handle the case when there are no offline runners available.
+   - Write the list of offline runners to the `offline_runners.txt` file using the `offline_runners_file` parameter when necessary.
+
+2. Update the `post` method:
+   - Add a new parameter `offline_runners_file` to the method signature.
+   - Include the link to the GitHub Actions run in the message using the `os.environ['GITHUB_RUN_ID']` environment variable.
+
+3. Update the `post_reply` method:
+   - Add a new parameter `offline_runners_file` to the method signature.
+   - Include the link to the GitHub Actions run in the reply message using the `os.environ['GITHUB_RUN_ID']` environment variable.
+
+Commit message: "feat: Create offline_runners.txt and update notification_service.py"
