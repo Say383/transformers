@@ -13,12 +13,16 @@
 # limitations under the License.
 
 import ast
+import json
 import collections
 import functools
+import os
 import json
 import operator
 import os
 import re
+import json
+import json
 import sys
 import time
 from typing import Dict, List, Optional, Union
@@ -541,9 +545,14 @@ class Message:
             },
         }
 
+        try:
+            offline_runners = json.loads(result)
+        except json.JSONDecodeError:
+            offline_runners = []
+
         text = ""
         if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n  • " + "\n  • ".join(offline_runners) if offline_runners else "No runners are currently offline."
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
 
@@ -712,7 +721,7 @@ def retrieve_available_artifacts():
     _available_artifacts: Dict[str, Artifact] = {}
 
     directories = filter(os.path.isdir, os.listdir())
-    for directory in directories:
+    for diretory in directories:
         artifact_name = directory
 
         name_parts = artifact_name.split("_postfix_")
