@@ -47,6 +47,7 @@ NON_MODEL_TEST_MODULES = [
 
 
 def handle_test_results(test_results):
+    offline_runners = []
     expressions = test_results.split(" ")
 
     failed = 0
@@ -66,6 +67,7 @@ def handle_test_results(test_results):
 
 
 def handle_stacktraces(test_results):
+    offline_runners = []
     # These files should follow the following architecture:
     # === FAILURES ===
     # <path>:<line>: Error ...
@@ -87,6 +89,9 @@ def handle_stacktraces(test_results):
 
 
 def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
+    if os.path.exists("utils/offline_runners.txt"):
+        with open("utils/offline_runners.txt", "r") as f:
+            offline_runners = f.read().splitlines()
     if isinstance(objects, dict):
         lists = objects.values()
     else:
@@ -99,6 +104,51 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
 
 
 class Message:
+    def __init__(
+        self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
+    ):
+        self.title = title
+        self.ci_title = ci_title
+
+        # Failures and success of the modeling tests
+        self.n_model_success = sum(r["success"] for r in model_results.values())
+        self.n_model_single_gpu_failures = sum(dicts_to_sum(r["failed"])["single"] for r in model_results.values())
+        self.n_model_multi_gpu_failures = sum(dicts_to_sum(r["failed"])["multi"] for r in model_results.values())
+
+        # Some suites do not have a distinction between single and multi GPU.
+        self.n_model_unknown_failures = sum(dicts_to_sum(r["failed"])["unclassified"] for r in model_results.values())
+        self.n_model_failures = (
+            self.n_model_single_gpu_failures + self.n_model_multi_gpu_failures + self.n_model_unknown_failures
+        )
+
+        # Failures and success of the additional tests
+        self.n_additional_success = sum(r["success"] for r in additional_results.values())
+
+        all_additional_failures = dicts_to_sum([r["failed"] for r in additional_results.values()])
+        self.n_additional_single_gpu_failures = all_additional_failures["single"]
+        self.n_additional_multi_gpu_failures = all_additional_failures["multi"]
+        self.n_additional_unknown_gpu_failures = all_additional_failures["unclassified"]
+        self.n_additional_failures = (
+            self.n_additional_single_gpu_failures
+            + self.n_additional_multi_gpu_failures
+            + self.n_additional_unknown_gpu_failures
+        )
+
+        # Results
+        self.n_failures = self.n_model_failures + self.n_additional_failures
+        self.n_success = self.n_model_success + self.n_additional_success
+        self.n_tests = self.n_failures + self.n_success
+
+        self.model_results = model_results
+        self.additional_results = additional_results
+
+        self.thread_ts = None
+
+        if selected_warnings is None:
+            selected_warnings = []
+        self.selected_warnings = selected_warnings
+
+    @property
     def __init__(
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
