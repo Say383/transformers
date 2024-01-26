@@ -1,0 +1,17 @@
+import os
+import json
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+
+    try:
+        with open(file_path, "w") as file:
+            # Write the contents of the file
+            file.write("")
+
+    except Exception as e:
+        # Handle any exceptions that may occur
+        print(f"Error creating the offline_runners.txt file: {str(e)}")
+
+# Call the function to create the file
+create_offline_runners_file()
