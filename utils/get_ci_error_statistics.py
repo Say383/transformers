@@ -13,11 +13,13 @@ import requests
 def get_job_links(workflow_run_id, token=None):
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
-    headers = None
-    if token is not None:
-        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    headers = {"Accept": "application/vnd.github+json"}
+    if token is not None and len(token) > 0:
+        headers["Authorization"] = f"Bearer {token}"
+    else:
+        print('Invalid token! Please check the authentication token.')
 
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/workflows/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
     job_links = {}
 
@@ -40,7 +42,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
 
     headers = None
-    if token is not None:
+    if token is not None and len(token) > 0:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
@@ -73,9 +75,12 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    result = requests.get(artifact_url, headers=headers, allow_redirects=False)
-    download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+        download_url = result.headers["Location"]
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        print(f'Error while downloading artifact: {e}')
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
@@ -89,7 +94,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
 
     with zipfile.ZipFile(artifact_zip_path) as z:
         for filename in z.namelist():
-            if not os.path.isdir(filename):
+            if z.extract(filename):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
@@ -135,7 +140,7 @@ def get_all_errors(artifact_dir, job_links=None):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
-        errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        errors.extend(get_errors_from_single_artifact(p, job_links=job_links) or [])
 
     return errors
 
