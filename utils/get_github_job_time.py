@@ -26,7 +26,7 @@ def extract_time_from_single_job(job):
     return job_info
 
 
-def get_job_time(workflow_run_id, token=None):
+def get_job_time(workflow_run_id, token=None, page=1):
     """Extract time info for all jobs in a GitHub Actions workflow run"""
 
     headers = None

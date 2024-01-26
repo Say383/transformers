@@ -36,7 +36,7 @@ def handle_test_results(test_results):
 
     # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
     # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+    time_spent = expressions[-1]
 
     for i, expression in enumerate(expressions):
         if "failed" in expression:
@@ -54,7 +54,7 @@ def extract_first_line_failure(failures_short_lines):
     for line in failures_short_lines.split("\n"):
         if re.search(r"_ \[doctest\]", line):
             in_error = True
-            file = line.split(" ")[2]
+            file = line.split(" ", 2)[-1]
         elif in_error and not line.split(" ")[0].isdigit():
             failures[file] = line
             in_error = False
@@ -66,7 +66,7 @@ class Message:
     def __init__(self, title: str, doc_test_results: Dict):
         self.title = title
 
-        self._time_spent = doc_test_results["time_spent"].split(",")[0]
+        self._time_spent = doc_test_results["time_spent"]
         self.n_success = doc_test_results["success"]
         self.n_failures = doc_test_results["failures"]
         self.n_tests = self.n_success + self.n_failures
