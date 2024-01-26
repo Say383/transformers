@@ -18,7 +18,9 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+        result = requests.get(url, headers=headers)
+        result.raise_for_status()
+        result = result.json()
     job_links = {}
 
     try:
@@ -26,7 +28,9 @@ def get_job_links(workflow_run_id, token=None):
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+        result = requests.get(url + f"&page={i + 2}", headers=headers)
+        result.raise_for_status()
+        result = result.json()
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
@@ -44,8 +48,13 @@ def get_artifacts_links(worflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    artifacts = {}
+    try:
+        result = requests.get(url, headers=headers)
+        result.raise_for_status()
+        artifacts = result.json()
+    except Exception as e:
+        print(f"Error occurred while fetching artifacts links: {e}")
+        artifacts = {}
 
     try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
@@ -73,9 +82,8 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    result = requests.get(artifact_url, headers=headers, allow_redirects=False)
-    download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    response = requests.get(artifact_url, headers=headers, allow_redirects=True)
+    response.raise_for_status()
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
@@ -91,25 +99,28 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
-                if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
+                if filename in ["error_log.txt"]:
                     with z.open(filename) as f:
                         for line in f:
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
                                 try:
-                                    # `error_line` is the place where `error` occurs
-                                    error_line = line[: line.index(": ")]
-                                    error = line[line.index(": ") + len(": ") :]
+                                    # Read the error_log.txt file and extract error information
+                                    error_line = line
+                                    error = line
                                     errors.append([error_line, error])
                                 except Exception:
                                     # skip un-related lines
                                     pass
-                            elif filename == "summary_short.txt" and line.startswith("FAILED "):
+                            # Extract failed tests from the error_log.txt file
+                            elif filename == "error_log.txt":
                                 # `test` is the test method that failed
-                                test = line[len("FAILED ") :]
+                                if line.startswith("FAILED "):
+                                    test = line[len("FAILED ") :]
                                 failed_tests.append(test)
+                            # Extract the job name from the job_name.txt file
                             elif filename == "job_name.txt":
-                                job_name = line
+                                job_name = line.strip()
 
     if len(errors) != len(failed_tests):
         raise ValueError(
@@ -135,7 +146,7 @@ def get_all_errors(artifact_dir, job_links=None):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
-        errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        errors.errors.extend(get_errors_from_single_artifact(p, job_links=job_links) or [])
 
     return errors
 
@@ -157,7 +168,7 @@ def reduce_by_error(logs, error_filter=None):
 
 def get_model(test):
     """Get the model name from a test method"""
-    test = test.split("::")[0]
+    test = test.split("::")[0] if test.startswith("tests/models/") else test.split("/")[2] if test.startswith("tests/") else test if test is not None else None.split("::")[0]
     if test.startswith("tests/models/"):
         test = test.split("/")[2]
     else:
@@ -176,7 +187,20 @@ def reduce_by_model(logs, error_filter=None):
     r = {}
     for test in tests:
         counter = Counter()
-        # count by errors in `test`
+        #         # Count errors per model
+        logs = [x for x in logs if x[2] is not None]
+        tests = {x[2] for x in logs}
+
+        r = {}
+        for test in tests:
+            counter = Counter()
+            # count by errors in `test`
+            counter.update([x[1] for x in logs if x[2] == test])
+            counts = counter.most_common()
+            error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
+            n_errors = sum(error_counts.values())
+            if n_errors > 0:
+                r[test] = {
         counter.update([x[1] for x in logs if x[2] == test])
         counts = counter.most_common()
         error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
@@ -194,9 +218,8 @@ def make_github_table(reduced_by_error):
     lines = [header, sep]
     for error in reduced_by_error:
         count = reduced_by_error[error]["count"]
-        line = f"| {count} | {error[:100]} |  |"
+        line = f"| {count} | {error[:100]} |  \t|"
         lines.append(line)
-
     return "\n".join(lines)
 
 
@@ -224,11 +247,11 @@ if __name__ == "__main__":
         help="Where to store the downloaded artifacts and other result files.",
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
-    args = parser.parse_args()
+    args = parser.parse_args([])
 
     os.makedirs(args.output_dir, exist_ok=True)
 
-    _job_links = get_job_links(args.workflow_run_id, token=args.token)
+    job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
     # To deal with `workflow_call` event, where a job name is the combination of the job names in the caller and callee.
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
@@ -260,7 +283,7 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
-        print(item)
+        pass
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
