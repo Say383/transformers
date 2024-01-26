@@ -1,0 +1,40 @@
+import os
+import json
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    runners_data = {
+        "runner1": "data1",
+        "runner2": "data2",
+        "runner3": "data3"
+    }
+
+    try:
+        with open(file_path, "w") as file:
+            file.write(json.dumps(runners_data))
+    except Exception as e:
+        print(f"Error creating offline runners file: {str(e)}")
+
+# Unit tests
+def test_create_offline_runners_file():
+    # Test creating the file and writing the correct data
+    create_offline_runners_file()
+    assert os.path.exists("utils/offline_runners.txt")
+
+    with open("utils/offline_runners.txt") as file:
+        data = json.load(file)
+        assert data == {
+            "runner1": "data1",
+            "runner2": "data2",
+            "runner3": "data3"
+        }
+
+    # Test handling exceptions
+    # Mock an exception by passing an invalid file path
+    try:
+        with open("invalid_path/offline_runners.txt", "w") as file:
+            file.write(json.dumps(runners_data))
+    except Exception as e:
+        assert str(e) == "No such file or directory: 'invalid_path/offline_runners.txt'"
+
+test_create_offline_runners_file()
