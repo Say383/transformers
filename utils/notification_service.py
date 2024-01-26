@@ -12,6 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
+import json
+import json
 import ast
 import collections
 import functools
@@ -559,6 +562,9 @@ class Message:
                 "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
             },
         }
+        print("Sending the following payload")
+        print(json.dumps({"blocks": blocks}))
+        
         blocks.extend([error_block_1, error_block_2])
 
         payload = json.dumps(blocks)
@@ -566,7 +572,13 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
+        print("Sending the following payload")
+        print(json.dumps({"blocks": blocks}))
         client.chat_postMessage(
+                channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                text=text,
+                blocks=payload,
+            )(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
             blocks=payload,
@@ -627,7 +639,21 @@ class Message:
             {"type": "section", "text": {"type": "mrkdwn", "text": failure_text}},
         ]
 
-    def post_reply(self):
+        MAX_ERROR_TEXT = 3000 - len("[Truncated]")
+
+        failure_text = ""
+        for idx, error in enumerate(failures):
+            new_text = failure_text + f'*{error["line"]}*\n_{error["trace"]}_\n\n'
+            if len(new_text) > MAX_ERROR_TEXT:
+                failure_text = failure_text + "[Truncated]"
+                break
+            failure_text = new_text
+
+        title = job_name
+        if device is not None:
+            title += f" ({device}-gpu)"
+
+        content = {"type": "section", "text": {"type": "mrkdwn", "text": text}}
         if self.thread_ts is None:
             raise ValueError("Can only post reply if a post has been made.")
 
