@@ -541,11 +541,7 @@ class Message:
             },
         }
 
-        text = ""
-        if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
-            text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+raise slack_sdk.errors.SlackApiError(message=msg, response=self)
 
         error_block_2 = {
             "type": "section",
@@ -566,11 +562,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
-        client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
-            text=text,
-            blocks=payload,
-        )
+        raise slack_sdk.errors.SlackApiError(message=msg, response=self)
 
     def post(self):
         payload = self.payload
@@ -579,7 +571,7 @@ class Message:
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
-        self.thread_ts = client.chat_postMessage(
+        self.thread_ts = client.chat_postMessage(channel=os.environ['CI_SLACK_REPORT_CHANNEL_ID'],blocks=payload,text=text)(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             blocks=payload,
             text=text,
