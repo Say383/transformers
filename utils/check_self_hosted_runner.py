@@ -45,8 +45,10 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token", default=None, type=str, required=True, help="A token that has actions:read permission. This token is required to authenticate with the GitHub API."
     )
     args = parser.parse_args()
 
     get_runner_status(args.target_runners, args.token)
+    if args.token is None:
+        raise ValueError("The --token argument is required.")
