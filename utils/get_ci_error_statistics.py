@@ -7,10 +7,16 @@ import logging
 from logging import basicConfig
 import traceback
 import zipfile
-from collections import Counter
+from collections import Counter, defaultdict
 
 import requests
 
+
+import pytest
+
+def test_get_job_links():
+    # Add test cases for get_job_links function here
+    pass
 
 def get_job_links(workflow_run_id, token=None):
     """Extract job names and their job links in a GitHub Actions workflow run"""
@@ -63,6 +69,12 @@ def get_artifacts_links(worflow_run_id, token=None):
 
     return {}
 
+
+import pytest
+
+def test_download_artifact():
+    # Add test cases for download_artifact function here
+    pass
 
 def download_artifact(artifact_name, artifact_url, output_dir, token):
     """Download a GitHub Action artifact from a URL.
@@ -133,6 +145,12 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     return result
 
 
+import pytest
+
+def test_get_all_errors():
+    # Add test cases for get_all_errors function here
+    pass
+
 def get_all_errors(artifact_dir, job_links=None):
     """Extract errors from all artifact files"""
 
@@ -144,6 +162,12 @@ def get_all_errors(artifact_dir, job_links=None):
 
     return errors
 
+
+import pytest
+
+def test_reduce_by_error():
+    # Add test cases for reduce_by_error function here
+    pass
 
 def reduce_by_error(logs, error_filter=None):
     """count each error"""
@@ -160,6 +184,12 @@ def reduce_by_error(logs, error_filter=None):
     return r
 
 
+import pytest
+
+def test_get_model():
+    # Add test cases for get_model function here
+    pass
+
 def get_model(test):
     """Get the model name from a test method"""
     test = test.split("::")[0]
@@ -170,6 +200,12 @@ def get_model(test):
 
     return test
 
+
+import pytest
+
+def test_reduce_by_model():
+    # Add test cases for reduce_by_model function here
+    pass
 
 def reduce_by_model(logs, error_filter=None):
     """count each error per model"""
