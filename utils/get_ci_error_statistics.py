@@ -267,7 +267,7 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
-        print(item)
+        log_info(str(item))
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
@@ -282,3 +282,13 @@ if __name__ == "__main__":
         fp.write(s1)
     with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s2)
+log_info("Starting the script")
+log_info(f"Workflow Run ID: {args.workflow_run_id}")
+log_info(f"Output Directory: {args.output_dir}")
+log_info(f"Token: {args.token}")
+log_info(f"Job Links: {_job_links}")
+log_info(f"Artifacts: {artifacts}")
+log_info(f"Errors: {errors}")
+log_info(f"Reduced by Error: {reduced_by_error}")
+log_info(f"Reduced by Model: {reduced_by_model}")
+log_info("Script execution completed")
