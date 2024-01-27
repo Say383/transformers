@@ -4,6 +4,9 @@ import math
 import os
 import time
 import logging
+from utils.logging import log_error, log_message, setup_logger
+
+logger = setup_logger(os.path.join(os.path.dirname(__file__), "logs", "script.log"))
 from logging import basicConfig
 import traceback
 import zipfile
