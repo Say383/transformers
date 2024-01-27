@@ -1,4 +1,4 @@
-import argparse
+import argparse, extract_warnings
 import json
 import math
 import os
@@ -9,7 +9,7 @@ import traceback
 import zipfile
 from collections import Counter
 
-import requests
+import requests, extract_warnings_from_single_artifact, extract_warnings
 
 
 def get_job_links(workflow_run_id, token=None):
