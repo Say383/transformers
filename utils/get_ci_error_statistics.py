@@ -161,8 +161,13 @@ def get_all_errors(artifact_dir, job_links=None):
 def reduce_by_error(logs, error_filter=None) -> None:
     """count each error"""
 
-    counter = Counter()
-    counter.update([x[1] for x in logs])
+    try:
+        counter = Counter()
+        counter.update([x[1] for x in logs if isinstance(x, tuple) and len(x) > 1])
+    except Exception as e:
+        logging.error(f'Error during error count: {e}')
+        counter = Counter()
+    counter.update([x[1] for x in logs if isinstance(x, tuple) and len(x) > 1])
     counts = counter.most_common()
     r = {}
     for error, count in counts:
@@ -247,7 +252,7 @@ if __name__ == "__main__":
     try:
         os.makedirs(args.output_dir, exist_ok=True)
     except Exception as e:
-        error("Failed to create output directory:\n{traceback.format_exc()}\nError Details: {e}")
+        logging.error(f'Failed to create output directory:\n{traceback.format_exc()}\nError Details: {e}')
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
