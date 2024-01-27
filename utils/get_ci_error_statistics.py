@@ -170,6 +170,10 @@ def reduce_by_error(logs, error_filter=None):
     for error, count in counts:
         if error_filter is None or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
+    
+    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+        if error_filter is None or error not in error_filter:
+            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
@@ -206,7 +210,11 @@ def reduce_by_model(logs, error_filter=None):
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
+        except Exception as e:
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
+        except Exception as e:
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
