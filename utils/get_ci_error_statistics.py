@@ -7,6 +7,7 @@ import logging
 from logging import basicConfig
 import traceback
 import zipfile
+import requests
 from collections import Counter
 
 import requests
