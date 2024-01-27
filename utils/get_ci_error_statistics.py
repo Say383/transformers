@@ -50,8 +50,19 @@ def get_artifacts_links(worflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    artifacts = {}
+    try:
+        result = requests.get(url, headers=headers)
+        result_json = result.json()
+        artifacts = {artifact['name']: artifact['archive_download_url'] for artifact in result_json['artifacts']}
+        pages_to_iterate_over = math.ceil((result_json['total_count'] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers)
+            result_json = result.json()
+            artifacts.update({artifact['name']: artifact['archive_download_url'] for artifact in result_json['artifacts']})
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        artifacts = {}
 
     try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
