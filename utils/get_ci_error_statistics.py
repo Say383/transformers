@@ -92,6 +92,9 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         fp.write(response.content)
 
 
+import logging
+import traceback
+
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     """Extract errors from a downloaded artifact (in .zip format)"""
     errors = []
@@ -271,6 +274,7 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
+        logging.error(f"Unknown error occurred while processing item {item}.")
         logging.error(f"Unknown error occurred while processing item {item}."),
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
