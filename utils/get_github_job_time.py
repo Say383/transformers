@@ -23,7 +23,11 @@ def extract_time_from_single_job(job):
     job_info["completed_at"] = end
     job_info["duration"] = duration_in_min
 
-    return job_info
+    try:
+        return job_info
+    except Exception:
+        print(f"Unknown error, could not extract time from single job:\n{traceback.format_exc()}")
+        return {}
 
 
 def get_job_time(workflow_run_id, token=None):
