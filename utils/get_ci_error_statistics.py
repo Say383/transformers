@@ -172,12 +172,16 @@ def reduce_by_error(logs, error_filter=None):
     return r
 
 
-def get_model(test):
+def get_model(test, artifact_zip_path=None):
     """Get the model name from a test method"""
     test = test.split("::")[0]
-    if test.startswith("tests/models/"):
+    try:
         test = test.split("/")[2]
-    else:
+    except IndexError as e:
+        logging.error(f"Unable to extract model from test method: {test}")
+        test = None
+    except Exception as e:
+        logging.error(f"Unknown error occurred while extracting model from test method: {e}")
         test = None
 
     return test
