@@ -1,4 +1,4 @@
-import argparse
+import logging, argparse
 import json
 import math
 import os
@@ -158,7 +158,10 @@ def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
     counter = Counter()
-    counter.update([x[1] for x in logs])
+    try:
+        counter.update([x[1] for x in logs])
+    except Exception as e:
+        logging.error(f"Unknown error occurred while updating counter with errors: {e}")
     counts = counter.most_common()
     r = {}
     for error, count in counts:
