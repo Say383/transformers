@@ -1,0 +1,9 @@
+import os
+
+def create_offline_runners_file():
+    file_path = "offline_runners.txt"
+    
+    with open(file_path, "w") as file:
+        pass
+
+create_offline_runners_file()
