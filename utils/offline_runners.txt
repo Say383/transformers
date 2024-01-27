@@ -1,0 +1,15 @@
+# utils/offline_runners.txt
+
+# Add the necessary data to the file
+data = [
+    "runner1",
+    "runner2",
+    "runner3",
+    # Add more runners as needed
+]
+
+# Open the file in write mode
+with open("utils/offline_runners.txt", "w") as file:
+    # Write each runner on a new line
+    for runner in data:
+        file.write(runner + "\n")
