@@ -4,11 +4,11 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     <AUTH_TOKEN>
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# WITH WARRANTIES OF ALL KINDS, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
@@ -520,16 +520,16 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            text = f"💔 CI runners are not available! Tests are not run. 😭\nThe following runners are offline:\n  • {offline_runners[0]}"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
                 offline_runners = json.loads(result)
             except json.JSONDecodeError:
                 offline_runners = []
         elif runner_failed:
-            text = "💔 CI runners have problems! Tests are not run. 😭"
+            text = "💔 CI runners have problems! Tests are not run. 😭\n\n🙏 Let's fix it ASAP! 🙏"
         elif setup_failed:
-            text = "💔 Setup job failed. Tests are not run. 😭"
+            text = "💔 Setup job failed. Tests are not run. 😭\n\n🙏 Let's fix it ASAP! 🙏"
         else:
             text = "💔 There was an issue running the tests. 😭"
 
