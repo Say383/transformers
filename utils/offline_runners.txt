@@ -1,0 +1,10 @@
+import os
+
+def create_offline_runners_file():
+    file_path = os.path.join("utils", "offline_runners.txt")
+    data = "example data"  # Replace with the necessary data
+
+    with open(file_path, "w") as file:
+        file.write(data)
+
+create_offline_runners_file()
