@@ -42,6 +42,7 @@ def get_job_time(workflow_run_id, token=None):
     job_time = {}
 
     try:
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -53,6 +54,9 @@ def get_job_time(workflow_run_id, token=None):
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\n")
+        return {}
     return {}
 
 
