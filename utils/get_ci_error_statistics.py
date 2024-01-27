@@ -158,7 +158,7 @@ def get_all_errors(artifact_dir, job_links=None):
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+def reduce_by_error(logs, error_filter=None) -> None:
     """count each error"""
 
     counter = Counter()
@@ -173,7 +173,7 @@ def reduce_by_error(logs, error_filter=None):
     return r
 
 
-def get_model(test):
+def get_model(test) -> str:
     """Get the model name from a test method"""
     test = test.split("::")[0]
     if test.startswith("tests/models/"):
@@ -184,7 +184,7 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def reduce_by_model(logs, error_filter=None) -> None:
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
