@@ -128,7 +128,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
         job_link = job_links.get(job_name, None)
 
     # A list with elements of the form (line of error, error, failed test)
-    result = [x + [y] + [job_link] for x, y in zip(errors, failed_tests)]
+    result = [(x[0], x[1], y, job_link) for x, y in zip(errors, failed_tests)]
 
     return result
 
