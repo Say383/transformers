@@ -4,7 +4,8 @@ import math
 import os
 import time
 import logging
-from logging import basicConfig
+import sys
+from logging import basicConfig, error, getLogger
 import traceback
 import zipfile
 from collections import Counter
@@ -231,7 +232,10 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    try:
+        os.makedirs(args.output_dir, exist_ok=True)
+    except Exception as e:
+        error("Failed to create output directory:\n{traceback.format_exc()}\nError Details: {e}")
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
