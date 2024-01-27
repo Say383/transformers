@@ -1,0 +1,8 @@
+utils/offline_runners.txt:
+
+This file should contain the list of offline runners. Each runner should be listed on a separate line.
+
+Example:
+runner1
+runner2
+runner3
