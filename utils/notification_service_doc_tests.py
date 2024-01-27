@@ -22,7 +22,7 @@ from fnmatch import fnmatch
 from typing import Dict
 
 import requests
-from slack_sdk import WebClient
+from slack_sdk.web import WebClient
 
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
@@ -76,19 +76,12 @@ class Message:
 
     @property
     def time(self) -> str:
-        time_spent = [self._time_spent]
-        total_secs = 0
+        return self.calculate_time_spent()
 
-        for time in time_spent:
-            time_parts = time.split(":")
-
-            # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
-            if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
-
-            hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
-            total_secs += hours * 3600 + minutes * 60 + seconds
-
+    def calculate_time_spent(self) -> str:
+        time_parts = self._time_spent.split(":")
+        hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
+        total_secs = hours * 3600 + minutes * 60 + seconds
         hours, minutes, seconds = total_secs // 3600, (total_secs % 3600) // 60, total_secs % 60
         return f"{int(hours)}h{int(minutes)}m{int(seconds)}s"
 
@@ -349,13 +342,13 @@ if __name__ == "__main__":
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
-    if "stats" in artifact:
+    if "stats" in artifact and 'failures' in artifact:
         failed, success, time_spent = handle_test_results(artifact["stats"])
-        doc_test_results["failures"] = failed
+        doc_test_results["failures"] = len(failed)
         doc_test_results["success"] = success
         doc_test_results["time_spent"] = time_spent[1:-1] + ", "
 
-        all_failures = extract_first_line_failure(artifact["failures_short"])
+        all_failures = extract_first_line_failure(artifact.get("failures_short", ''))
         for line in artifact["summary_short"].split("\n"):
             if re.search("FAILED", line):
                 line = line.replace("FAILED ", "")
