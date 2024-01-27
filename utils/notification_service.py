@@ -24,7 +24,7 @@ import time
 from typing import Dict, List, Optional, Union
 
 import requests
-from get_ci_error_statistics import get_job_links
+from utils.get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
@@ -511,11 +511,11 @@ class Message:
     @staticmethod
     def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False):
         blocks = []
-        title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
+        title_block = {"type": "header", "text": {"type": "plain_text", "text": title,"emoji": True}}
         blocks.append(title_block)
 
         if ci_title:
-            ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
+            ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title,"emoji": True}}
             blocks.append(ci_title_block)
 
         offline_runners = []
@@ -567,7 +567,7 @@ class Message:
         print(json.dumps({"blocks": blocks}))
 
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel=os.environ.get("CI_SLACK_REPORT_CHANNEL_ID_DAILY"),
             text=text,
             blocks=payload,
         )
