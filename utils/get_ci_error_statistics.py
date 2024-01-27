@@ -208,8 +208,11 @@ def reduce_by_model(logs, error_filter=None):
         if n_errors > 0:
             r[test] = {"count": n_errors, "errors": error_counts}
 
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+            r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
+        print(f"Error occurred while counting error: {error}\nError details: {e}")
+        except Exception as e:
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
             print(f"Error occurred while counting error: {error}\nError details: {e}")
         except Exception as e:
             print(f"Error occurred while counting error: {error}\nError details: {e}")
