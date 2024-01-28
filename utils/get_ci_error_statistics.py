@@ -3,7 +3,7 @@ import json
 import math
 import os
 import time
-import logging
+from utils.logging import logging
 from logging import basicConfig
 import traceback
 import zipfile
@@ -36,7 +36,8 @@ def get_job_links(workflow_run_id, token=None):
     except Exception as e:
         logging.error('Unknown error, could not fetch links.')
         logging.exception(e)
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        logging.error('Unknown error, could not fetch links.')
+        logging.exception(e)
 
     return {}
 
