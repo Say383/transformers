@@ -1,0 +1,27 @@
+# check_self_hosted_runner.py
+
+import os
+import json
+
+def create_offline_runners_file():
+    file_path = os.path.join("utils", "offline_runners.txt")
+    with open(file_path, "w") as fp:
+        fp.write("")
+
+# Call the create_offline_runners_file() function at the appropriate place in the script
+
+# Unit tests for create_offline_runners_file() function
+def test_create_offline_runners_file():
+    # Create the file
+    create_offline_runners_file()
+
+    # Check if the file exists
+    assert os.path.exists(os.path.join("utils", "offline_runners.txt"))
+
+    # Check if the file is empty
+    with open(os.path.join("utils", "offline_runners.txt"), "r") as fp:
+        content = fp.read()
+        assert content == ""
+
+# Call the unit test function
+test_create_offline_runners_file()
