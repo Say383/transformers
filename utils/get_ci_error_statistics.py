@@ -4,6 +4,7 @@ import math
 import os
 import time
 import logging
+from .unzip_tool import get_ci_error_statistics as get_ci_error_statistics
 from logging import basicConfig
 import traceback
 import zipfile
