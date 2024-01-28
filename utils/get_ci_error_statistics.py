@@ -35,6 +35,7 @@ def get_job_links(workflow_run_id, token=None):
         return job_links
     except Exception as e:
         logging.error(f"An error occurred while fetching links:\n{traceback.format_exc()}\nError Details: {e}")
+    return {}
 
     return {}
 
