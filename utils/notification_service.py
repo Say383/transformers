@@ -567,7 +567,7 @@ class Message:
         print(json.dumps({"blocks": blocks}))
 
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel="YOUR_SLACK_CHANNEL_ID_HERE",
             text=text,
             blocks=payload,
         )
@@ -580,7 +580,7 @@ class Message:
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
         self.thread_ts = client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel="YOUR_SLACK_CHANNEL_ID_HERE",
             blocks=payload,
             text=text,
         )
