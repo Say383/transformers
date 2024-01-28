@@ -3,7 +3,7 @@ import json
 import math
 import os
 import time
-import logging
+from utils import logging
 from logging import basicConfig
 import traceback
 import zipfile
