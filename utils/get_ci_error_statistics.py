@@ -153,14 +153,19 @@ def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
     counter = Counter()
-    counter.update([x[1] for x in logs])
+    try:
+        counter.update([(x[1],) for x in logs])
+    except Exception as e:
+        logging.error(f'An error occurred while updating the counter: {e}')
     counts = counter.most_common()
     r = {}
-    for error, count in counts:
-        if error_filter is None or error not in error_filter:
-            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
-
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
+        for error, count in counts:
+            if error_filter is None or error not in error_filter:
+                r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except Exception as e:
+        logging.error(f'An error occurred while handling error counts: {e}')
     return r
 
 
@@ -202,9 +207,15 @@ def make_github_table(reduced_by_error):
     sep = "|-:|:-|:-|"
     lines = [header, sep]
     for error in reduced_by_error:
-        count = reduced_by_error[error]["count"]
-        line = f"| {count} | {error[:100]} |  |"
-        lines.append(line)
+        try:
+            count = reduced_by_error[error]["count"]
+        except Exception as e:
+            logging.error(f'An error occurred while getting the count for error {error}: {e}')
+        try:
+            line = f"| {count} | {error[:100]} |  |"
+            lines.append(line)
+        except Exception as e:
+            logging.error(f'An error occurred while processing {error} for the table: {e}')
 
     return "\n".join(lines)
 
