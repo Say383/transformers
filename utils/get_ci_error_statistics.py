@@ -20,7 +20,9 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    response = requests.get(url, headers=headers)
+    response.raise_for_status()
+    result = response.json()
     job_links = {}
 
     try:
