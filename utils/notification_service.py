@@ -641,7 +641,7 @@ class Message:
 
                     blocks = self.get_reply_blocks(job, job_result, failures, device, text=text)
 
-                    print("Sending the following reply")
+                    
                     print(json.dumps({"blocks": blocks}))
 
                     client.chat_postMessage(
@@ -664,7 +664,7 @@ class Message:
                         text=f'Number of failures: {job_result["failed"][device]}',
                     )
 
-                    print("Sending the following reply")
+                    
                     print(json.dumps({"blocks": blocks}))
 
                     client.chat_postMessage(
@@ -845,7 +845,7 @@ if __name__ == "__main__":
         Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
         exit(0)
 
-    arguments = sys.argv[1:][0]
+    arguments = sys.argv[1:][0] if len(sys.argv) > 1 else ''
     try:
         models = ast.literal_eval(arguments)
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
