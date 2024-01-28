@@ -79,60 +79,13 @@ def handle_stacktraces(test_results):
             line = stacktrace[: stacktrace.index(" ")].split(":")[-2]
             error_message = stacktrace[stacktrace.index(" ") :]
 
-            stacktraces.append(f"(line {line}) {error_message}")
-        except Exception:
-            stacktraces.append("Cannot retrieve error message.")
+        payload = json.dumps(blocks)
 
-    return stacktraces
-
-
-def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
-    if isinstance(objects, dict):
-        lists = objects.values()
-    else:
-        lists = objects
-
-    # Convert each dictionary to counter
-    counters = map(collections.Counter, lists)
-    # Sum all the counters
-    return functools.reduce(operator.add, counters)
-
-
-class Message:
-    def __init__(
-        self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
-    ):
-        self.title = title
-        self.ci_title = ci_title
-
-        # Failures and success of the modeling tests
-        self.n_model_success = sum(r["success"] for r in model_results.values())
-        self.n_model_single_gpu_failures = sum(dicts_to_sum(r["failed"])["single"] for r in model_results.values())
-        self.n_model_multi_gpu_failures = sum(dicts_to_sum(r["failed"])["multi"] for r in model_results.values())
-
-        # Some suites do not have a distinction between single and multi GPU.
-        self.n_model_unknown_failures = sum(dicts_to_sum(r["failed"])["unclassified"] for r in model_results.values())
-        self.n_model_failures = (
-            self.n_model_single_gpu_failures + self.n_model_multi_gpu_failures + self.n_model_unknown_failures
+        client.chat_postMessage(
+            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            text=text,
+            blocks=payload,
         )
-
-        # Failures and success of the additional tests
-        self.n_additional_success = sum(r["success"] for r in additional_results.values())
-
-        all_additional_failures = dicts_to_sum([r["failed"] for r in additional_results.values()])
-        self.n_additional_single_gpu_failures = all_additional_failures["single"]
-        self.n_additional_multi_gpu_failures = all_additional_failures["multi"]
-        self.n_additional_unknown_gpu_failures = all_additional_failures["unclassified"]
-        self.n_additional_failures = (
-            self.n_additional_single_gpu_failures
-            + self.n_additional_multi_gpu_failures
-            + self.n_additional_unknown_gpu_failures
-        )
-
-        # Results
-        self.n_failures = self.n_model_failures + self.n_additional_failures
-        self.n_success = self.n_model_success + self.n_additional_success
-        self.n_tests = self.n_failures + self.n_success
 
         self.model_results = model_results
         self.additional_results = additional_results
