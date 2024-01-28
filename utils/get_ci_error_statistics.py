@@ -81,7 +81,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        logging.error(f"An error occurred while fetching request to artifact download URL {download_url}:\n{traceback.format_exc()}\nError Details: {e}")
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
@@ -232,7 +235,10 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    try:
+        os.makedirs(args.output_dir, exist_ok=True)
+    except Exception as e:
+        logging.error(f"An error occurred while creating the output directory {args.output_dir}:\n{traceback.format_exc()}\nError Details: {e}")
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
