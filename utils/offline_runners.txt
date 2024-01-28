@@ -1,0 +1,9 @@
+import json
+import os
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    offline_runners = []
+
+    with open(file_path, "w") as fp:
+        fp.write(json.dumps(offline_runners))
