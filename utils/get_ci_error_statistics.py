@@ -44,7 +44,6 @@ def get_job_links(workflow_run_id, token=None, headers=None):
 
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
-
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
@@ -87,7 +86,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     response = requests.get(download_url, headers=headers, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as artifact_file:
-        fp.write(response.content)
+        artifact_file.write(response.content)
 
 
 def get_errors_from_single_artifact_test(artifact_zip_path, job_links=None):
