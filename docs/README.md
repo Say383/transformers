@@ -20,10 +20,17 @@ To generate the documentation, you first have to build it. Several packages are 
 you can install them with the following command, at the root of the code repository:
 
 ```bash
-pip install -e ".[docs]"
+pip install sphinxcontrib-napoleon
 ```
 
 Then you need to install our special tool that builds the documentation:
+
+```
+pip install sphinxcontrib-napoleon
+pip install logging
+pip install time
+pip install traceback
+```
 
 ```bash
 pip install git+https://github.com/huggingface/doc-builder
