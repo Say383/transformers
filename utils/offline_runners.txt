@@ -1,0 +1,9 @@
+# utils/offline_runners.txt
+
+# Contents of the new file
+This is the contents of the offline_runners.txt file.
+
+# Create the new file
+with open("utils/offline_runners.txt", "w") as file:
+    file.write("# Contents of the new file\n")
+    file.write("This is the contents of the offline_runners.txt file.\n")
