@@ -518,7 +518,8 @@ class Message:
             ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
             blocks.append(ci_title_block)
 
-        offline_runners = []
+        text = "💔 CI runners are not available! Tests are not run. 😭"
+        offline_runners = ["runner1", "runner2", "runner3"]  # Replace with the actual list of offline runners
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
