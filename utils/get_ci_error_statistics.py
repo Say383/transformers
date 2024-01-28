@@ -149,7 +149,9 @@ def get_all_errors(artifact_dir, job_links=None):
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+from collections import Counter
+
+def reduce_by_error(logs, error_filter=None, test_filter=None):
     """count each error"""
 
     counter = Counter()
@@ -274,7 +276,7 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
 
-    reduced_by_error = reduce_by_error(errors)
+    reduced_by_error = reduce_by_error(errors, test_filter=None)
     reduced_by_model = reduce_by_model(errors)
 
     s1 = make_github_table(reduced_by_error)
