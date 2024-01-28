@@ -1,0 +1,11 @@
+import json
+import os.path
+
+file_path = "utils/offline_runners.txt"
+
+if not os.path.isfile(file_path):
+    # offline_runners is a list containing the offline runners' information
+    offline_runners = []
+
+    with open(file_path, "w") as fp:
+        fp.write(json.dumps(offline_runners))
