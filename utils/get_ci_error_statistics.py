@@ -6,6 +6,7 @@ import time
 import logging
 from logging import basicConfig
 import traceback
+import logging
 import zipfile
 from collections import Counter
 
