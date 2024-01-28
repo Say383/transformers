@@ -210,7 +210,7 @@ def make_github_table_test(reduced_by_error):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model_test(reduced_by_model):
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
