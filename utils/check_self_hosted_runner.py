@@ -1,4 +1,5 @@
 import argparse
+parser = argparse.ArgumentParser()
 import json
 import subprocess
 
