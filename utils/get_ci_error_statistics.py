@@ -1,10 +1,11 @@
 import argparse
+import logging
 import json
 import math
 import os
 import time
 import logging
-from logging import basicConfig
+import logging
 import traceback
 import zipfile
 from collections import Counter
@@ -285,6 +286,4 @@ if __name__ == "__main__":
         fp.write(s1)
     with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s2)
-logging.basicConfig(level=logging.INFO)
-logging.basicConfig(level=logging.INFO)
 logging.basicConfig(level=logging.INFO)
