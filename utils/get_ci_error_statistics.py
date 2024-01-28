@@ -90,7 +90,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         fp.write(response.content)
 
 
-def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
+def get_errors_from_single_artifact_test(artifact_zip_path, job_links=None):
     """Extract errors from a downloaded artifact (in .zip format)"""
     errors = []
     failed_tests = []
