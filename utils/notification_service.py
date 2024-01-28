@@ -577,6 +577,8 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
+        os.environ['TRANSFORMERS_CACHE'] = "/path/to/writable/directory"
+
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
         self.thread_ts = client.chat_postMessage(
