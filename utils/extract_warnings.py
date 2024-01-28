@@ -37,7 +37,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 line = line.strip()
                 buffer.append(line)
 
-    if from_gh:
+    if args.from_gh:
         for filename in os.listdir(artifact_path):
             file_path = os.path.join(artifact_path, filename)
             if not os.path.isdir(file_path):
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # optional parameters
     parser.add_argument(
         "--targets",
-        default="DeprecationWarning,UserWarning,FutureWarning",
+        default=None,
         type=list_str,
         help="Comma-separated list of target warning(s) which we want to extract.",
     )
