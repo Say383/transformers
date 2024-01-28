@@ -104,7 +104,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
                         for line in f:
-                            line = line.decode("UTF-8").strip()
+                            # Decode the line from bytes to string and remove leading/trailing whitespaces
                             if filename == "failures_line.txt":
                                 try:
                                     # `error_line` is the place where `error` occurs
@@ -282,8 +282,10 @@ if __name__ == "__main__":
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
 
+    # Write the results to a file
     with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s1)
     with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s2)
+# Set the logging level to INFO
 logging.basicConfig(level=logging.INFO)
