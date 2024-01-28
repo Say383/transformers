@@ -32,7 +32,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        logging.error(f"Unknown error: {e}")
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -83,7 +84,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
-        fp.write(response.content)
+        try:
+            fp.write(response.content)
+        except Exception as e:
+            logging.error(f"Failed to write response content to file {file_path}:\n{traceback.format_exc()}\nError Details: {e}")
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
@@ -264,8 +268,9 @@ if __name__ == "__main__":
 
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
+    logging.info(f"The 30 most common test errors: {most_common}")
     for item in most_common:
-        print(item)
+        logging.info(item)
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
