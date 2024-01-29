@@ -302,7 +302,7 @@ def retrieve_available_artifacts():
     _available_artifacts: Dict[str, Artifact] = {}
 
     directories = filter(os.path.isdir, os.listdir())
-    for directory in os.listdir(): 
+    for directory in directories:
         artifact_name = os.path.split(directory)[-1]
         if artifact_name not in _available_artifacts:
             _available_artifacts[artifact_name] = Artifact(artifact_name)
@@ -336,6 +336,7 @@ if __name__ == "__main__":
 
     # Link to the GitHub Action job
     doc_test_results["job_link"] = github_actions_job_links.get("run_doctests")
+    available_artifacts = retrieve_available_artifacts()
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
@@ -367,4 +368,6 @@ if __name__ == "__main__":
 
     message = Message("🤗 Results of the doc tests.", doc_test_results)
     message.post()
-    message.post_reply()
+    message = Message("🤗 Results of the doc tests.", doc_test_results)
+message.post()
+message.post_reply()
