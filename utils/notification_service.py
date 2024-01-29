@@ -569,7 +569,7 @@ class Message:
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
-            blocks=payload,
+            blocks=json.dumps(payload),
         )
 
     def post(self):
