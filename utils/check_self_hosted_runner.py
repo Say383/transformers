@@ -40,7 +40,7 @@ if __name__ == "__main__":
         "--target_runners",
         default=None,
         type=list_str,
-        required=True,
+        required=True, default=None,
         help="Comma-separated list of runners to check status.",
     )
 
