@@ -29,6 +29,84 @@ Then you need to install our special tool that builds the documentation:
 pip install git+https://github.com/huggingface/doc-builder
 ```
 
+Once you have set up the `doc-builder` and additional packages, you can generate the documentation by 
+typing the following command:
+
+```bash
+doc-builder build transformers docs/source/en/ --build_dir ~/tmp/test-build
+```
+
+You can adapt the `--build_dir` to set any temporary folder that you prefer. This command will create it and generate
+the MDX files that will be rendered as the documentation on the main website. You can inspect them in your favorite
+Markdown editor.
+
+To preview the docs, first install the `watchdog` module with:
+
+```bash
+pip install watchdog
+```
+
+Then run the following command:
+
+```bash
+doc-builder preview transformers docs/source/en/
+```
+
+The docs will be viewable at [http://localhost:3000](http://localhost:3000). You can also preview the docs once you have opened a PR. You will see a bot add a comment to a link where the documentation with your changes lives.
+
+---
+**NOTE**
+
+The `preview` command only works with existing doc files. When you add a completely new file, you need to update `_toctree.yml` & restart the `preview` command (`ctrl-c` to stop it & call `doc-builder preview ...` again).
+
+---
+```
+# Generating the documentation
+
+To generate the documentation, you first have to build it. Several packages are necessary to build the doc, 
+you can install them with the following command, at the root of the code repository:
+
+```bash
+pip install -e ".[docs]"
+```
+
+Then you need to install our special tool that builds the documentation:
+
+```bash
+pip install git+https://github.com/huggingface/doc-builder
+```
+
+Once you have set up the `doc-builder` and additional packages, you can generate the documentation by 
+typing the following command:
+
+```bash
+doc-builder build transformers docs/source/en/ --build_dir ~/tmp/test-build
+```
+
+You can adapt the `--build_dir` to set any temporary folder that you prefer. This command will create it and generate
+the MDX files that will be rendered as the documentation on the main website. You can inspect them in your favorite
+Markdown editor.
+
+To preview the docs, first install the `watchdog` module with:
+
+```bash
+pip install watchdog
+```
+
+Then run the following command:
+
+```bash
+doc-builder preview transformers docs/source/en/
+```
+
+The docs will be viewable at [http://localhost:3000](http://localhost:3000). You can also preview the docs once you have opened a PR. You will see a bot add a comment to a link where the documentation with your changes lives.
+
+---
+**NOTE**
+
+The `preview` command only works with existing doc files. When you add a completely new file, you need to update `_toctree.yml` & restart the `preview` command (`ctrl-c` to stop it & call `doc-builder preview ...` again).
+
+---
 ---
 **NOTE**
 
