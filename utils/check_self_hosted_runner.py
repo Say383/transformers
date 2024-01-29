@@ -1,6 +1,9 @@
 import subprocess
 import argparse
 import json
+import json
+import argparse
+import json
 import subprocess
 
 
@@ -36,6 +39,7 @@ if __name__ == "__main__":
         return values.split(",")
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--token', default=None, type=str, required=True, help='A token that has actions:read permission.')
     # Required parameters
     parser.add_argument(
         "--target_runners",
