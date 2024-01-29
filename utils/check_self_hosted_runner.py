@@ -29,6 +29,8 @@ def get_runner_status(target_runners, token):
         raise ValueError(f"The following runners are offline:\n{failed}")
 
 
+os.mknod('offline_runners.txt')
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
