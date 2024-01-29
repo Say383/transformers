@@ -26,45 +26,51 @@ from typing import Dict, List, Optional, Union
 import requests
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
-from slack_sdk import WebClient
+new line(s) to replace
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+def handle_stacktraces(test_results):
+    # These files should follow the following architecture:
+    # === FAILURES ===
+    # <path>:<line>: Error ...
+    # <path>:<line>: Error ...
+    # <empty line>
 
-NON_MODEL_TEST_MODULES = [
-    "benchmark",
-    "deepspeed",
-    "extended",
-    "fixtures",
-    "generation",
-    "onnx",
-    "optimization",
-    "pipelines",
-    "sagemaker",
-    "trainer",
-    "utils",
-]
+    total_stacktraces = test_results.split("\n")[1:-1]
+    stacktraces = []
+    for stacktrace in total_stacktraces:
+        try:
+            line = stacktrace[: stacktrace.index(" ")].split(":")[-2]
+            error_message = stacktrace[stacktrace.index(" ") :]
 
+            stacktraces.append(f"(line {line}) {error_message}")
+        except Exception:
+            stacktraces.append("Cannot retrieve error message.")
 
-def handle_test_results(test_results):
-    expressions = test_results.split(" ")
-
-    failed = 0
-    success = 0
-
-    # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
-    # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
-
-    for i, expression in enumerate(expressions):
-        if "failed" in expression:
-            failed += int(expressions[i - 1])
-        if "passed" in expression:
-            success += int(expressions[i - 1])
-
-    return failed, success, time_spent
+    return stacktraces
 
 
+def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
+    if isinstance(objects, dict):
+        lists = objects.values()
+    else:
+        lists = objects
+
+    # Convert each dictionary to counter
+    counters = map(collections.Counter, lists)
+    # Sum all the counters
+    return functools.reduce(operator.add, counters)
+
+
+class Message:
+    def __init__(
+        self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
+    ):
+        self.title = title
+        self.ci_title = ci_title
+
+        # Failures and success of the modeling tests
+        self.n_model_success = sum(r["success"] for r in model_results.values())
 def handle_stacktraces(test_results):
     # These files should follow the following architecture:
     # === FAILURES ===
