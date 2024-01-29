@@ -161,7 +161,7 @@ class Message:
     def payload(self) -> str:
         blocks = [self.header]
 
-        if self.n_failures > 0:
+        if len(doc_test_results[category].get('failed', [])) > 0:
             blocks.append(self.failures)
 
         if self.n_failures > 0:
