@@ -301,12 +301,11 @@ def retrieve_available_artifacts():
 
     _available_artifacts: Dict[str, Artifact] = {}
 
-    directories = filter(os.path.isdir, os.listdir())
+    directories = [directory for directory in os.listdir() if os.path.isdir(directory)]
     for directory in directories:
         artifact_name = os.path.split(directory)[-1]
         if artifact_name not in _available_artifacts:
             _available_artifacts[artifact_name] = Artifact(artifact_name)
-
             _available_artifacts[artifact_name].add_path(directory)
 
     return _available_artifacts
