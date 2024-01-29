@@ -1,4 +1,4 @@
-<!---
+<!--
 Copyright 2020 The HuggingFace Team. All rights reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -58,7 +58,7 @@ To preview the docs, first install the `watchdog` module with:
 pip install watchdog
 ```
 
-Then run the following command:
+Next, run the following command to generate the documentation:
 
 ```bash
 doc-builder preview {package_name} {path_to_docs}
@@ -70,7 +70,7 @@ For example:
 doc-builder preview transformers docs/source/en/
 ```
 
-The docs will be viewable at [http://localhost:3000](http://localhost:3000). You can also preview the docs once you have opened a PR. You will see a bot add a comment to a link where the documentation with your changes lives.
+The documentation can be viewed at [http://localhost:3000](http://localhost:3000) or by opening a PR, where a bot will add a comment with a link to the documentation containing your changes.
 
 ---
 **NOTE**
@@ -88,7 +88,7 @@ the filename without the extension in the [`_toctree.yml`](https://github.com/hu
 
 ## Renaming section headers and moving sections
 
-It helps to keep the old links working when renaming the section header and/or moving sections from one document to another. This is because the old links are likely to be used in Issues, Forums, and Social media and it'd make for a much more superior user experience if users reading those months later could still easily navigate to the originally intended information.
+It's important to keep the old links working when renaming the section header and/or moving sections from one document to another in order to maintain a superior user experience. This is because the old links are likely to be used in Issues, Forums, and Social media and it'd make for a much more superior user experience if users reading those months later could still easily navigate to the originally intended information.
 
 Therefore, we simply keep a little map of moved sections at the end of the document where the original section was. The key is to preserve the original anchor.
 
