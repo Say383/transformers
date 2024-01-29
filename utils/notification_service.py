@@ -547,6 +547,35 @@ class Message:
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
 
+        offline_runners = []
+        if runner_not_available:
+            text = "💔 CI runners are not available! Tests are not run. 😭"
+            result = os.environ.get("OFFLINE_RUNNERS")
+            try:
+                offline_runners = json.loads(result)
+            except json.JSONDecodeError:
+                offline_runners = []
+        elif runner_failed:
+            text = "💔 CI runners have problems! Tests are not run. 😭"
+        elif setup_failed:
+            text = "💔 Setup job failed. Tests are not run. 😭"
+        else:
+            text = "💔 There was an issue running the tests. 😭"
+
+        error_block_1 = {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": text,
+            },
+        }
+
+        text = ""
+        if len(offline_runners) > 0:
+            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n{text}\n\n"
+        text += "🙏 Let's fix it ASAP! 🙏"
+
         error_block_2 = {
             "type": "section",
             "text": {
