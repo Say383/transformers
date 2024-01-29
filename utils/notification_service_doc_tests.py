@@ -355,7 +355,7 @@ if __name__ == "__main__":
         doc_test_results["success"] = success
         doc_test_results["time_spent"] = time_spent[1:-1] + ", "
 
-        all_failures = extract_first_line_failure(artifact["failures_short"])
+        all_failures = extract_first_line_failure(artifact["failures_short"]) if 'failures_short' in artifact else {}
         for line in artifact["summary_short"].split("\n"):
             if re.search("FAILED", line):
                 line = line.replace("FAILED ", "")
