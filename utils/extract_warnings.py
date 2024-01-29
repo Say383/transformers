@@ -5,6 +5,7 @@ import time
 import zipfile
 
 from get_ci_error_statistics import download_artifact, get_artifacts_links
+import re
 
 from transformers import logging
 
@@ -30,7 +31,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                     warning = "\n".join(buffer)
                     # Only keep the warnings specified in `targets`
                     if any(f": {x}: " in warning for x in targets):
-                        selected_warnings.add(warning)
+                        selected_warnings.add(line)
                     buffer.clear()
                 continue
             else:
