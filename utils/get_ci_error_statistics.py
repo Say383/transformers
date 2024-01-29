@@ -61,8 +61,17 @@ def get_artifacts_links(worflow_run_id, token=None):
         for i in range(pages_to_iterate_over):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+            pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
-        return artifacts
+            for i in range(pages_to_iterate_over):
+                result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+                artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+
+            return artifacts
+        except Exception:
+            print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+
+        return {}
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
@@ -201,7 +210,6 @@ def reduce_by_model(logs, error_filter=None):
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
 
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
