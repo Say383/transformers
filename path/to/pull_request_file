@@ -1,0 +1,67 @@
+import argparse
+import json
+import math
+import os
+import time
+import logging
+from logging import basicConfig
+import logging
+import traceback
+import zipfile
+from collections import Counter
+
+import requests
+
+
+def get_job_links(workflow_run_id, token=None):
+    """Extract job names and their job links in a GitHub Actions workflow run
+    ...
+    # Implementation of the function
+
+def get_artifacts_links(worflow_run_id, token=None):
+    """Get all artifact links from a workflow run
+    ...
+    # Implementation of the function
+
+def download_artifact(artifact_name, artifact_url, output_dir, token):
+    """Download a GitHub Action artifact from a URL.
+    ...
+    # Implementation of the function
+
+def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
+    """Extract errors from a downloaded artifact (in .zip format)
+    ...
+    # Implementation of the function
+
+def get_all_errors(artifact_dir, job_links=None):
+    """Extract errors from all artifact files
+    ...
+    # Implementation of the function
+
+def reduce_by_error(logs, error_filter=None):
+    """Count each error
+    ...
+    # Implementation of the function
+
+def get_model(test):
+    """Get the model name from a test method
+    ...
+    # Implementation of the function
+
+def reduce_by_model(logs, error_filter=None):
+    """count each error per model
+    ...
+    # Implementation of the function
+
+def make_github_table(reduced_by_error):
+    ...
+    # Implementation of the function
+
+def make_github_table_per_model(reduced_by_model):
+    ...
+    # Implementation of the function
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    ...
+    # Implementation of the main function
