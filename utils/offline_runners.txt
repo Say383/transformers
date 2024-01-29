@@ -1,0 +1,28 @@
+utils/offline_runners.txt:
+
+runner1
+runner2
+runner3
+...
+
+# Implementation
+with open("utils/offline_runners.txt", "w") as file:
+    file.write("runner1\n")
+    file.write("runner2\n")
+    file.write("runner3\n")
+    # Write more runners as needed
+
+# Unit Tests
+def test_offline_runners_file():
+    # Create the file
+    with open("utils/offline_runners.txt", "w") as file:
+        file.write("runner1\n")
+        file.write("runner2\n")
+        file.write("runner3\n")
+
+    # Read the file and check the content
+    with open("utils/offline_runners.txt", "r") as file:
+        content = file.read()
+        assert content == "runner1\nrunner2\nrunner3\n"
+
+test_offline_runners_file()
