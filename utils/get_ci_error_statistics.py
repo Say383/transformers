@@ -3,7 +3,7 @@ import json
 import math
 import os
 import time
-import logging
+from utils import logging
 from logging import basicConfig
 import traceback
 import zipfile
@@ -41,7 +41,12 @@ def get_job_links(workflow_run_id, token=None):
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
 
+    # Initialize headers
     headers = None
+    
+    # Check for token and set appropriate headers
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
@@ -78,7 +83,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
-        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        logging.error(f"Error encountered while fetching artifact URL: {artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
@@ -269,8 +274,13 @@ if __name__ == "__main__":
     for item in most_common:
         print(item)
 
-    with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
-        json.dump(errors, fp, ensure_ascii=False, indent=4)
+log_path = os.path.join(args.output_dir, "error.log")
+logging.basicConfig(filename=log_path, level=logging.INFO, filemode="w")
+
+with open(log_path, "w") as log_file:
+    for error in errors:
+        log_file.write(error)
+        log_file.write("\n")
 
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
