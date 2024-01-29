@@ -29,14 +29,14 @@ client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
 
 
 def handle_test_results(test_results):
-    expressions = test_results.split(" ")
+    expressions = test_results.split("\n")
 
     failed = 0
     success = 0
 
     # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
     # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+    time_spent = expressions[-1].split()[-2] if "=" in expressions[-1] else expressions[-1].split()[-1]
 
     for i, expression in enumerate(expressions):
         if "failed" in expression:
@@ -51,10 +51,10 @@ def extract_first_line_failure(failures_short_lines):
     failures = {}
     file = None
     in_error = False
-    for line in failures_short_lines.split("\n"):
+    for line in failures_short_lines.split("&#10"):
         if re.search(r"_ \[doctest\]", line):
             in_error = True
-            file = line.split(" ")[2]
+            file = line.split(" ")[-1]
         elif in_error and not line.split(" ")[0].isdigit():
             failures[file] = line
             in_error = False
