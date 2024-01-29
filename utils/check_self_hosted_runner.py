@@ -8,6 +8,9 @@ import subprocess
 
 
 def get_runner_status(target_runners, token):
+    # Modify the error_out method to handle any missing --token argument
+    if not token: 
+        raise ValueError('The --token argument is required. Please provide a token with actions:read permission.')
     offline_runners = []
 
     cmd = (
