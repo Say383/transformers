@@ -37,7 +37,7 @@ check how they look before committing for instance). You don't have to commit th
 
 ---
 
-## Building the documentation
+## Running the get_ci_error_statistics.py script
 
 Once you have setup the `doc-builder` and additional packages, you can generate the documentation by 
 typing the following command:
