@@ -12,7 +12,7 @@ from transformers import logging
 logger = logging.get_logger(__name__)
 
 
-def extract_warnings_from_single_artifact(artifact_path, targets):
+def extract_warnings_from_single_artifact(artifact_path, targets, from_gh=False):
     """Extract warnings from a downloaded artifact (in .zip format)"""
     selected_warnings = set()
     buffer = []
@@ -106,6 +106,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    if not args.workflow_run_id:
+        parser.error('You must provide a valid workflow run id.')
+    if args.from_gh and not args.token:
+        parser.error('You must provide a valid token for GitHub Actions.')
+
+    if not args.output_dir:
+        args.output_dir = 'output_dir'
+
     from_gh = args.from_gh
     if from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
@@ -128,7 +136,12 @@ if __name__ == "__main__":
             time.sleep(1)
 
     # extract warnings from artifacts
-    selected_warnings = extract_warnings(args.output_dir, args.targets)
+    if not os.path.exists(args.output_dir):
+        logger.warning(f'The output directory {args.output_dir} does not exist. Creating a new directory...')
+        os.makedirs(args.output_dir)
+    selected_warnings = extract_warnings(args.output_dir, args.targets or ['DeprecationWarning', 'UserWarning', 'FutureWarning'])
     selected_warnings = sorted(selected_warnings)
-    with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
+    warnings_file_path = os.path.join(args.output_dir, "selected_warnings.json")
+    with open(warnings_file_path, "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
+    logger.info(f'Selected warnings are saved to: {warnings_file_path}')
