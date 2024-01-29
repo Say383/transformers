@@ -29,7 +29,12 @@ from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+slack_bot_token = "YOUR_SLACK_BOT_TOKEN"
+slack_channel_id = "YOUR_SLACK_CHANNEL_ID"
+slack_channel_id_daily = "YOUR_SLACK_CHANNEL_ID_DAILY"
+slack_channel_dummy_tests = "YOUR_SLACK_CHANNEL_DUMMY_TESTS"
+slack_report_channel_id = "YOUR_SLACK_REPORT_CHANNEL_ID"
+client = WebClient(token=slack_bot_token)
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
@@ -683,7 +688,9 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
     _artifact = {}
 
-    if os.path.exists(artifact_path):
+    # Add a check to ensure that the offline_runners.txt file exists before attempting to read its contents
+    offline_runners_path = os.path.join(artifact_path, "offline_runners.txt")
+    if os.path.exists(offline_runners_path):
         files = os.listdir(artifact_path)
         for file in files:
             try:
@@ -784,7 +791,7 @@ if __name__ == "__main__":
     repository_full_name = f"{org}/{repo}"
 
     # This env. variable is set in workflow file (under the job `send_results`).
-    ci_event = os.environ["CI_EVENT"]
+    ci_event = "YOUR_EVENT_NAME_OR_IDENTIFIER"
 
     # To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
     pr_number_re = re.compile(r"\(#(\d+)\)$")
