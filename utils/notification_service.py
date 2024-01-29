@@ -529,7 +529,7 @@ class Message:
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
         elif setup_failed:
-            text = "💔 Setup job failed. Tests are not run. 😭"
+            text = "💔 There was an issue running the tests. 😭"
         else:
             text = "💔 There was an issue running the tests. 😭"
 
@@ -545,7 +545,7 @@ class Message:
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+        text = "🙏 Let's ensure that the authentication credentials are correctly set and fix it ASAP! 🙏"
 
         error_block_2 = {
             "type": "section",
@@ -567,7 +567,7 @@ class Message:
         print(json.dumps({"blocks": blocks}))
 
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID_DAILY"],
             text=text,
             blocks=payload,
         )
