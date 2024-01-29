@@ -567,7 +567,7 @@ class Message:
         print(json.dumps({"blocks": blocks}))
 
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel=os.environ["CI_SLACK_CHANNEL_ID"],
             text=text,
             blocks=payload,
         )
@@ -668,7 +668,7 @@ class Message:
                     print(json.dumps({"blocks": blocks}))
 
                     client.chat_postMessage(
-                        channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                        channel=os.environ["CI_SLACK_CHANNEL_ID"],
                         text=f"Results for {job}",
                         blocks=blocks,
                         thread_ts=self.thread_ts["ts"],
@@ -814,7 +814,7 @@ if __name__ == "__main__":
         # Retrieve the PR title and author login to complete the report
         commit_number = ci_url.split("/")[-1]
         ci_detail_url = f"https://api.github.com/repos/{repository_full_name}/commits/{commit_number}"
-        ci_details = requests.get(ci_detail_url).json()
+        ci_details = requests.get(ci_detail_url, headers={'Authorization': f'Bearer {os.environ["ACCESS_REPO_INFO_TOKEN"]}'}).json()
         ci_author = ci_details["author"]["login"]
 
         merged_by = None
