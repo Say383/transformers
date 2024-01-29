@@ -1,0 +1,3 @@
+# Create the offline_runners.txt file
+with open("utils/offline_runners.txt", "w") as file:
+    pass
