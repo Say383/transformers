@@ -65,29 +65,19 @@ def extract_first_line_failure(failures_short_lines):
 class Message:
     def __init__(self, title: str, doc_test_results: Dict):
         self.title = title
-
-        self._time_spent = doc_test_results["time_spent"].split(",")[0]
-        self.n_success = doc_test_results["success"]
-        self.n_failures = doc_test_results["failures"] if "failures" in doc_test_results else 0
-        self.n_tests = sum(doc_test_results.get(category, {}).get('failed', 0) for category in doc_test_results)
-
-        # Failures and success of the modeling tests
         self.doc_test_results = doc_test_results
 
     @property
     def time(self) -> str:
-        time_spent = [self._time_spent]
-        total_secs = 0
+        time_spent = self.doc_test_results["time_spent"].split(",")[0]
+        time_parts = time_spent.split(":")
 
-        for time in time_spent:
-            time_parts = time.split(":")
+        # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
+        if len(time_parts) == 1:
+            time_parts = [0, 0, time_parts[0]]
 
-            # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
-            if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
-
-            hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
-            total_secs += hours * 3600 + minutes * 60 + seconds
+        hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
+        total_secs = hours * 3600 + minutes * 60 + seconds
 
         hours, minutes, seconds = total_secs // 3600, (total_secs % 3600) // 60, total_secs % 60
         return f"{int(hours)}h{int(minutes)}m{int(seconds)}s"
