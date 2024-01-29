@@ -72,7 +72,11 @@ class Message:
         self.n_tests = self.n_success + self.n_failures
 
         # Failures and success of the modeling tests
-        self.doc_test_results = doc_test_results
+        try:
+            self.doc_test_results = doc_test_results
+        except Exception as e:
+            self.error_out()
+            print(f'Error in Message class: {e}')
 
     @property
     def time(self) -> str:
@@ -189,8 +193,11 @@ class Message:
             }
         ]
 
-        print("Sending the following payload")
-        print(json.dumps({"blocks": json.loads(payload)}))
+        client.chat_postMessage(
+            channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
+            text="An error occurred while running the tests.",
+            blocks=payload,
+        )
 
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
