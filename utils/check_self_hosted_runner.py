@@ -49,4 +49,7 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
+    if args.token is None:
+        raise ValueError("Please provide the --token argument. Example: python check_self_hosted_runner.py --target_runners runner1,runner2 --token YOUR_TOKEN")
+
     get_runner_status(args.target_runners, args.token)
