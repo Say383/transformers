@@ -541,7 +541,7 @@ class Message:
             },
         }
 
-        text = ""
+        text = "Results of the runner status check tests."
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
