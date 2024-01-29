@@ -79,6 +79,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
@@ -117,7 +118,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 job_name = line
 
     if len(errors) != len(failed_tests):
-        raise ValueError(
+        logging.error(f"Error: The test reports in {artifact_zip_path} have some problem.\n{traceback.format_exc()}\n")
+    raise ValueError(
             f"`errors` and `failed_tests` should have the same number of elements. Got {len(errors)} for `errors` "
             f"and {len(failed_tests)} for `failed_tests` instead. The test reports in {artifact_zip_path} have some"
             " problem."
