@@ -357,7 +357,7 @@ if __name__ == "__main__":
 
         all_failures = extract_first_line_failure(artifact["failures_short"])
         for line in artifact["summary_short"].split("\n"):
-            if re.search("FAILED", line):
+            if "FAILED" in line:
                 line = line.replace("FAILED ", "")
                 line = line.split()[0].replace("\n", "")
 
