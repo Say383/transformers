@@ -1,7 +1,7 @@
 import argparse
-import json
 import subprocess
-
+import json
+import os
 
 def get_runner_status(target_runners, token):
     offline_runners = []
@@ -30,12 +30,7 @@ def get_runner_status(target_runners, token):
 
 
 if __name__ == "__main__":
-
-    def list_str(values):
-        return values.split(",")
-
     parser = argparse.ArgumentParser()
-    # Required parameters
     parser.add_argument(
         "--target_runners",
         default=None,
