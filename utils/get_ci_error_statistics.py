@@ -165,6 +165,15 @@ def get_all_errors(artifact_dir, job_links=None):
 
 
 def reduce_by_error(logs, error_filter=None):
+    """Count each error occurrence
+
+    Args:
+        logs (list): A list of error logs. 
+        error_filter (list, optional): A list of error names to exclude from the count. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing error counts and related details.
+    """
     """count each error"""
 
     counter = Counter()
@@ -191,6 +200,15 @@ def get_model(test):
 
 
 def reduce_by_model(logs, error_filter=None):
+    """Count each error per model
+
+    Args:
+        logs (list): A list of error logs. 
+        error_filter (list, optional): A list of error names to exclude from the count. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing error counts per model and related details.
+    """
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
@@ -257,7 +275,7 @@ if __name__ == "__main__":
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
     if _job_links:
         for k, v in _job_links.items():
-            # This is how GitHub actions combine job names.
+            # This is how GitHub Actions combine job names.
             if " / " in k:
                 index = k.find(" / ")
                 k = k[index + len(" / ") :]
