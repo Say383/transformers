@@ -231,7 +231,11 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    try:
+        os.makedirs(args.output_dir, exist_ok=True)
+    except Exception as e:
+        logging.error(f'Error while creating directory: {args.output_dir}')
+        logging.error(f'Error Details: {e}')
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
