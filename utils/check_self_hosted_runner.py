@@ -1,9 +1,16 @@
+import subprocess
+import argparse
+import json
+import json
 import argparse
 import json
 import subprocess
 
 
 def get_runner_status(target_runners, token):
+    # Modify the error_out method to handle any missing --token argument
+    if not token: 
+        raise ValueError('The --token argument is required. Please provide a token with actions:read permission.')
     offline_runners = []
 
     cmd = (
@@ -35,6 +42,7 @@ if __name__ == "__main__":
         return values.split(",")
 
     parser = argparse.ArgumentParser()
+    parser.add_argument('--token', default=None, type=str, required=True, help='A token that has actions:read permission.')
     # Required parameters
     parser.add_argument(
         "--target_runners",

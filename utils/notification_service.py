@@ -531,7 +531,7 @@ class Message:
         elif setup_failed:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
-            text = "💔 There was an issue running the tests. 😭"
+            text = "💔 The request to the Slack API failed. Please check the Slack API authentication settings and try again. 😭"
 
         error_block_1 = {
             "type": "header",
