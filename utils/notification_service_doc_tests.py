@@ -68,8 +68,8 @@ class Message:
 
         self._time_spent = doc_test_results["time_spent"].split(",")[0]
         self.n_success = doc_test_results["success"]
-        self.n_failures = doc_test_results["failures"]
-        self.n_tests = self.n_success + self.n_failures
+        self.n_failures = doc_test_results["failures"] if "failures" in doc_test_results else 0
+        self.n_tests = sum(doc_test_results.get(category, {}).get('failed', 0) for category in doc_test_results)
 
         # Failures and success of the modeling tests
         self.doc_test_results = doc_test_results
