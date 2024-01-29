@@ -155,7 +155,19 @@ def get_all_errors(artifact_dir, job_links=None):
 def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
-    counter = Counter()
+    error_counts = {}
+    try:
+        _counter = Counter([x[1] for x in logs])
+        error_counts = _counter
+    except Exception as e:
+        logging.error(f'Error counting errors: {e}')
+        print(f'Error counting errors: {traceback.format_exc()}')
+        error_counts = counter
+    try:
+        counts = _counter.most_common()
+    except Exception as e:
+        logging.error(f'Error getting most common: {e}')
+        print(f'Error getting most common: {traceback.format_exc()}')
     counter.update([x[1] for x in logs])
     counts = counter.most_common()
     r = {}
@@ -187,7 +199,18 @@ def reduce_by_model(logs, error_filter=None):
 
     r = {}
     for test in tests:
-        counter = Counter()
+        error_counts = {}
+        try:
+            _counter = Counter([x[1] for x in logs if x[2] == test])
+            error_counts = _counter
+        except Exception as e:
+            logging.error(f'Error counting errors per model: {e}')
+            print(f'Error counting errors per model: {traceback.format_exc()}')
+        try:
+            counts = _counter.most_common()
+        except Exception as e:
+            logging.error(f'Error getting most common per model: {e}')
+            print(f'Error getting most common per model: {traceback.format_exc()}')
         # count by errors in `test`
         counter.update([x[1] for x in logs if x[2] == test])
         counts = counter.most_common()
