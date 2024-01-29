@@ -24,6 +24,7 @@ def get_job_links(workflow_run_id, token=None):
     job_links = {}
 
     try:
+    # Add try-except block to handle potential errors
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -50,6 +51,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     artifacts = {}
 
     try:
+    # Add try-except block to handle potential errors
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -76,6 +78,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
+    # Add try-except block to handle potential errors
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
@@ -102,6 +105,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
                                 try:
+                                # Add try-except block to handle potential errors
                                     # `error_line` is the place where `error` occurs
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
@@ -230,6 +234,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
+# Add logging statement to track the progress
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -258,7 +263,7 @@ if __name__ == "__main__":
 
     errors = get_all_errors(args.output_dir, job_links=job_links)
 
-    # `e[1]` is the error
+    logging.info('Counting the top 30 most common test errors') # Add logging statement
     counter = Counter()
     counter.update([e[1] for e in errors])
 
