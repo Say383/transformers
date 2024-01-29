@@ -1,0 +1,5 @@
+# utils/offline_runners.txt
+offline_runners = ["runner1", "runner2", "runner3"]
+
+with open("utils/offline_runners.txt", "w") as file:
+    file.write("\n".join(offline_runners))
