@@ -267,10 +267,12 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
-        print(item)
+        log_info(str(item))
 
-    with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
-        json.dump(errors, fp, ensure_ascii=False, indent=4)
+    with open(os.path.join(args.output_dir, "errors.log"), "w", encoding="UTF-8") as fp:
+        for error in errors:
+            log_error(f"Error: {error[1]}, Failed Test: {error[3]}, Job Link: {error[4]}")
+            fp.write(f"Error: {error[1]}, Failed Test: {error[3]}, Job Link: {error[4]}\n")
 
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
@@ -278,7 +280,16 @@ if __name__ == "__main__":
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
 
-    with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s1)
-    with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s2)
+    with open(os.path.join(args.output_dir, "reduced_by_error.log"), "w", encoding="UTF-8") as fp:
+        log_info("Reduced by Error:")
+        for error in reduced_by_error:
+            count = reduced_by_error[error]["count"]
+            log_info(f"Count: {count}, Error: {error}")
+            fp.write(f"Count: {count}, Error: {error}\n")
+    with open(os.path.join(args.output_dir, "reduced_by_model.log"), "w", encoding="UTF-8") as fp:
+        log_info("Reduced by Model:")
+        for model in reduced_by_model:
+            count = reduced_by_model[model]["count"]
+            error, _count = list(reduced_by_model[model]["errors"].items())[0]
+            log_info(f"Model: {model}, Count: {count}, Error: {error}, Error Count: {_count}")
+            fp.write(f"Model: {model}, Count: {count}, Error: {error}, Error Count: {_count}\n")
