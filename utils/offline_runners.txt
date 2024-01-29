@@ -1,0 +1,14 @@
+import os
+
+def create_offline_runners_file():
+    content = [
+        "runner1",
+        "runner2",
+        "runner3"
+    ]
+
+    with open("utils/offline_runners.txt", "w") as file:
+        file.write("\n".join(content))
+
+# Call the function to create the file
+create_offline_runners_file()
