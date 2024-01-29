@@ -231,7 +231,10 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    try:
+        os.makedirs(args.output_dir, exist_ok=True)
+    except Exception as e:
+        logging.error(f'Error creating directory: {args.output_dir}. Details: {e}')
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
@@ -245,11 +248,17 @@ if __name__ == "__main__":
                 k = k[index + len(" / ") :]
             job_links[k] = v
     with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
-        json.dump(job_links, fp, ensure_ascii=False, indent=4)
+        try:
+            json.dump(job_links, fp, ensure_ascii=False, indent=4)
+        except Exception as e:
+            logging.error(f'Error writing job_links.json. Details: {e}')
 
     artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
     with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
-        json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+        try:
+            json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+        except Exception as e:
+            logging.error(f'Error writing artifacts.json. Details: {e}')
 
     for idx, (name, url) in enumerate(artifacts.items()):
         download_artifact(name, url, args.output_dir, args.token)
@@ -277,6 +286,12 @@ if __name__ == "__main__":
     s2 = make_github_table_per_model(reduced_by_model)
 
     with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s1)
+        try:
+            fp.write(s1)
+        except Exception as e:
+            logging.error(f'Error writing reduced_by_error.txt. Details: {e}')
     with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s2)
+        try:
+            fp.write(s2)
+        except Exception as e:
+            logging.error(f'Error writing reduced_by_model.txt. Details: {e}')
