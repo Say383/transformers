@@ -47,6 +47,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
     )
+    parser.add_argument(
+        "--slack_token", default=None, type=str, required=True, help="A token for Slack API authentication."
+    )
     args = parser.parse_args()
-
     get_runner_status(args.target_runners, args.token)
