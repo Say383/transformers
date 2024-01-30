@@ -21,6 +21,7 @@ import time
 from fnmatch import fnmatch
 from typing import Dict
 
+from fnmatch import fnmatch
 import requests
 from slack_sdk import WebClient
 
