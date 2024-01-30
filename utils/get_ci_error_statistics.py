@@ -192,7 +192,7 @@ def count_occurrences(logs, error_filter=None):
     return r
 
 
-def get_model(test):
+def extract_model(test):
     """Get the model name from a test method"""
     test = test.split("::")[0]
     if test.startswith("tests/models/"):
@@ -203,7 +203,7 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def count_errors_per_model(logs, error_filter=None):
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
