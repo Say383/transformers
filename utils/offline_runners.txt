@@ -1,0 +1,8 @@
+# utils/offline_runners.txt
+
+# Create the new file
+with open("utils/offline_runners.txt", "w") as file:
+    pass  # Leave the file empty for now
+
+# Close the file
+file.close()
