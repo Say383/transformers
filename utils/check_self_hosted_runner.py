@@ -38,7 +38,7 @@ if __name__ == "__main__":
     # Required parameters
     parser.add_argument(
         "--target_runners",
-        default=None,
+        default=input('Enter the token: '),
         type=list_str,
         required=True,
         help="Comma-separated list of runners to check status.",
