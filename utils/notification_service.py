@@ -458,7 +458,7 @@ class Message:
 
     @property
     def additional_failures(self) -> Dict:
-        failures = {k: v["failed"] for k, v in self.additional_results.items()}
+        failures = {k: v["failed"] for k, v in available_artifacts.items()}
         errors = {k: v["error"] for k, v in self.additional_results.items()}
 
         individual_reports = []
@@ -722,7 +722,7 @@ def retrieve_available_artifacts():
         if artifact_name.startswith("single-gpu"):
             artifact_name = artifact_name[len("single-gpu") + 1 :]
 
-            if artifact_name in _available_artifacts:
+            if artifact_name in available_artifacts:
                 _available_artifacts[artifact_name].single_gpu = True
             else:
                 _available_artifacts[artifact_name] = Artifact(artifact_name, single_gpu=True)
