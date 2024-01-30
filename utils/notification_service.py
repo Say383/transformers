@@ -909,7 +909,7 @@ if __name__ == "__main__":
                 job_name = f"Model tests ({model.replace('models_', 'models/')}, {artifact_path['gpu']}-gpu)"
                 if job_name_prefix:
                     job_name = f"{job_name_prefix} / {job_name}"
-                model_results[model]["job_link"][artifact_path["gpu"]] = github_actions_job_links.get(job_name)
+                model_results[model]["job_link"][artifact_path["gpu"]] = get_job_links(workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"])
                 failed, success, time_spent = handle_test_results(artifact["stats"])
                 model_results[model]["success"] += success
                 model_results[model]["time_spent"] += time_spent[1:-1] + ", "
