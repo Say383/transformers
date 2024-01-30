@@ -42,12 +42,37 @@ def get_job_links(workflow_run_id, token=None, exception_handler=None):
     return {}
 
 
+def get_artifacts_links(workflow_run_id, token=None):
+    """Get all artifact links from a workflow run"""
+
+    headers = None
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+
+
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
 
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/artifacts?per_page=100"
+    result = requests.get(url, headers=headers).json()
+    artifacts = {}
+
+    try:
+        artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+
+        return artifacts
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+
+    return {}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
     result = requests.get(url, headers=headers).json()
