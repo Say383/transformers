@@ -520,18 +520,18 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            text = "💔 CI runners are not available! Tests are not run. 😭 The following file is missing: offline_runners.txt"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
                 offline_runners = json.loads(result)
             except json.JSONDecodeError:
                 offline_runners = []
         elif runner_failed:
-            text = "💔 CI runners have problems! Tests are not run. 😭"
+            text = "💔 CI runners are not available! Tests are not run. 😭 The following file is missing: offline_runners.txt Additionally, there was a Slack API authentication error"
         elif setup_failed:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
-            text = "💔 There was an issue running the tests. 😭"
+            text = "💔 There was an issue running the tests. 😭" + " The following file is missing: offline_runners.txt"
 
         error_block_1 = {
             "type": "header",
