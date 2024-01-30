@@ -206,6 +206,8 @@ def make_github_table(reduced_by_error):
 
 
 def make_github_table_per_model(reduced_by_model):
+    if not reduced_by_model:
+        return 'No errors found.'
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
