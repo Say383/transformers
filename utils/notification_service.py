@@ -458,7 +458,7 @@ class Message:
 
     @property
     def additional_failures(self) -> Dict:
-        failures = {k: v["failed"] for k, v in self.additional_results.items()}
+        failures = {k: v["failed"] for k, v in available_artifacts.items()}
         errors = {k: v["error"] for k, v in self.additional_results.items()}
 
         individual_reports = []
@@ -502,7 +502,6 @@ class Message:
 
         if self.n_model_failures == 0 and self.n_additional_failures == 0:
             blocks.append(self.no_failures)
-
         if len(self.selected_warnings) > 0:
             blocks.append(self.warnings)
 
@@ -542,10 +541,11 @@ class Message:
         }
 
         text = ""
+        ci_title = ""
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+        ci_title = ""
 
         error_block_2 = {
             "type": "section",
@@ -722,7 +722,7 @@ def retrieve_available_artifacts():
         if artifact_name.startswith("single-gpu"):
             artifact_name = artifact_name[len("single-gpu") + 1 :]
 
-            if artifact_name in _available_artifacts:
+            if artifact_name in available_artifacts:
                 _available_artifacts[artifact_name].single_gpu = True
             else:
                 _available_artifacts[artifact_name] = Artifact(artifact_name, single_gpu=True)
@@ -845,7 +845,7 @@ if __name__ == "__main__":
         Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
         exit(0)
 
-    arguments = sys.argv[1:][0]
+    arguments = sys.argv[1]
     try:
         models = ast.literal_eval(arguments)
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
@@ -909,7 +909,7 @@ if __name__ == "__main__":
                 job_name = f"Model tests ({model.replace('models_', 'models/')}, {artifact_path['gpu']}-gpu)"
                 if job_name_prefix:
                     job_name = f"{job_name_prefix} / {job_name}"
-                model_results[model]["job_link"][artifact_path["gpu"]] = github_actions_job_links.get(job_name)
+                model_results[model]["job_link"][artifact_path["gpu"]] = get_job_links(workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"])
                 failed, success, time_spent = handle_test_results(artifact["stats"])
                 model_results[model]["success"] += success
                 model_results[model]["time_spent"] += time_spent[1:-1] + ", "
