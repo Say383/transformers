@@ -128,7 +128,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
     try:
-            with z.open(filename) as f:
+            try:
+                            with z.open(filename) as f:
                         for line in f:
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
