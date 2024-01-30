@@ -28,7 +28,7 @@ def get_job_links(workflow_run_id, token=None):
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json() if result is not None else {}
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
@@ -156,7 +156,7 @@ def reduce_by_error(logs, error_filter=None):
     counts = counter.most_common()
     r = {}
     for error, count in counts:
-        if error_filter is None or error not in error_filter:
+        if error_filter is None or (error_filter is not None and error not in error_filter):
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
