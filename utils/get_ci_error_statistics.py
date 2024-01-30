@@ -221,7 +221,11 @@ def make_github_table_per_model(reduced_by_model):
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
         lines.append(line)
 
-    return "\n".join(lines)
+    try:
+        return "\n".join(lines)
+    except Exception as e:
+        logging.error(f"Error generating GitHub table per model: {e}")
+        return ""
 
 
 if __name__ == "__main__":
