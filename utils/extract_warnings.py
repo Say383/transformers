@@ -12,7 +12,7 @@ from transformers import logging
 logger = logging.get_logger(__name__)
 
 
-def extract_warnings_from_single_artifact(artifact_path, targets):
+def extract_warnings_from_single_artifact(artifact_path, targets, from_gh=False):
     """Extract warnings from a downloaded artifact (in .zip format)"""
     selected_warnings = set()
     buffer = []
@@ -107,7 +107,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     from_gh = args.from_gh
-    if from_gh:
+    result = None
+    # Add a check for the result variable to ensure it is not None before accessing its properties.
+    if result is not None and from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
         pass
     else:
