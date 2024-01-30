@@ -237,13 +237,13 @@ def make_github_table(errors):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(errors):
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
-    for model in reduced_by_model:
-        count = reduced_by_model[model]["count"]
-        error, _count = list(reduced_by_model[model]["errors"].items())[0]
+    for model in errors: 
+        count = errors[model]["count"]
+        error, _count = list(errors[model]["errors"].items())[0]
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
         lines.append(line)
 
