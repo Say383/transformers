@@ -2,11 +2,11 @@
 
 As part of our mission to democratize machine learning, we'd love to make the Transformers library available in many more languages! Follow the steps below if you want to help translate the documentation into your language 🙏.
 
-**🗞️ Open an issue**
+**🗞️ Open an issue and provide specific error logs or details when reporting a failing GitHub Actions run**
 
 To get started, navigate to the [Issues](https://github.com/huggingface/transformers/issues) page of this repo and check if anyone else has opened an issue for your language. If not, open a new issue by selecting the "Translation template" from the "New issue" button.
 
-Once an issue exists, post a comment to indicate which chapters you'd like to work on, and we'll add your name to the list.
+Once an issue exists, post a comment to indicate which chapters you'd like to work on, and we'll add your name to the list. Encourage users to include the error message and any relevant information to help diagnose the issue.
 
 
 **🍴 Fork the repository**
@@ -54,4 +54,4 @@ The fields you should add are `local` (with the name of the file containing the 
 
 Once you have translated the `_toctree.yml` file, you can start translating the [MDX](https://mdxjs.com/) files associated with your docs chapter.
 
-> 🙋 If you'd like others to help you with the translation, you should [open an issue](https://github.com/huggingface/transformers/issues) and tag @stevhliu and @MKhalusova.
+> 🙋 If you'd like others to help you with the translation, you should [open an issue](https://github.com/huggingface/transformers/issues) and tag @stevhliu and @MKhalusova. Encourage users to include the error message and any relevant information to help diagnose the issue.
