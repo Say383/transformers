@@ -109,7 +109,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    response = requests.get(download_url, headers=headers, allow_redirects=True,timeout=(3.05, 35))
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
