@@ -1,0 +1,24 @@
+utils/offline_runners.txt:
+
+[
+  {
+    "name": "single-gpu-ci-runner-docker",
+    "status": "offline"
+  },
+  {
+    "name": "multi-gpu-ci-runner-docker",
+    "status": "offline"
+  },
+  {
+    "name": "single-gpu-scheduled-ci-runner-docker",
+    "status": "offline"
+  },
+  {
+    "name": "multi-scheduled-scheduled-ci-runner-docker",
+    "status": "offline"
+  },
+  {
+    "name": "single-gpu-doctest-ci-runner-docker",
+    "status": "offline"
+  }
+]
