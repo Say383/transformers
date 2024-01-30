@@ -502,7 +502,6 @@ class Message:
 
         if self.n_model_failures == 0 and self.n_additional_failures == 0:
             blocks.append(self.no_failures)
-
         if len(self.selected_warnings) > 0:
             blocks.append(self.warnings)
 
