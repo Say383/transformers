@@ -4,7 +4,7 @@ import math
 import os
 import time
 import logging
-from logging import basicConfig
+from logging import basicConfig, get_logger
 import traceback
 import zipfile
 from collections import Counter
