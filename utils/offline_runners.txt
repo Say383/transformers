@@ -1,0 +1,5 @@
+def create_offline_runners_file(file_path: str):
+    content = "This is the content of the offline_runners.txt file."
+
+    with open(file_path, "w") as file:
+        file.write(content)
