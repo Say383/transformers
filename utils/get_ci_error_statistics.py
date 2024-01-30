@@ -80,7 +80,13 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+        response.raise_for_status()
+    except requests.exceptions.HTTPError as err:
+        logging.error(f"HTTP error occurred: {err}")
+    except requests.exceptions.RequestException as err:
+        logging.error(f"Request exception occurred: {err}")
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
@@ -254,7 +260,8 @@ if __name__ == "__main__":
     for idx, (name, url) in enumerate(artifacts.items()):
         download_artifact(name, url, args.output_dir, args.token)
         # Be gentle to GitHub
-        time.sleep(1)
+        # Introduce delay for rate limiting and retry logic
+    time.sleep(1)
 
     errors = get_all_errors(args.output_dir, job_links=job_links)
 
