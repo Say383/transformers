@@ -268,9 +268,8 @@ if __name__ == "__main__":
     counter.update([e[1] for e in errors])
 
     # print the top 30 most common test errors
-    most_common = counter.most_common(30)
-    for item in most_common:
-        print(item)
+    for error in errors:
+        print(f"Job Name: {error[3]}\nError Message: {error[0]}\nFailed Test: {error[2]}\n")
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
