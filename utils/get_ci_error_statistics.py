@@ -72,7 +72,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     See https://docs.github.com/en/rest/actions/artifacts#download-an-artifact
     """
     headers = None
-    if token is not None:
+    if isinstance(token, str):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
@@ -229,7 +229,10 @@ if __name__ == "__main__":
         help="Where to store the downloaded artifacts and other result files.",
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
-    args = parser.parse_args()
+    try:
+        args = parser.parse_args()
+    except Exception as e:
+        logging.error(f'Error parsing arguments: {e}')
 
     os.makedirs(args.output_dir, exist_ok=True)
 
@@ -271,7 +274,10 @@ if __name__ == "__main__":
         json.dump(errors, fp, ensure_ascii=False, indent=4)
 
     reduced_by_error = reduce_by_error(errors)
-    reduced_by_model = reduce_by_model(errors)
+    try:
+        reduced_by_model = reduce_by_model(errors)
+    except Exception as e:
+        logging.error(f'Error reducing errors by model: {e}')
 
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
