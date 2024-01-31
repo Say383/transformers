@@ -972,7 +972,7 @@ if __name__ == "__main__":
 
     additional_results = {
         key: {
-            "failed": {"unclassified": 0, "single": 0, "multi": 0},
+            "failed": {"Unclassified": 0, "single": 0, "multi": 0},
             "success": 0,
             "time_spent": "",
             "error": False,
