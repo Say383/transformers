@@ -1,6 +1,6 @@
 import argparse
 import json
-from utils import slack_auth
+import slack_auth
 import subprocess
 
 
