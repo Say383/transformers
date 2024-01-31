@@ -879,7 +879,7 @@ if __name__ == "__main__":
     # - Failures: as a line-break separated list of errors
     model_results = {
         model: {
-            "failed": {m: {"unclassified": 0, "single": 0, "multi": 0} for m in modeling_categories},
+            "failed": {m: {"Unclassified": 0, "PyTorch": 0, "TensorFlow": 0, "Flax": 0, "Tokenizers": 0, "Pipelines": 0, "Trainer": 0, "ONNX": 0, "Auto": 0} for m in modeling_categories},
             "success": 0,
             "time_spent": "",
             "failures": {},
