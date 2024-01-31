@@ -234,8 +234,11 @@ def reduce_by_error(logs, error_filter=None):
 
 
 def get_model(test):
+    try:
     """Get the model name from a test method"""
     test = test.split("::")[0]
+    except Exception as e:
+        return None
     if test.startswith("tests/models/"):
         test = test.split("/")[2]
     else:
