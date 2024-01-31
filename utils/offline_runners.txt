@@ -1,0 +1,6 @@
+# Create the file "offline_runners.txt" in the "utils" directory
+with open("utils/offline_runners.txt", "w") as file:
+    file.write("Add necessary information about offline runners here")
+
+# Close the file
+file.close()
