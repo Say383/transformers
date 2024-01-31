@@ -12,7 +12,8 @@ from collections import Counter
 import requests
 
 
-def get_job_links(workflow_run_id, token=None):
+def get_job_links(workflow_run_id, token=None):    # Update the get_job_links function to handle the case when the token parameter is not provided.
+    # Add a default value of None for the token parameter.
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
     headers = None
