@@ -144,7 +144,10 @@ def get_all_errors(artifact_dir, job_links=None):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
-        errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        try:
+            errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        except Exception as e:
+            logging.error(f'An error occurred while processing artifact: {e}')
 
     return errors
 
