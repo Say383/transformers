@@ -547,28 +547,9 @@ class Message:
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
 
-        error_block_2 = {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": text,
-            },
-            "accessory": {
-                "type": "button",
-                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-            },
-        }
-        blocks.extend([error_block_1, error_block_2])
-
-        payload = json.dumps(blocks)
-
-        print("Sending the following payload")
-        print(json.dumps({"blocks": blocks}))
-
-        client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
-            text=text,
+        client = slack_sdk.WebClient(token="YOUR_SLACK_API_TOKEN")
+        
+        return client
             blocks=payload,
         )
 
