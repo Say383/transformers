@@ -21,6 +21,7 @@ you can install them with the following command, at the root of the code reposit
 
 ```bash
 pip install -e ".[docs]"
+pip install git+https://github.com/huggingface/doc-builder
 ```
 
 Then you need to install our special tool that builds the documentation:
@@ -56,6 +57,7 @@ To preview the docs, first install the `watchdog` module with:
 
 ```bash
 pip install watchdog
+doc-builder preview transformers docs/source/en/
 ```
 
 Then run the following command:
