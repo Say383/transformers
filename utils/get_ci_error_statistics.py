@@ -247,8 +247,9 @@ if __name__ == "__main__":
     job_links = {}
     # To deal with `workflow_call` event, where a job name is the combination of the job names in the caller and callee.
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
-    if _job_links:
-        for k, v in _job_links.items():
+    try:
+        if _job_links:
+            for k, v in _job_links.items():
     except Exception as e:
         logging.error(f"An error occurred while creating the GitHub table: {e}")
         traceback.print_exc()
@@ -259,9 +260,18 @@ if __name__ == "__main__":
         logging.error(f"An error occurred while creating the GitHub table: {e}")
         traceback.print_exc()
             # This is how GitHub actions combine job names.
-            if " / " in k:
-                index = k.find(" / ")
-                k = k[index + len(" / ") :]
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+                if " / " in k:
+                    index = k.find(" / ")
+                    k = k[index + len(" / ") :]
             job_links[k] = v
     with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
         json.dump(job_links, fp, ensure_ascii=False, indent=4)
