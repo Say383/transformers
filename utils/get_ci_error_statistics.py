@@ -154,7 +154,7 @@ def reduce_by_error(logs, error_filter=None):
     r = {}
     for error, count in counts:
         if error_filter is None or error not in error_filter:
-            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
+            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error], "job_link": None}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
@@ -191,7 +191,6 @@ def reduce_by_model(logs, error_filter=None):
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
 
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
@@ -239,6 +238,9 @@ if __name__ == "__main__":
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
     if _job_links:
         for k, v in _job_links.items():
+    if "errors" not in reduced_by_model[model]:
+        reduced_by_model[model]["errors"] = {}
+    reduced_by_model[model]["errors"].update(error_counts)
             # This is how GitHub actions combine job names.
             if " / " in k:
                 index = k.find(" / ")
