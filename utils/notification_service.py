@@ -26,10 +26,11 @@ from typing import Dict, List, Optional, Union
 import requests
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
+from utils.slack_config import SLACK_BOT_TOKEN, SLACK_CHANNEL_ID, SLACK_CHANNEL_ID_DAILY, SLACK_CHANNEL_DUMMY_TESTS, SLACK_REPORT_CHANNEL_ID
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+client = WebClient(token=SLACK_BOT_TOKEN)
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
@@ -868,7 +869,7 @@ if __name__ == "__main__":
         "Trainer",
         "ONNX",
         "Auto",
-        "Unclassified",
+        "Unclassified", "PyTorch", "TensorFlow", "Flax", "Tokenizers", "Pipelines", "Trainer", "ONNX", "Auto", 
     ]
 
     # This dict will contain all the information relative to each model:
@@ -878,7 +879,7 @@ if __name__ == "__main__":
     # - Failures: as a line-break separated list of errors
     model_results = {
         model: {
-            "failed": {m: {"unclassified": 0, "single": 0, "multi": 0} for m in modeling_categories},
+            "failed": {m: {"Unclassified": 0, "PyTorch": 0, "TensorFlow": 0, "Flax": 0, "Tokenizers": 0, "Pipelines": 0, "Trainer": 0, "ONNX": 0, "Auto": 0} for m in modeling_categories},
             "success": 0,
             "time_spent": "",
             "failures": {},
@@ -895,7 +896,7 @@ if __name__ == "__main__":
     job_name_prefix = ""
     if ci_event.startswith("Past CI - "):
         framework, version = ci_event.replace("Past CI - ", "").split("-")
-        framework = "PyTorch" if framework == "pytorch" else "TensorFlow"
+        framework = "PyTorch" if framework.lower() == "pytorch" else "TensorFlow"
         job_name_prefix = f"{framework} {version}"
     elif ci_event.startswith("Nightly CI"):
         job_name_prefix = "Nightly CI"
@@ -971,7 +972,7 @@ if __name__ == "__main__":
 
     additional_results = {
         key: {
-            "failed": {"unclassified": 0, "single": 0, "multi": 0},
+            "failed": {"Unclassified": 0, "single": 0, "multi": 0},
             "success": 0,
             "time_spent": "",
             "error": False,
