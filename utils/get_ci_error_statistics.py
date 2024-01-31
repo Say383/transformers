@@ -160,7 +160,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     failed_tests = []
     job_name = None
 
-    with zipfile.ZipFile(artifact_zip_path) as z:
+    try:
+        with zipfile.ZipFile(artifact_zip_path) as z:
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
@@ -183,6 +184,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 failed_tests.append(test)
                             elif filename == "job_name.txt":
                                 job_name = line
+                    except UnicodeDecodeError:
+                        continue
 
     if len(errors) != len(failed_tests):
         raise ValueError(
