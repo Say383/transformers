@@ -39,7 +39,7 @@ def get_job_links(workflow_run_id, token=None):    # Update the get_job_links fu
     return {}
 
 
-def get_artifacts_links(worflow_run_id, token=None):
+def get_artifacts_links(worflow_run_id, token=None):    # Add a default value of None for the token parameter.
     """Get all artifact links from a workflow run"""
 
     headers = None
