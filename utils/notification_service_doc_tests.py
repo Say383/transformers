@@ -366,9 +366,9 @@ if __name__ == "__main__":
                 else:
                     file_path, test = line.split("::") if "::" in line else (line, line)
 
-                for file_regex in docs.keys():
+                for file_regex, category in docs.items():
                     if fnmatch(file_path, file_regex):
-                        category = docs[file_regex]
+                        category = category
                         doc_test_results[category]["failed"].append(test)
 
                         failure = all_failures[test] if test in all_failures else "N/A"
