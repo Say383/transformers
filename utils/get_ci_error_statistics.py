@@ -246,6 +246,15 @@ if __name__ == "__main__":
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
     if _job_links:
         for k, v in _job_links.items():
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
             # This is how GitHub actions combine job names.
             if " / " in k:
                 index = k.find(" / ")
