@@ -95,12 +95,31 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     job_name = None
 
     with zipfile.ZipFile(artifact_zip_path) as z:
+        try:
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
-                        for line in f:
+                        try:
+                            line = line.decode("UTF-8").strip()
+                            if filename == "failures_line.txt":
+                                try:
+                                    # `error_line` is the place where `error` occurs
+                                    error_line = line[: line.index(": ")]
+                                    error = line[line.index(": ") + len(": ") :]
+                                    errors.append([error_line, error])
+                                except Exception:
+                                    # skip un-related lines
+                                    pass
+                            elif filename == "summary_short.txt" and line.startswith("FAILED "):
+                                # `test` is the test method that failed
+                                test = line[len("FAILED ") :]
+                                failed_tests.append(test)
+                            elif filename == "job_name.txt":
+                                job_name = line
+    except Exception as e:
+        logging.error(f"An error occurred while processing the artifact file:\n{traceback.format_exc()}\nError Details: {e}")
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
                                 try:
