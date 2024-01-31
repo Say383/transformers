@@ -30,7 +30,7 @@ from utils.slack_config import SLACK_BOT_TOKEN, SLACK_CHANNEL_ID, SLACK_CHANNEL_
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+client = WebClient(token=SLACK_BOT_TOKEN)
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
