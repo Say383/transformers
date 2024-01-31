@@ -23,7 +23,7 @@ import sys
 import time
 from typing import Dict, List, Optional, Union
 
-import requests
+import slack_auth
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
@@ -270,7 +270,7 @@ class Message:
                     individual_reports.append(key)
 
         header = "Single |  Multi | Category\n"
-        category_failures_report = prepare_reports(
+        category_failures_report = report = prepare_reports(
             title="The following modeling categories had failures", header=header, reports=individual_reports
         )
 
@@ -547,28 +547,9 @@ class Message:
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
 
-        error_block_2 = {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": text,
-            },
-            "accessory": {
-                "type": "button",
-                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-            },
-        }
-        blocks.extend([error_block_1, error_block_2])
-
-        payload = json.dumps(blocks)
-
-        print("Sending the following payload")
-        print(json.dumps({"blocks": blocks}))
-
-        client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
-            text=text,
+        client = slack_sdk.WebClient(token="YOUR_SLACK_API_TOKEN")
+        
+        return client
             blocks=payload,
         )
 
@@ -579,7 +560,7 @@ class Message:
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
-        self.thread_ts = client.chat_postMessage(
+        self.thread_ts = slack_client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             blocks=payload,
             text=text,
@@ -644,7 +625,7 @@ class Message:
                     print("Sending the following reply")
                     print(json.dumps({"blocks": blocks}))
 
-                    client.chat_postMessage(
+                    slack_slack_client.chat_postMessage(
                         channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
                         text=f"Results for {job}",
                         blocks=blocks,
@@ -667,7 +648,7 @@ class Message:
                     print("Sending the following reply")
                     print(json.dumps({"blocks": blocks}))
 
-                    client.chat_postMessage(
+                    slack_client.chat_postMessage(
                         channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
                         text=f"Results for {job}",
                         blocks=blocks,
@@ -722,7 +703,7 @@ def retrieve_available_artifacts():
         if artifact_name.startswith("single-gpu"):
             artifact_name = artifact_name[len("single-gpu") + 1 :]
 
-            if artifact_name in _available_artifacts:
+            if artifact_name in _available_artifacts.keys():
                 _available_artifacts[artifact_name].single_gpu = True
             else:
                 _available_artifacts[artifact_name] = Artifact(artifact_name, single_gpu=True)
