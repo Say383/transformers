@@ -218,17 +218,18 @@ def get_all_errors(artifact_dir, job_links=None):
 
 
 def reduce_by_error(logs, error_filter=None):
-    """count each error"""
-
-    counter = Counter()
-    counter.update([x[1] for x in logs])
-    counts = counter.most_common()
+    """count each error and handle potential errors and exceptions"""
     r = {}
-    for error, count in counts:
-        if error_filter is None or error not in error_filter:
-            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
-
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
+        counter = Counter()
+        counter.update([x[1] for x in logs])
+        counts = counter.most_common()
+        for error, count in counts:
+            if error_filter is None or error not in error_filter:
+                r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except (Exception, error_filter) as e:
+        print(f"Error when counting errors: {e}")
     return r
 
 
