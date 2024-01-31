@@ -574,8 +574,7 @@ class Message:
 
     def post(self):
         payload = self.payload
-        print("Sending the following payload")
-        print(json.dumps({"blocks": json.loads(payload)}))
+
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
