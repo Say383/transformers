@@ -13,7 +13,8 @@ logger = logging.get_logger(__name__)
 
 
 def extract_warnings_from_single_artifact(artifact_path, targets):
-    """Extract warnings from a downloaded artifact (in .zip format)"""
+    """Extract warnings from a downloaded artifact (in .zip format)
+    Handles exceptions that may occur during the file reading and parsing, and adds error handling and logging."""
     selected_warnings = set()
     buffer = []
 
