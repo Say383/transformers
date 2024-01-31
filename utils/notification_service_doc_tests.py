@@ -36,7 +36,7 @@ def handle_test_results(test_results):
 
     # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
     # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+    time_spent = expressions[-1].strip()
 
     for i, expression in enumerate(expressions):
         if "failed" in expression:
@@ -56,20 +56,20 @@ def extract_first_line_failure(failures_short_lines):
             in_error = True
             file = line.split(" ")[2]
         elif in_error and not line.split(" ")[0].isdigit():
-            failures[file] = line
+            failures[file] = line.split("\n")[0]
             in_error = False
 
-    return failures
+    return {k: v.split("\n")[0] for k, v in failures.items()}
 
 
 class Message:
     def __init__(self, title: str, doc_test_results: Dict):
         self.title = title
 
-        self._time_spent = doc_test_results["time_spent"].split(",")[0]
-        self.n_success = doc_test_results["success"]
-        self.n_failures = doc_test_results["failures"]
-        self.n_tests = self.n_success + self.n_failures
+        self._time_spent = doc_test_results["time_spent"]
+        self.n_success = sum(v["n_success"] for v in doc_test_results.values())
+        self.n_failures = sum(v["n_failures"] for v in doc_test_results.values())
+        self.n_tests = sum(v["n_tests"] for v in doc_test_results.values())
 
         # Failures and success of the modeling tests
         self.doc_test_results = doc_test_results
