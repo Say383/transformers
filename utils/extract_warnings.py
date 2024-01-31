@@ -90,7 +90,7 @@ if __name__ == "__main__":
         required=True,
         help="Where to store the downloaded artifacts and other result files.",
     )
-    parser.add_argument("--token", type=str, required=True, help="A GitHub token with actions:read permission.")
+    parser.add_argument("--TRANSFORMERS_CACHE", type=str, required=True, help="A GitHub token with actions:read permission.")
     # optional parameters
     parser.add_argument(
         "--targets",
