@@ -1,0 +1,14 @@
+import os
+import json
+
+offline_runners = [
+    "runner1",
+    "runner2",
+    "runner3"
+    # Add more offline runners here if needed
+]
+
+file_path = os.path.join("utils", "offline_runners.txt")
+
+with open(file_path, "w") as file:
+    file.write(json.dumps(offline_runners))
