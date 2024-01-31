@@ -896,7 +896,7 @@ if __name__ == "__main__":
     job_name_prefix = ""
     if ci_event.startswith("Past CI - "):
         framework, version = ci_event.replace("Past CI - ", "").split("-")
-        framework = "PyTorch" if framework == "pytorch" else "TensorFlow"
+        framework = "PyTorch" if framework.lower() == "pytorch" else "TensorFlow"
         job_name_prefix = f"{framework} {version}"
     elif ci_event.startswith("Nightly CI"):
         job_name_prefix = "Nightly CI"
