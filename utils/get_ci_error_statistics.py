@@ -212,17 +212,20 @@ def make_github_table(reduced_by_error):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(reduced_by_model):    # Wrap the code in a try-except block to catch any exceptions that might occur during the creation of the GitHub table per model.
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
-    for model in reduced_by_model:
-        count = reduced_by_model[model]["count"]
-        error, _count = list(reduced_by_model[model]["errors"].items())[0]
-        line = f"| {model} | {count} | {error[:60]} | {_count} |"
-        lines.append(line)
+    try:
+            count = reduced_by_model[model]["count"]
+            error, _count = list(reduced_by_model[model]["errors"].items())[0]
+            line = f"| {model} | {count} | {error[:60]} | {_count} |"
+            lines.append(line)
 
     return "\n".join(lines)
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table per model: {e}")
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
