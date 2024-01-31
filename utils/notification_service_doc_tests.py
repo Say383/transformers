@@ -364,7 +364,7 @@ if __name__ == "__main__":
                 if "::" in line:
                     file_path, test = line.split("::")
                 else:
-                    file_path, test = line, line
+                    file_path, test = line.split("::") if "::" in line else (line, line)
 
                 for file_regex in docs.keys():
                     if fnmatch(file_path, file_regex):
