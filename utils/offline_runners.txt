@@ -1,0 +1,9 @@
+# utils/notification_service.py
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    with open(file_path, "w") as file:
+        # Write any initial content to the file if needed
+        pass
+
+create_offline_runners_file()
