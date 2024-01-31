@@ -152,7 +152,7 @@ def get_all_errors(artifact_dir, job_links=None):
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+def reduce_by_error(logs, error_filter=None):    # Wrap the code in a try-except block to catch any exceptions that might occur during the reduction of errors.
     """count each error"""
 
     counter = Counter()
