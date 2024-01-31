@@ -3,7 +3,7 @@ import json
 import math
 import os
 import time
-import logging
+from utils.logging import logging
 from logging import basicConfig
 import traceback
 import zipfile
@@ -78,7 +78,9 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
-        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:
+{traceback.format_exc()}
+Error Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
@@ -267,7 +269,7 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
-        print(item)
+        logging.info(item)
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
