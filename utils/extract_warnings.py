@@ -4,7 +4,7 @@ import os
 import time
 import zipfile
 
-from get_ci_error_statistics import download_artifact, get_artifacts_links
+from utils.get_ci_error_statistics import get_job_links, download_artifact, get_artifacts_links
 
 from transformers import logging
 
@@ -106,8 +106,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    from_gh = args.from_gh
-    if from_gh:
+    from_gh = False
+    if not from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
         pass
     else:
