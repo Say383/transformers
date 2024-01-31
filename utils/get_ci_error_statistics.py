@@ -84,6 +84,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
+    logging.info('Downloaded artifact successfully')
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
@@ -99,7 +100,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
                         for line in f:
-                            line = line.decode("UTF-8").strip()
+                            line = line.strip()
                             if filename == "failures_line.txt":
                                 try:
                                     # `error_line` is the place where `error` occurs
