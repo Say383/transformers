@@ -98,6 +98,8 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
     return functools.reduce(operator.add, counters)
 
 
+from slack_utils import handle_authentication_error
+
 class Message:
     def __init__(
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
