@@ -201,6 +201,7 @@ def make_github_table(reduced_by_error):
         count = reduced_by_error[error]["count"]
         line = f"| {count} | {error[:100]} |  |"
         lines.append(line)
+    lines.append(sep)
 
     return "\n".join(lines)
 
