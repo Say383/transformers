@@ -84,8 +84,8 @@ def handle_stacktraces(test_results):
             error_message = stacktrace[stacktrace.index(" ") :]
 
             stacktraces.append(f"(line {line}) {error_message}")
-        except Exception:
-            stacktraces.append("Cannot retrieve error message.")
+        except FileNotFoundError:
+            stacktraces.append("The offline runners file 'offline_runners.txt' could not be found.")
 
     return stacktraces
 
