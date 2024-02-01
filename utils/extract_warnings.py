@@ -18,7 +18,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
     buffer = []
 
     def parse_line(fp):
-        for line in fp:
+        for line in fp.split('\n'):
             if isinstance(line, bytes):
                 line = line.decode("UTF-8")
             if "warnings summary (final)" in line:
@@ -44,7 +44,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 # read the file
                 if filename != "warnings.txt":
                     continue
-                with open(file_path) as fp:
+                with open(file_path, 'r', encoding='utf-8') as fp:
                     parse_line(fp)
     else:
         try:
