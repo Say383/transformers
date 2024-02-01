@@ -546,7 +546,7 @@ class Message:
 
         offline_runners = []
         handle_not_authed_error()
-    client.headers.update({'Authorization': f'Bearer {your_auth_token}'})
+    client.headers.update({'Authorization': f'Bearer {args.token}'})
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
@@ -561,6 +561,7 @@ class Message:
             text = "💔 There was an issue running the tests. 😭"
 
         error_block_1 = {
+    cmd += f' --token {args.token}'
             "type": "header",
             "text": {
                 "type": "plain_text",
