@@ -547,28 +547,48 @@ class Message:
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
 
-        error_block_2 = {
-            "type": "section",
-            "text": {
-                "type": "plain_text",
-                "text": text,
-            },
-            "accessory": {
-                "type": "button",
-                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
-            },
-        }
-        blocks.extend([error_block_1, error_block_2])
-
-        payload = json.dumps(blocks)
-
-        print("Sending the following payload")
-        print(json.dumps({"blocks": blocks}))
-
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
+            blocks=payload,
+            token=os.environ["CI_SLACK_BOT_TOKEN"],
+        )
+
+    def post(self):
+        payload = self.payload
+        print("Sending the following payload")
+        print(json.dumps({"blocks": json.loads(payload)}))
+
+        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+
+        self.thread_ts = client.chat_postMessage(
+            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            blocks=payload,
+            text=text,
+            token=os.environ["CI_SLACK_BOT_TOKEN"],
+        )
+
+    def get_reply_blocks(self, job_name, job_result, failures, device, text):
+        """
+        failures: A list with elements of the form {"line": full test name, "trace": error trace}
+        """
+        # `text` must be less than 3001 characters in Slack SDK
+        # keep some room for adding "[Truncated]" when necessary
+        MAX_ERROR_TEXT = 3000 - len("[Truncated]")
+
+        failure_text = ""
+        for idx, error in enumerate(failures):
+            new_text = failure_text + f'*{error["line"]}*\n_{error["trace"]}_\n\n'
+            if len(new_text) > MAX_ERROR_TEXT:
+                # `failure_text` here has length <= 3000
+                failure_text = failure_text + "[Truncated]"
+                break
+            # `failure_text` here has length <= MAX_ERROR_TEXT
+            failure_text = new_text
+
+        title = job_name
+        if device is not None:
+            title += f" ({device}-gpu)"
             blocks=payload,
         )
 
