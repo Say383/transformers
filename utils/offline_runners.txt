@@ -1,0 +1,25 @@
+# notification_service.py
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    offline_runners_data = "Runner 1\nRunner 2\nRunner 3"  # Replace with the actual data
+
+    with open(file_path, "w") as file:
+        file.write(offline_runners_data)
+
+class Message:
+    # Existing code
+
+    @staticmethod
+    def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False):
+        # Existing code
+
+        if runner_not_available or runner_failed or setup_failed:
+            file_path = "utils/offline_runners.txt"
+            try:
+                with open(file_path, "r") as file:
+                    offline_runners_data = file.read()
+            except FileNotFoundError:
+                offline_runners_data = ""
+
+            # Existing code
