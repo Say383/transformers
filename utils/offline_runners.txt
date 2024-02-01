@@ -20,8 +20,8 @@ def get_runner_status(target_runners, token):
             if runner["status"] == "offline":
                 offline_runners.append(runner)
 
-    # save the result so we can report them on Slack
-    with open("offline_runners.txt", "w") as fp:
+    # Save the result to the offline_runners.txt file
+    with open("utils/offline_runners.txt", "w") as fp:
         fp.write(json.dumps(offline_runners))
 
     if len(offline_runners) > 0:
@@ -39,7 +39,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--target_runners",
         default=None,
-        type=str,
+        type=list_str,
         required=True,
         help="Comma-separated list of runners to check status.",
     )
