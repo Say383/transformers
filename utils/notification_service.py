@@ -566,7 +566,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
-        client.chat_postMessage(
+        client.chat_postMessage(channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],text=text,token="<your_valid_token>",
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
             blocks=payload,
