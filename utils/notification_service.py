@@ -567,9 +567,9 @@ class Message:
         print(json.dumps({"blocks": blocks}))
 
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel="your_channel_id",
             text=text,
-            blocks=payload,
+            text="The request to the Slack API failed. (url: https://www.slack.com/api/chat.postMessage)\nThe server responded with: {'ok': False, 'error': 'not_authed'}",
         )
 
     def post(self):
