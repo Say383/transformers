@@ -4,12 +4,19 @@ import math
 import os
 import time
 import logging
+import time
+import logging
 from logging import basicConfig
 import traceback
 import zipfile
 from collections import Counter
 
 import requests
+import os
+import logging
+import time
+import traceback
+from collections import Counter
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -263,9 +270,12 @@ if __name__ == "__main__":
     counter.update([e[1] for e in errors])
 
     # print the top 30 most common test errors
-    most_common = counter.most_common(30)
-    for item in most_common:
-        print(item)
+    try:
+        most_common = counter.most_common(30)
+        for item in most_common:
+            print(item)
+    except Exception as e:
+        print(f"Error while printing top 30 most common test errors: {e}")
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
