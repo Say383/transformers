@@ -26,7 +26,161 @@ from typing import Dict, List, Optional, Union
 import requests
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
-from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+
+class Message:
+    ...
+
+    @staticmethod
+    def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False):
+        blocks = []
+        title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
+        blocks.append(title_block)
+
+        if ci_title:
+            ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
+            blocks.append(ci_title_block)
+
+        offline_runners = []
+        if runner_not_available:
+            text = "💔 CI runners are not available! Tests are not run. 😭"
+            result = os.environ.get("OFFLINE_RUNNERS")
+            try:
+                offline_runners = json.loads(result)
+            except json.JSONDecodeError:
+                offline_runners = []
+        elif runner_failed:
+            text = "💔 CI runners have problems! Tests are not run. 😭"
+        elif setup_failed:
+            text = "💔 Setup job failed. Tests are not run. 😭"
+        else:
+            text = "💔 There was an issue running the tests. 😭"
+
+        error_block_1 = {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": text,
+            },
+        }
+
+        text = ""
+        if len(offline_runners) > 0:
+            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n{text}\n\n"
+        text += "🙏 Let's fix it ASAP! 🙏"
+
+        error_block_2 = {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": text,
+            },
+            "accessory": {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+            },
+        }
+        blocks.extend([error_block_1, error_block_2])
+
+        payload = json.dumps(blocks)
+
+        print("Sending the following payload")
+        print(json.dumps({"blocks": blocks}))
+
+        try:
+            client.chat_postMessage(
+                channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                text=text,
+                blocks=payload,
+            )
+        except SlackApiError as e:
+            if e.response["error"] == "not_authed":
+                print("Slack API authentication failed. Please check your Slack API credentials.")
+            else:
+                print("An error occurred while sending the Slack message.")
+                print(e.response["error"])
+
+        exit(0)
+=======
+from slack_sdk.errors import SlackApiError
+
+class Message:
+    ...
+
+    @staticmethod
+    def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False):
+        blocks = []
+        title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
+        blocks.append(title_block)
+
+        if ci_title:
+            ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
+            blocks.append(ci_title_block)
+
+        offline_runners = []
+        if runner_not_available:
+            text = "💔 CI runners are not available! Tests are not run. 😭"
+            result = os.environ.get("OFFLINE_RUNNERS")
+            try:
+                offline_runners = json.loads(result)
+            except json.JSONDecodeError:
+                offline_runners = []
+        elif runner_failed:
+            text = "💔 CI runners have problems! Tests are not run. 😭"
+        elif setup_failed:
+            text = "💔 Setup job failed. Tests are not run. 😭"
+        else:
+            text = "💔 There was an issue running the tests. 😭"
+
+        error_block_1 = {
+            "type": "header",
+            "text": {
+                "type": "plain_text",
+                "text": text,
+            },
+        }
+
+        text = ""
+        if len(offline_runners) > 0:
+            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = f"The following runners are offline:\n{text}\n\n"
+        text += "🙏 Let's fix it ASAP! 🙏"
+
+        error_block_2 = {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": text,
+            },
+            "accessory": {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+            },
+        }
+        blocks.extend([error_block_1, error_block_2])
+
+        payload = json.dumps(blocks)
+
+        print("Sending the following payload")
+        print(json.dumps({"blocks": blocks}))
+
+        try:
+            client.chat_postMessage(
+                channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                text=text,
+                blocks=payload,
+            )
+        except SlackApiError as e:
+            if e.response["error"] == "not_authed":
+                print("Slack API authentication failed. Please check your Slack API credentials.")
+            else:
+                print("An error occurred while sending the Slack message.")
+                print(e.response["error"])
+
+        exit(0)
 
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
