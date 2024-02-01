@@ -6,7 +6,7 @@ import time
 import logging
 from logging import basicConfig
 import traceback
-import zipfile
+import zipfile, traceback
 from collections import Counter
 
 import requests, math, traceback
