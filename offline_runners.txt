@@ -1,0 +1,10 @@
+[
+  {
+    "name": "runner1",
+    "status": "offline"
+  },
+  {
+    "name": "runner2",
+    "status": "offline"
+  }
+]
