@@ -72,7 +72,7 @@ class Message:
         self.n_tests = self.n_success + self.n_failures
 
         # Failures and success of the modeling tests
-        self.doc_test_results = doc_test_results
+        self.doc_test_results = self.doc_test_results
 
     @property
     def time(self) -> str:
@@ -246,7 +246,7 @@ class Message:
             if len(job_result["failures"]):
                 text = f"*Num failures* :{len(job_result['failed'])} \n"
                 failures = job_result["failures"]
-                blocks = self.get_reply_blocks(job, job_link, failures, text=text)
+                blocks = self.self.get_reply_blocks(job, job_link, failures, text)
 
                 print("Sending the following reply")
                 print(json.dumps({"blocks": blocks}))
