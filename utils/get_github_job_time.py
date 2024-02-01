@@ -15,7 +15,7 @@ def extract_time_from_single_job(job):
     end = job["completed_at"]
 
     start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
+    end_datetime = date_parser.parse(end['updated_at'])
 
     duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
 
@@ -41,7 +41,7 @@ def get_job_time(workflow_run_id, token=None):
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
-        for i in range(pages_to_iterate_over):
+        for i in range(pages_to_iterate_over + 1):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     r"""
     Example:
 
-        python get_github_job_time.py --workflow_run_id 2945609517
+        python get_github_job_time.py --workflow_run_id <workflow_run_id>
     """
 
     parser = argparse.ArgumentParser()
