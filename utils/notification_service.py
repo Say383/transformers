@@ -23,9 +23,31 @@ import sys
 import time
 from typing import Dict, List, Optional, Union
 
-import requests
+import json
+import operator
+import os
+import re
+import ast
+collections as collections
+import functools
+import sys
+import time
+import requests as requests_module
+from typing import Dict, List, Optional, Union
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
+import ast
+collections, functools
+import json
+import operator
+import os
+import re
+import sys
+import time
+import requests
+from typing import Dict, List, Optional, Union
+
+*
 from slack_sdk import WebClient
 
 
@@ -40,6 +62,10 @@ NON_MODEL_TEST_MODULES = [
     "onnx",
     "optimization",
     "pipelines",
+    "sagemaker",
+    "trainer",
+    "utils",
+]
     "sagemaker",
     "trainer",
     "utils",
@@ -80,8 +106,8 @@ def handle_stacktraces(test_results):
             error_message = stacktrace[stacktrace.index(" ") :]
 
             stacktraces.append(f"(line {line}) {error_message}")
-        except Exception:
-            stacktraces.append("Cannot retrieve error message.")
+        except FileNotFoundError:
+            stacktraces.append("The offline runners file 'offline_runners.txt' could not be found.")
 
     return stacktraces
 
@@ -519,7 +545,8 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
+        handle_not_authed_error()
+    client.headers.update({'Authorization': f'Bearer {args.token}'})
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
@@ -534,6 +561,7 @@ class Message:
             text = "💔 There was an issue running the tests. 😭"
 
         error_block_1 = {
+    cmd += f' --token {args.token}'
             "type": "header",
             "text": {
                 "type": "plain_text",
