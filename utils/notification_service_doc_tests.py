@@ -23,6 +23,11 @@ from typing import Dict
 
 import requests
 from slack_sdk import WebClient
+from fnmatch import fnmatch
+from typing import Dict
+
+import requests
+from slack_sdk import WebClient
 
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
@@ -31,19 +36,14 @@ client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
 def handle_test_results(test_results):
     expressions = test_results.split(" ")
 
-    failed = 0
-    success = 0
+    result = re.match(r'\d+ passed', test_results)
+    if result:
+        success = int(result.group(0).split()[0])
+    result = re.match(r'\d+ failed', test_results)
+    if result:
+        failed = int(result.group(0).split()[0])
 
-    # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
-    # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
-
-    for i, expression in enumerate(expressions):
-        if "failed" in expression:
-            failed += int(expressions[i - 1])
-        if "passed" in expression:
-            success += int(expressions[i - 1])
-
+    time_spent = test_results.split(' ')[-1]
     return failed, success, time_spent
 
 
@@ -51,13 +51,15 @@ def extract_first_line_failure(failures_short_lines):
     failures = {}
     file = None
     in_error = False
+    file_regex = r'[A-Za-z0-9_:.\/]+\.[a-z]{2,4}'
     for line in failures_short_lines.split("\n"):
-        if re.search(r"_ \[doctest\]", line):
+        if re.match(file_regex, line):
+            file = line
             in_error = True
-            file = line.split(" ")[2]
-        elif in_error and not line.split(" ")[0].isdigit():
-            failures[file] = line
-            in_error = False
+        elif in_error:
+            if ' FAILED ' in line:
+                failures[file] = line
+                in_error = False
 
     return failures
 
