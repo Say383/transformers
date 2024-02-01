@@ -23,9 +23,31 @@ import sys
 import time
 from typing import Dict, List, Optional, Union
 
-import requests
+import json
+import operator
+import os
+import re
+import ast
+collections as collections
+import functools
+import sys
+import time
+import requests as requests_module
+from typing import Dict, List, Optional, Union
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
+import ast
+collections, functools
+import json
+import operator
+import os
+import re
+import sys
+import time
+import requests
+from typing import Dict, List, Optional, Union
+
+*
 from slack_sdk import WebClient
 
 
@@ -524,6 +546,7 @@ class Message:
 
         offline_runners = []
         handle_not_authed_error()
+    client.headers.update({'Authorization': f'Bearer {your_auth_token}'})
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
