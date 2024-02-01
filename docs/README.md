@@ -39,7 +39,7 @@ check how they look before committing for instance). You don't have to commit th
 
 ## Building the documentation
 
-Once you have setup the `doc-builder` and additional packages, you can generate the documentation by 
+Once you have set up the `doc-builder` and additional packages, you can generate the documentation by 
 typing the following command:
 
 ```bash
@@ -61,12 +61,6 @@ pip install watchdog
 Then run the following command:
 
 ```bash
-doc-builder preview {package_name} {path_to_docs}
-```
-
-For example:
-
-```bash
 doc-builder preview transformers docs/source/en/
 ```
 
@@ -78,7 +72,6 @@ The docs will be viewable at [http://localhost:3000](http://localhost:3000). You
 The `preview` command only works with existing doc files. When you add a completely new file, you need to update `_toctree.yml` & restart `preview` command (`ctrl-c` to stop it & call `doc-builder preview ...` again).
 
 ---
-
 ## Adding a new element to the navigation bar
 
 Accepted files are Markdown (.md or .md).
