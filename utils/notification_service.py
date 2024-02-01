@@ -551,7 +551,8 @@ class Message:
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
             blocks=payload,
-            token=os.environ["CI_SLACK_BOT_TOKEN"],
+            accessory={"type": "button","text": {"type": "plain_text","text": "Check Action results","emoji": True},"url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}"},
+            token=os.environ["CI_SLACK_BOT_TOKEN"]
         )
 
     def post(self):
