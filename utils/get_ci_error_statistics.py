@@ -20,7 +20,7 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get_with_retry(url, headers=headers).json()
     job_links = {}
 
     try:
@@ -56,7 +56,7 @@ def get_artifacts_links(worflow_run_id, token=None):
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            result = requests.get_with_retry(url + f"&page={i + 2}", headers=headers).json()
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
@@ -80,7 +80,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
-        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+        result = requests.get_with_retry(artifact_url, headers=headers, allow_redirects=False)
     except requests.RequestException as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
         raise
@@ -262,7 +262,7 @@ if __name__ == "__main__":
     for idx, (name, url) in enumerate(artifacts.items()):
         download_artifact(name, url, args.output_dir, args.token)
         # Be gentle to GitHub
-        time.sleep(5)
+        time.sleep(1)
 
     errors = get_all_errors(args.output_dir, job_links=job_links)
 
