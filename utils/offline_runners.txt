@@ -1,0 +1,8 @@
+# Create the new file
+with open("utils/offline_runners.txt", "w") as file:
+    # Write the offline runners' information to the file
+    file.write("Offline runner 1\n")
+    file.write("Offline runner 2\n")
+    file.write("Offline runner 3\n")
+
+# No need to close the file explicitly as it is automatically closed when the `with` block is exited
