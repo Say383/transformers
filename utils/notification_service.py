@@ -44,6 +44,10 @@ NON_MODEL_TEST_MODULES = [
     "trainer",
     "utils",
 ]
+    "sagemaker",
+    "trainer",
+    "utils",
+]
 
 
 def handle_test_results(test_results):
