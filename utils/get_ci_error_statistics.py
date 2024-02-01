@@ -9,7 +9,8 @@ import traceback
 import zipfile, traceback
 from collections import Counter
 
-import requests, math, traceback
+import requests, traceback
+from collections import Counter
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -193,7 +194,7 @@ def reduce_by_model(logs, error_filter=None):
     return r
 
 
-def make_github_table(reduced_by_error):
+def make_github_table(reduced_by_error: dict):
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
     lines = [header, sep]
