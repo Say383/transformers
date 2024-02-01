@@ -1,4 +1,4 @@
-import argparse
+import argparse, json, math, time, os
 import json
 import math
 import os
@@ -231,6 +231,31 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    _job_links = get_job_links(args.workflow_run_id, token=args.token)
+    job_links = {}
+    if _job_links:
+        for k, v in _job_links.items():
+            if " / " in k:
+                index = k.find(" / ")
+                k = k[index + len(" / ") :]
+            job_links[k] = v
+    with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
+        json.dump(job_links, fp, ensure_ascii=False, indent=4)
+        artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
+    with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
+        json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+    for idx, (name, url) in enumerate(artifacts.items()):
+        download_artifact(name, url, args.output_dir, args.token)
+        # Be gentle to GitHub
+        time.sleep(1)
+
+    errors = get_all_errors(args.output_dir, job_links=job_links)
+
+    # `e[1]` is the error
+    counter = Counter()
+    counter.update([e[1] for e in errors])
 
     os.makedirs(args.output_dir, exist_ok=True)
 
