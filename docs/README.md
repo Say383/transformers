@@ -44,6 +44,36 @@ typing the following command:
 
 ```bash
 doc-builder build transformers docs/source/en/ --build_dir ~/tmp/test-build
+
+## Generating CI Error Statistics
+
+To generate CI error statistics, you can use the `get_ci_error_statistics.py` script. This script analyzes the error logs from CI runs and generates reports on the frequency and types of errors encountered.
+
+To run the script, use the following command:
+
+```bash
+python tests/get_ci_error_statistics.py --log_file <path_to_log_file> --output_dir <output_directory>
+```
+
+The script takes the following command-line arguments:
+
+- `--log_file`: The path to the log file containing the error logs from CI runs.
+- `--output_dir`: The directory where the output files will be saved.
+
+After running the script, you will find the following output files in the specified output directory:
+
+- `error_statistics.csv`: A CSV file containing the error statistics, including the error message and the number of occurrences.
+- `error_summary.txt`: A text file summarizing the error statistics.
+
+## Interpreting the Error Reports
+
+The `error_statistics.csv` file provides detailed information about the errors encountered during CI runs. Each row in the CSV file represents a unique error message, and the corresponding column contains the number of occurrences of that error.
+
+You can use this information to identify common errors and troubleshoot issues in your code or CI configuration.
+
+The `error_summary.txt` file provides a summary of the error statistics, including the total number of errors and the most frequent error messages.
+
+Please refer to the generated error reports for more information on interpreting the error statistics and utilizing the output files.
 ```
 
 You can adapt the `--build_dir` to set any temporary folder that you prefer. This command will create it and generate
@@ -59,6 +89,32 @@ pip install watchdog
 ```
 
 Then run the following command:
+## Prerequisites
+
+Before running the `get_ci_error_statistics.py` script, make sure you have the following prerequisites installed:
+
+- Python 3.6 or higher
+- Required dependencies (specified in the `requirements.txt` file)
+
+You can install the required dependencies by running the following command:
+
+```bash
+pip install -r requirements.txt
+```
+
+Make sure to activate your virtual environment before installing the dependencies.
+
+## Example Usage
+
+Here's an example of how to use the `get_ci_error_statistics.py` script:
+
+```bash
+python tests/get_ci_error_statistics.py --log_file ci_logs.txt --output_dir error_reports
+```
+
+This command will analyze the error logs in the `ci_logs.txt` file and generate the error reports in the `error_reports` directory.
+
+Please note that you need to replace `ci_logs.txt` with the path to your actual log file and `error_reports` with the desired output directory.
 
 ```bash
 doc-builder preview {package_name} {path_to_docs}
