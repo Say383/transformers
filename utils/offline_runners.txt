@@ -1,0 +1,12 @@
+# Create the new file and populate it with offline runners
+
+def create_offline_runners_file():
+    file_path = "utils/offline_runners.txt"
+    offline_runners = ["runner1", "runner2", "runner3"]  # Replace with the actual list of offline runners
+
+    with open(file_path, "w") as file:
+        for runner in offline_runners:
+            file.write(runner + "\n")
+
+# Call the function to create the file
+create_offline_runners_file()

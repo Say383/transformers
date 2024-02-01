@@ -4,6 +4,9 @@ import subprocess
 
 
 def get_runner_status(target_runners, token):
+    if token is None:
+        raise ValueError("The --token argument is missing.")
+
     offline_runners = []
 
     cmd = (
