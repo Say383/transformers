@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import ast
+import requests
 import collections
 import functools
 import json
