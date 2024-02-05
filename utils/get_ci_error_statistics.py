@@ -9,7 +9,7 @@ import traceback
 import zipfile
 from collections import Counter
 
-import requests
+import requests, dateutil.parser as date_parser, dateutil.parser as date_parser
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -32,7 +32,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\n{e}") # log the exception.
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
