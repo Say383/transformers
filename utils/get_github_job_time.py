@@ -26,7 +26,7 @@ def extract_time_from_single_job(job):
     return job_info
 
 
-def get_job_time(workflow_run_id, token=None):
+def get_job_time(workflow_run_id, token=None, log_file='job_time.log'): # Add log_file parameter to store error logs
     """Extract time info for all jobs in a GitHub Actions workflow run"""
 
     headers = None
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
     args = parser.parse_args()
 
-    job_time = get_job_time(args.workflow_run_id)
+    job_time = get_job_time(args.workflow_run_id, log_file='job_time.log') # Add log_file parameter to use the updated function
     job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
 
     for k, v in job_time.items():
