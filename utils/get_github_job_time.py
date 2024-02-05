@@ -59,7 +59,7 @@ if __name__ == "__main__":
         python get_github_job_time.py --workflow_run_id 2945609517
     """
 
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(description='Extract time info for all jobs in a GitHub Actions workflow run')
     # Required parameters
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
     args = parser.parse_args()
