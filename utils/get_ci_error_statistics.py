@@ -156,7 +156,10 @@ def reduce_by_error(logs, error_filter=None):
         if error_filter is None or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except Exception as e:
+        print(f'Error sorting errors: {e}')
     return r
 
 
@@ -166,7 +169,7 @@ def get_model(test):
     if test.startswith("tests/models/"):
         test = test.split("/")[2]
     else:
-        test = None
+        print(f'Invalid test method: {test}')
 
     return test
 
