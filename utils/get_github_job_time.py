@@ -6,50 +6,17 @@ import dateutil.parser as date_parser
 import requests
 
 
-def extract_time_from_single_job(job):
-    """Extract time info from a single job in a GitHub Actions workflow run"""
+def get_job_times(workflow_run_id, token=None):
+    job_links = get_job_links(workflow_run_id, token=token)
+    artifacts = get_artifacts_links(workflow_run_id, token=token)
+    job_time = get_job_time(workflow_run_id, token=token)
+    selected_warnings = extract_warnings(workflow_run_id, targets=["DeprecationWarning", "UserWarning", "FutureWarning"])
 
-    job_info = {}
+    # Perform analysis on the retrieved data
+    # ...
 
-    start = job["started_at"]
-    end = job["completed_at"]
-
-    start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
-
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
-
-    job_info["started_at"] = start
-    job_info["completed_at"] = end
-    job_info["duration"] = duration_in_min
-
-    return job_info
-
-
-def get_job_time(workflow_run_id, token=None):
-    """Extract time info for all jobs in a GitHub Actions workflow run"""
-
-    headers = None
-    if token is not None:
-        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
-
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    job_time = {}
-
-    try:
-        job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
-
-        for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
-            job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
-
-        return job_time
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
-
-    return {}
+    # Return the analyzed data
+    return job_time
 
 
 if __name__ == "__main__":
