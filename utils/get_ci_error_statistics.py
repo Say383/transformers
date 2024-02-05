@@ -14,6 +14,27 @@ import requests
 
 def get_job_links(workflow_run_id, token=None):
     """Extract job names and their job links in a GitHub Actions workflow run"""
+    
+    headers = None
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
+    try:
+        result = requests.get(url, headers=headers)
+        result.raise_for_status()
+        job_links = {job["name"]: job["html_url"] for job in result.json()["jobs"]}
+        pages_to_iterate_over = math.ceil((result.json()["total_count"] - 100) / 100)
+    
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers)
+            result.raise_for_status()
+            job_links.update({job["name"]: job["html_url"] for job in result.json()["jobs"]})
+    
+        return job_links
+    except requests.exceptions.RequestException as e:
+        print(f"Error occurred while fetching job links:\n{e}")
+        return {}
 
     headers = None
     if token is not None:
@@ -40,6 +61,27 @@ def get_job_links(workflow_run_id, token=None):
 
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
+    
+    headers = None
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
+    try:
+        result = requests.get(url, headers=headers)
+        result.raise_for_status()
+        artifacts = {artifact["name"]: artifact["archive_download_url"] for artifact in result.json()["artifacts"]}
+        pages_to_iterate_over = math.ceil((result.json()["total_count"] - 100) / 100)
+    
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers)
+            result.raise_for_status()
+            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result.json()["artifacts"]})
+    
+        return artifacts
+    except requests.exceptions.RequestException as e:
+        print(f"Error occurred while fetching artifact links:\n{e}")
+        return {}
 
     headers = None
     if token is not None:
@@ -77,8 +119,9 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
-    except Exception as e:
-        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        result.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error occurred while fetching artifact URL {artifact_url}:\n{e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
@@ -117,10 +160,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 job_name = line
 
     if len(errors) != len(failed_tests):
-        raise ValueError(
-            f"`errors` and `failed_tests` should have the same number of elements. Got {len(errors)} for `errors` "
-            f"and {len(failed_tests)} for `failed_tests` instead. The test reports in {artifact_zip_path} have some"
-            " problem."
+        raise ValueError(f"`errors` and `failed_tests` should have the same number of elements.")
         )
 
     job_link = None
