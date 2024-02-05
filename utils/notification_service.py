@@ -531,7 +531,13 @@ class Message:
         elif setup_failed:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
-            text = "💔 There was an issue running the tests. 😭"
+            if not offline_runners:
+                text = "💔 CI runners are not available! Tests are not run. 😭"
+                result = os.environ.get("OFFLINE_RUNNERS")
+                if result is not None:
+                    offline_runners = json.loads(result)  
+            else:
+                text = "💔 There was an issue running the tests. 😭"  
 
         error_block_1 = {
             "type": "header",
