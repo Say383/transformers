@@ -12,8 +12,9 @@ from transformers import logging
 logger = logging.get_logger(__name__)
 
 
-def extract_warnings_from_single_artifact(artifact_path, targets):
-    """Extract warnings from a downloaded artifact (in .zip format)"""
+def extract_warnings_from_single_artifact(artifact_path, targets, from_gh):
+    """Extract warnings from a downloaded artifact (in .zip format)
+    Handles the case where the artifact name is a combination of the artifact names in the caller and callee."""
     selected_warnings = set()
     buffer = []
 
@@ -71,7 +72,7 @@ def extract_warnings(artifact_dir, targets):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
     for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+        selected_warnings.update(extract_warnings_from_single_artifact(p, targets, from_gh))
 
     return selected_warnings
 
