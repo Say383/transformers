@@ -36,6 +36,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
             else:
                 line = line.strip()
                 buffer.append(line)
+                logger.debug(f"Added line to buffer: {line}")
 
     if from_gh:
         for filename in os.listdir(artifact_path):
@@ -55,6 +56,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                         if filename != "warnings.txt":
                             continue
                         with z.open(filename) as fp:
+                            parse_line(fp)
                             parse_line(fp)
         except Exception:
             logger.warning(
@@ -126,6 +128,7 @@ if __name__ == "__main__":
             download_artifact(name, url, args.output_dir, args.token)
             # Be gentle to GitHub
             time.sleep(1)
+    logger = logging.get_logger(__name__)
 
     # extract warnings from artifacts
     selected_warnings = extract_warnings(args.output_dir, args.targets)
