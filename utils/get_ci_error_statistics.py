@@ -5,6 +5,7 @@ import os
 import time
 import logging
 from logging import basicConfig
+import logging
 import traceback
 import zipfile
 from collections import Counter
@@ -13,7 +14,15 @@ import requests
 
 
 def get_job_links(workflow_run_id, token=None):
-    """Extract job names and their job links in a GitHub Actions workflow run"""
+    """Extract job names and their job links in a GitHub Actions workflow run
+
+    Args:
+        workflow_run_id (str): The GitHub Actions workflow run id.
+        token (str, optional): A token that has actions:read permission.
+
+    Returns:
+        dict: A dictionary containing job names and their links.
+    """
 
     headers = None
     if token is not None:
@@ -39,7 +48,15 @@ def get_job_links(workflow_run_id, token=None):
 
 
 def get_artifacts_links(worflow_run_id, token=None):
-    """Get all artifact links from a workflow run"""
+    """Get all artifact links from a workflow run
+
+    Args:
+        workflow_run_id (str): The GitHub Actions workflow run id.
+        token (str, optional): A token that has actions:read permission.
+
+    Returns:
+        dict: A dictionary containing artifact names and their download URLs.
+    """
 
     headers = None
     if token is not None:
@@ -87,7 +104,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
-    """Extract errors from a downloaded artifact (in .zip format)"""
+    """Extract errors from a downloaded artifact (in .zip format)\n\n    Args:\n        artifact_zip_path (str): The path to the downloaded artifact.\n        job_links (dict, optional): A dictionary containing job names and their links.\n\n    Returns:\n        list: A list of errors and related information.\n    """
     errors = []
     failed_tests = []
     job_name = None
@@ -134,7 +151,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
 
 
 def get_all_errors(artifact_dir, job_links=None):
-    """Extract errors from all artifact files"""
+    """Extract errors from all artifact files\n\n    Args:\n        artifact_dir (str): The directory where the artifacts are stored.\n        job_links (dict, optional): A dictionary containing job names and their links.\n\n    Returns:\n        list: A list of errors and related information.\n    """
 
     errors = []
 
@@ -146,7 +163,9 @@ def get_all_errors(artifact_dir, job_links=None):
 
 
 def reduce_by_error(logs, error_filter=None):
-    """count each error"""
+    """Count each error\n\n    Args:\n        logs (list): A list of errors and related information.\n        error_filter (list, optional): A list of error filters.\n
+    Returns:\n        dict: A dictionary containing the count of each error and the associated failed tests.
+    """
 
     counter = Counter()
     counter.update([x[1] for x in logs])
