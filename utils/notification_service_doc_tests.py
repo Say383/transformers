@@ -275,7 +275,7 @@ def get_job_links():
             result = requests.get(url + f"&page={i + 2}").json()
             jobs.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
-        return jobs
+            return []
     except Exception as e:
         print("Unknown error, could not fetch links.", e)
 

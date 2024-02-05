@@ -3,10 +3,11 @@ import math
 import traceback
 
 import dateutil.parser as date_parser
+import logging
 import requests
 
 
-def extract_time_from_single_job(job):
+def extract_time_from_single_job(job, logger=None):
     """Extract time info from a single job in a GitHub Actions workflow run"""
 
     job_info = {}
@@ -27,6 +28,7 @@ def extract_time_from_single_job(job):
 
 
 def get_job_time(workflow_run_id, token=None):
+    logger = logging.getLogger(__name__)
     """Extract time info for all jobs in a GitHub Actions workflow run"""
 
     headers = None

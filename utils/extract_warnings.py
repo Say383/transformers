@@ -64,7 +64,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
     return selected_warnings
 
 
-def extract_warnings(artifact_dir, targets):
+def extract_warnings(artifact_dir, targets, logger=None):
     """Extract warnings from all artifact files"""
 
     selected_warnings = set()
