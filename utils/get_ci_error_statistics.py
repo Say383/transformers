@@ -4,7 +4,8 @@ import math
 import os
 import time
 import logging
-from logging import basicConfig
+import sys
+from logging import basicConfig, error, getLogger
 import traceback
 import zipfile
 from collections import Counter
@@ -58,7 +59,7 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -77,13 +78,25 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error making request to artifact URL {artifact_url}: {traceback.format_exc()}\nError Details: {e}")
+        logging.error(f"Error making request to artifact URL {artifact_url}: {traceback.format_exc()}\nError Details: {e}")      
+        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
+        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
-        fp.write(response.content)
+        try:
+            fp.write(response.content)
+        except Exception as e:
+            logging.error(f"Error writing artifact content to {file_path}: {traceback.format_exc()}\nError Details: {e}")
+        try:
+            fp.write(response.content)
+        except Exception as e:
+            logging.error(f"Error writing artifact content to {file_path}: {traceback.format_exc()}\nError Details: {e}")
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
@@ -145,11 +158,16 @@ def get_all_errors(artifact_dir, job_links=None):
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+def reduce_by_error(logs, error_filter=None) -> None:
     """count each error"""
 
-    counter = Counter()
-    counter.update([x[1] for x in logs])
+    try:
+        counter = Counter()
+        counter.update([x[1] for x in logs if isinstance(x, tuple) and len(x) > 1])
+    except Exception as e:
+        logging.error(f'Error during error count: {e}')
+        counter = Counter()
+    counter.update([x[1] for x in logs if isinstance(x, tuple) and len(x) > 1])
     counts = counter.most_common()
     r = {}
     for error, count in counts:
@@ -160,7 +178,7 @@ def reduce_by_error(logs, error_filter=None):
     return r
 
 
-def get_model(test):
+def get_model(test) -> str:
     """Get the model name from a test method"""
     test = test.split("::")[0]
     if test.startswith("tests/models/"):
@@ -171,7 +189,7 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def reduce_by_model(logs, error_filter=None) -> None:
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
@@ -212,7 +230,10 @@ def make_github_table_per_model(reduced_by_model):
     for model in reduced_by_model:
         count = reduced_by_model[model]["count"]
         error, _count = list(reduced_by_model[model]["errors"].items())[0]
-        line = f"| {model} | {count} | {error[:60]} | {_count} |"
+        try:
+            line = f"| {model} | {count} | {error[:60]} | {_count} |"
+        except Exception as e:
+            logging.error(f'Error generating table line for model {model}: {e}')
         lines.append(line)
 
     return "\n".join(lines)
@@ -231,7 +252,13 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    try:
+        try:
+            os.makedirs(args.output_dir, exist_ok=True)
+        except Exception as e:
+            logging.error(f'Failed to create output directory:\n{traceback.format_exc()}\nError Details: {e}')
+    except Exception as e:
+        logging.error(f'Failed to create output directory:\n{traceback.format_exc()}\nError Details: {e}')
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
@@ -270,8 +297,14 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
 
-    reduced_by_error = reduce_by_error(errors)
-    reduced_by_model = reduce_by_model(errors)
+    try:
+        reduced_by_error = reduce_by_error(errors)
+    except Exception as e:
+        logging.error(f'Error during error reduction: {e}')
+    try:
+        reduced_by_model = reduce_by_model(errors)
+    except Exception as e:
+        logging.error(f'Error during model reduction: {e}')
 
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
