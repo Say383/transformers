@@ -29,14 +29,14 @@ client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
 
 
 def handle_test_results(test_results):
-    expressions = test_results.split(" ")
+    expressions = test_results.split("\n")
 
     failed = 0
     success = 0
 
     # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
     # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+    time_spent = expressions[-1].split()[-2] if "=" in expressions[-1] else expressions[-1].split()[-1]
 
     for i, expression in enumerate(expressions):
         if "failed" in expression:
@@ -51,10 +51,10 @@ def extract_first_line_failure(failures_short_lines):
     failures = {}
     file = None
     in_error = False
-    for line in failures_short_lines.split("\n"):
+    for line in failures_short_lines.split("&#10"):
         if re.search(r"_ \[doctest\]", line):
             in_error = True
-            file = line.split(" ")[2]
+            file = line.split(" ")[-1]
         elif in_error and not line.split(" ")[0].isdigit():
             failures[file] = line
             in_error = False
@@ -65,29 +65,19 @@ def extract_first_line_failure(failures_short_lines):
 class Message:
     def __init__(self, title: str, doc_test_results: Dict):
         self.title = title
-
-        self._time_spent = doc_test_results["time_spent"].split(",")[0]
-        self.n_success = doc_test_results["success"]
-        self.n_failures = doc_test_results["failures"]
-        self.n_tests = self.n_success + self.n_failures
-
-        # Failures and success of the modeling tests
         self.doc_test_results = doc_test_results
 
     @property
     def time(self) -> str:
-        time_spent = [self._time_spent]
-        total_secs = 0
+        time_spent = self.doc_test_results["time_spent"].split(",")[0]
+        time_parts = time_spent.split(":")
 
-        for time in time_spent:
-            time_parts = time.split(":")
+        # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
+        if len(time_parts) == 1:
+            time_parts = [0, 0, time_parts[0]]
 
-            # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
-            if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
-
-            hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
-            total_secs += hours * 3600 + minutes * 60 + seconds
+        hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
+        total_secs = hours * 3600 + minutes * 60 + seconds
 
         hours, minutes, seconds = total_secs // 3600, (total_secs % 3600) // 60, total_secs % 60
         return f"{int(hours)}h{int(minutes)}m{int(seconds)}s"
@@ -161,7 +151,7 @@ class Message:
     def payload(self) -> str:
         blocks = [self.header]
 
-        if self.n_failures > 0:
+        if len(doc_test_results[category].get('failed', [])) > 0:
             blocks.append(self.failures)
 
         if self.n_failures > 0:
@@ -269,7 +259,7 @@ def get_job_links():
 
     try:
         jobs.update({job["name"]: job["html_url"] for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100) if result.get("total_count") else 0
 
         for i in range(pages_to_iterate_over):
             result = requests.get(url + f"&page={i + 2}").json()
@@ -311,12 +301,11 @@ def retrieve_available_artifacts():
 
     _available_artifacts: Dict[str, Artifact] = {}
 
-    directories = filter(os.path.isdir, os.listdir())
+    directories = [directory for directory in os.listdir() if os.path.isdir(directory)]
     for directory in directories:
-        artifact_name = directory
+        artifact_name = os.path.split(directory)[-1]
         if artifact_name not in _available_artifacts:
             _available_artifacts[artifact_name] = Artifact(artifact_name)
-
             _available_artifacts[artifact_name].add_path(directory)
 
     return _available_artifacts
@@ -346,6 +335,7 @@ if __name__ == "__main__":
 
     # Link to the GitHub Action job
     doc_test_results["job_link"] = github_actions_job_links.get("run_doctests")
+    available_artifacts = retrieve_available_artifacts()
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
@@ -377,4 +367,6 @@ if __name__ == "__main__":
 
     message = Message("🤗 Results of the doc tests.", doc_test_results)
     message.post()
-    message.post_reply()
+    message = Message("🤗 Results of the doc tests.", doc_test_results)
+message.post()
+message.post_reply()
