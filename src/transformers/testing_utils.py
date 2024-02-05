@@ -140,7 +140,7 @@ USER = "__DUMMY_TRANSFORMERS_USER__"
 ENDPOINT_STAGING = "https://hub-ci.huggingface.co"
 
 # Not critical, only usable on the sandboxed CI instance.
-TOKEN = "hf_94wBhPGp6KrrTH3KDchhKpRxZwd6dmHWLL"
+TOKEN = ""
 
 
 def parse_flag_from_env(key, default=False):
