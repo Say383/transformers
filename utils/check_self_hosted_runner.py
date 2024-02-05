@@ -3,6 +3,8 @@ import json
 import subprocess
 
 
+import argparse
+
 def get_runner_status(target_runners, token):
     offline_runners = []
 
@@ -45,7 +47,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "nargs='?', const=None, required=True, help='A token that has actions:read permission.'", default=None, type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
 
