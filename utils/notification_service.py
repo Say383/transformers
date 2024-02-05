@@ -519,6 +519,14 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
+        offline_runners_path = "offline_runners.txt"
+        if os.path.exists(offline_runners_path) and os.path.getsize(offline_runners_path) > 0:
+            with open(offline_runners_path, 'r') as fp:
+                try:
+                    offline_runners = json.load(fp)
+                except json.JSONDecodeError:
+                    offline_runners = []  # In case the file is not valid JSON
+        
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
