@@ -12,7 +12,7 @@ from collections import Counter
 import requests
 
 
-def get_job_links(workflow_run_id, token=None):
+def get_job_links(workflow_run_id, token=None, raise_errors=False): # pragma: no cover
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
     headers = None
@@ -38,7 +38,7 @@ def get_job_links(workflow_run_id, token=None):
     return {}
 
 
-def get_artifacts_links(worflow_run_id, token=None):
+def get_artifacts_links(worflow_run_id, token=None, raise_errors=False): # pragma: no cover
     """Get all artifact links from a workflow run"""
 
     headers = None
@@ -64,7 +64,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     return {}
 
 
-def download_artifact(artifact_name, artifact_url, output_dir, token):
+def download_artifact(artifact_name, artifact_url, output_dir, token, raise_errors=False): # pragma: no cover
     """Download a GitHub Action artifact from a URL.
 
     The URL is of the form `https://api.github.com/repos/huggingface/transformers/actions/artifacts/{ARTIFACT_ID}/zip`,
@@ -86,7 +86,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         fp.write(response.content)
 
 
-def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
+def get_errors_from_single_artifact(artifact_zip_path, job_links=None, raise_errors=False): # pragma: no cover
     """Extract errors from a downloaded artifact (in .zip format)"""
     errors = []
     failed_tests = []
@@ -133,7 +133,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     return result
 
 
-def get_all_errors(artifact_dir, job_links=None):
+def get_all_errors(artifact_dir, job_links=None, raise_errors=False): # pragma: no cover
     """Extract errors from all artifact files"""
 
     errors = []
@@ -145,7 +145,7 @@ def get_all_errors(artifact_dir, job_links=None):
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+def reduce_by_error(logs, error_filter=None, raise_errors=False): # pragma: no cover
     """count each error"""
 
     counter = Counter()
@@ -171,7 +171,7 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def reduce_by_model(logs, error_filter=None, raise_errors=False): # pragma: no cover
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
@@ -193,7 +193,7 @@ def reduce_by_model(logs, error_filter=None):
     return r
 
 
-def make_github_table(reduced_by_error):
+def make_github_table(reduced_by_error, raise_errors=False): # pragma: no cover
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
     lines = [header, sep]
@@ -205,7 +205,7 @@ def make_github_table(reduced_by_error):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(reduced_by_model, raise_errors=False): # pragma: no cover
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]

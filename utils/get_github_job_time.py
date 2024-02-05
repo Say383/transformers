@@ -6,7 +6,30 @@ import dateutil.parser as date_parser
 import requests
 
 
-def extract_time_from_single_job(job):
+def extract_time_from_single_job(job, raise_errors=False): # pragma: no cover
+    """Extract time info from a single job in a GitHub Actions workflow run"""
+
+    job_info = {}
+
+    start = job.get("started_at")
+    end = job.get("completed_at")
+
+    try:
+        start_datetime = date_parser.parse(start)
+        end_datetime = date_parser.parse(end)
+
+        duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+
+        job_info["started_at"] = start
+        job_info["completed_at"] = end
+        job_info["duration"] = duration_in_min
+    except Exception as e:
+        if raise_errors:
+            raise e
+        else:
+            print(f"Error extracting time info from job: {e}")
+
+    return job_info
     """Extract time info from a single job in a GitHub Actions workflow run"""
 
     job_info = {}
@@ -26,7 +49,33 @@ def extract_time_from_single_job(job):
     return job_info
 
 
-def get_job_time(workflow_run_id, token=None):
+def get_job_time(workflow_run_id, token=None, raise_errors=False): # pragma: no cover
+    """Extract time info for all jobs in a GitHub Actions workflow run"""
+
+    headers = None
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
+    result = requests.get(url, headers=headers).json()
+    job_time = {}
+
+    try:
+        job_time.update({job["name"]: extract_time_from_single_job(job, raise_errors) for job in result["jobs"]})
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            job_time.update({job["name"]: extract_time_from_single_job(job, raise_errors) for job in result["jobs"]})
+
+        return job_time
+    except Exception as e:
+        if raise_errors:
+            raise e
+        else:
+            print(f"Error extracting time info from jobs: {e}")
+
+    return {}
     """Extract time info for all jobs in a GitHub Actions workflow run"""
 
     headers = None
