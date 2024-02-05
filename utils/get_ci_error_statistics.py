@@ -7,6 +7,7 @@ import logging
 from logging import basicConfig
 import traceback
 import zipfile
+import logging
 from collections import Counter
 
 import requests
@@ -32,8 +33,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        logging.error(f'Unknown error, could not fetch links: {e}')
 
     return {}
 
@@ -149,8 +150,14 @@ def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
     counter = Counter()
-    counter.update([x[1] for x in logs])
-    counts = counter.most_common()
+    try:
+        counter.update([x[1] for x in logs])
+    except Exception as e:
+        logging.error(f'Error counting errors: {e}')
+    try:
+        counts = counter.most_common()
+    except Exception as e:
+        logging.error(f'Error getting most common errors: {e}')
     r = {}
     for error, count in counts:
         if error_filter is None or error not in error_filter:
@@ -179,6 +186,7 @@ def reduce_by_model(logs, error_filter=None):
     tests = {x[2] for x in logs}
 
     r = {}
+        
     for test in tests:
         counter = Counter()
         # count by errors in `test`
