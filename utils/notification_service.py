@@ -563,8 +563,8 @@ class Message:
 
         payload = json.dumps(blocks)
 
-        print("Sending the following payload")
-        print(json.dumps({"blocks": blocks}))
+        # Prepare the payload for Slack notification
+        payload = json.dumps(blocks)
 
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
