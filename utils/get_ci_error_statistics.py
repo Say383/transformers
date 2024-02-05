@@ -1,10 +1,11 @@
 import argparse
+import logging
 import json
 import math
 import os
 import time
 import logging
-from logging import basicConfig
+import logging
 import traceback
 import zipfile
 from collections import Counter
@@ -32,7 +33,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        logging.error(f"Unknown error: {e}")
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -83,7 +85,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
-        fp.write(response.content)
+        try:
+            fp.write(response.content)
+        except Exception as e:
+            logging.error(f"Failed to write response content to file {file_path}:\n{traceback.format_exc()}\nError Details: {e}")
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
@@ -99,7 +104,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
                         for line in f:
-                            line = line.decode("UTF-8").strip()
+                            # Decode the line from bytes to string and remove leading/trailing whitespaces
                             if filename == "failures_line.txt":
                                 try:
                                     # `error_line` is the place where `error` occurs
@@ -264,8 +269,9 @@ if __name__ == "__main__":
 
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
+    logging.log_info(f"The 30 most common test errors: {most_common}")
     for item in most_common:
-        print(item)
+        logging.log_info(item)
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
@@ -276,7 +282,10 @@ if __name__ == "__main__":
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
 
+    # Write the results to a file
     with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s1)
     with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s2)
+# Set the logging level to INFO
+logging.basicConfig(level=logging.INFO)
