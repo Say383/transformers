@@ -1,12 +1,15 @@
 import argparse
+import argparse
 import json
 import os
 import time
 import zipfile
 
 from get_ci_error_statistics import download_artifact, get_artifacts_links
+import argparse
 
 from transformers import logging
+import argparse
 
 
 logger = logging.get_logger(__name__)
@@ -79,7 +82,8 @@ def extract_warnings(artifact_dir, targets):
 if __name__ == "__main__":
 
     def list_str(values):
-        return values.split(",")
+        if values is None:
+            return []
 
     parser = argparse.ArgumentParser()
     # Required parameters
@@ -94,7 +98,7 @@ if __name__ == "__main__":
     # optional parameters
     parser.add_argument(
         "--targets",
-        default="DeprecationWarning,UserWarning,FutureWarning",
+        default=None,
         type=list_str,
         help="Comma-separated list of target warning(s) which we want to extract.",
     )
