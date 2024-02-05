@@ -32,7 +32,7 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -199,7 +199,8 @@ def make_github_table(reduced_by_error):
     lines = [header, sep]
     for error in reduced_by_error:
         count = reduced_by_error[error]["count"]
-        line = f"| {count} | {error[:100]} |  |"
+        status = error[3] if error[3] else ''
+        line = f"| {count} | {error[:100]} | {status} |"
         lines.append(line)
 
     return "\n".join(lines)
