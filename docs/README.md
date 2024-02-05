@@ -324,6 +324,9 @@ The syntax for Example docstrings can look as follows:
 
 ```
     Example:
+    ```
+    >>> # your example code here
+    ```
 
     ```python
     >>> from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
@@ -369,10 +372,14 @@ contains the example docstring to the [documentation_tests.txt](../utils/documen
 
 ### For Python files
 
+To include your example in the daily doctests, you need to add the filename that contains the example docstring to the [documentation_tests.txt](../utils/documentation_tests.txt).
+
+To include your example in the daily doctests, you need to add the filename that contains the example docstring to the [documentation_tests.txt](../utils/documentation_tests.txt).
+
 Run all the tests in the docstrings of a given file with the following command, here is how we test the modeling file of Wav2Vec2 for instance:
 
 ```bash
-pytest --doctest-modules src/transformers/models/wav2vec2/modeling_wav2vec2.py -sv --doctest-continue-on-failure
+pytest --doctest-modules src/transformers/models/wav2vec2/modeling_wav2vec2.py -sv --doctest-continue-on-failure --doctest-glob="*.py"
 ```
 
 If you want to isolate a specific docstring, just add `::` after the file name then type the whole path of the function/class/method whose docstring you want to test. For instance, here is how to just test the forward method of `Wav2Vec2ForCTC`:
