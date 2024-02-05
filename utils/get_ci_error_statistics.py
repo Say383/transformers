@@ -44,24 +44,17 @@ def get_artifacts_links(worflow_run_id, token=None):
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+import os
+import time
+import logging
+from logging import basicConfig
+import traceback
+import zipfile
+from collections import Counter
 
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    artifacts = {}
+import requests
 
-    try:
-        artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
-
-        for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
-            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
-
-        return artifacts
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
-
-    return {}
+from utils.extract_warnings import extract_warnings, extract_warnings_from_single_artifact
 
 
 def download_artifact(artifact_name, artifact_url, output_dir, token):
@@ -70,6 +63,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     The URL is of the form `https://api.github.com/repos/huggingface/transformers/actions/artifacts/{ARTIFACT_ID}/zip`,
     but it can't be used to download directly. We need to get a redirect URL first.
     See https://docs.github.com/en/rest/actions/artifacts#download-an-artifact
+    """
+    headers = None
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
     """
     headers = None
     if token is not None:
