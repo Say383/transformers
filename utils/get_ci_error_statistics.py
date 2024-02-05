@@ -20,7 +20,7 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get_with_retry(url, headers=headers).json()
     job_links = {}
 
     try:
@@ -32,7 +32,9 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        logging.error(f'Unknown error, could not fetch links:\n{traceback.format_exc()}\nError Details: {e}')
+        raise
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -54,11 +56,13 @@ def get_artifacts_links(worflow_run_id, token=None):
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            result = requests.get_with_retry(url + f"&page={i + 2}", headers=headers).json()
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
+        logging.error(f'Unknown error, could not fetch links:\n{traceback.format_exc()}\nError Details: {e}')
+        raise
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -76,9 +80,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
-        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
-    except Exception as e:
+        result = requests.get_with_retry(artifact_url, headers=headers, allow_redirects=False)
+    except requests.RequestException as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        raise
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
@@ -117,6 +122,9 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 job_name = line
 
     if len(errors) != len(failed_tests):
+        error_report = []
+        for x, y, job_link in zip(errors, failed_tests, job_links.values()):
+            error_report.append(f'Error: {x} Test: {y} Job Link: {job_link}')
         raise ValueError(
             f"`errors` and `failed_tests` should have the same number of elements. Got {len(errors)} for `errors` "
             f"and {len(failed_tests)} for `failed_tests` instead. The test reports in {artifact_zip_path} have some"
