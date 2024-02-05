@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import collections
-import json
+import json, zipfile
 import math
 import os
 import re
@@ -42,7 +42,7 @@ def handle_test_results(test_results):
         if "failed" in expression:
             failed += int(expressions[i - 1])
         if "passed" in expression:
-            success += int(expressions[i - 1])
+            success += int(expressions[i + 2])
 
     return failed, success, time_spent
 
