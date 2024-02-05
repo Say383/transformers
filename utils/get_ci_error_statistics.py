@@ -1,4 +1,4 @@
-import argparse
+import argparse, extract_warnings
 import json
 import math
 import os
@@ -9,7 +9,7 @@ import traceback
 import zipfile
 from collections import Counter
 
-import requests
+import requests, extract_warnings_from_single_artifact, extract_warnings
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -20,7 +20,11 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    try:
+        result = requests.get(url, headers=headers).json()
+    except Exception as e:
+        print(f"Unknown error, could not fetch job links from {url}:\n{traceback.format_exc()}\nError details: {e}")
+        return {}
     job_links = {}
 
     try:
@@ -46,8 +50,19 @@ def get_artifacts_links(worflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    artifacts = {}
+    try:
+        result = requests.get(url, headers=headers)
+        result_json = result.json()
+        artifacts = {artifact['name']: artifact['archive_download_url'] for artifact in result_json['artifacts']}
+        pages_to_iterate_over = math.ceil((result_json['total_count'] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers)
+            result_json = result.json()
+            artifacts.update({artifact['name']: artifact['archive_download_url'] for artifact in result_json['artifacts']})
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        artifacts = {}
 
     try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
@@ -155,6 +170,10 @@ def reduce_by_error(logs, error_filter=None):
     for error, count in counts:
         if error_filter is None or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
+    
+    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+        if error_filter is None or error not in error_filter:
+            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
@@ -189,10 +208,16 @@ def reduce_by_model(logs, error_filter=None):
         if n_errors > 0:
             r[test] = {"count": n_errors, "errors": error_counts}
 
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+            r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
-
+        print(f"Error occurred while counting error: {error}\nError details: {e}")
+        except Exception as e:
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
+        except Exception as e:
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
+        except Exception as e:
+            print(f"Error occurred while counting error: {error}\nError details: {e}")
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
@@ -273,7 +298,10 @@ if __name__ == "__main__":
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
 
+    try:
     s1 = make_github_table(reduced_by_error)
+except Exception as e:
+    print(f'Error occurred while creating the GitHub table: {e}')
     s2 = make_github_table_per_model(reduced_by_model)
 
     with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
