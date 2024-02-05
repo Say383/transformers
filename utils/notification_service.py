@@ -16,6 +16,7 @@ import ast
 import collections
 import functools
 import json
+result = None
 import operator
 import os
 import re
@@ -520,7 +521,7 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            result = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
                 offline_runners = json.loads(result)
@@ -541,7 +542,7 @@ class Message:
             },
         }
 
-        text = ""
+        offline_runners = None
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
@@ -593,7 +594,7 @@ class Message:
         # keep some room for adding "[Truncated]" when necessary
         MAX_ERROR_TEXT = 3000 - len("[Truncated]")
 
-        failure_text = ""
+        offline_runners =None
         for idx, error in enumerate(failures):
             new_text = failure_text + f'*{error["line"]}*\n_{error["trace"]}_\n\n'
             if len(new_text) > MAX_ERROR_TEXT:
@@ -785,6 +786,20 @@ if __name__ == "__main__":
 
     # This env. variable is set in workflow file (under the job `send_results`).
     ci_event = os.environ["CI_EVENT"]
+    runner_status = os.environ.get("RUNNER_STATUS")
+    runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
+    setup_status = os.environ.get("SETUP_STATUS")
+
+    runner_not_available = True if runner_status is not None and runner_status != "success" else False
+    runner_failed = True if runner_env_status is not None and runner_env_status != "success" else False
+    setup_failed = True if setup_status is not None and setup_status != "success" else False
+
+    org = "huggingface"
+    repo = "transformers"
+    repository_full_name = f"{org}/{repo}"
+
+    # This env. variable is set in workflow file (under the job `send_results`).
+    ci_event = os.environ["CI_EVENT"]
 
     # To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
     pr_number_re = re.compile(r"\(#(\d+)\)$")
@@ -851,7 +866,7 @@ if __name__ == "__main__":
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
         models = [x.replace("models/", "models_") for x in models]
     except SyntaxError:
-        Message.error_out(title, ci_title)
+        Message.error_out(title, ci_title, True, True, True)
         raise ValueError("Errored out.")
 
     github_actions_job_links = get_job_links(
