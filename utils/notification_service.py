@@ -771,6 +771,15 @@ def prepare_reports(title, header, reports, to_truncate=True):
 
 
 if __name__ == "__main__":
+    title = 'Title'
+    ci_title = 'CI Title'
+    runner_not_available = False
+    runner_failed = False
+    setup_failed = False
+    try:
+        Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
+    except json.decoder.JSONDecodeError:
+        runner_not_available, runner_failed, setup_failed = False, False, False
     runner_status = os.environ.get("RUNNER_STATUS")
     runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
     setup_status = os.environ.get("SETUP_STATUS")
