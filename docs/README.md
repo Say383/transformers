@@ -88,7 +88,23 @@ the filename without the extension in the [`_toctree.yml`](https://github.com/hu
 
 ## Renaming section headers and moving sections
 
-It helps to keep the old links working when renaming the section header and/or moving sections from one document to another. This is because the old links are likely to be used in Issues, Forums, and Social media and it'd make for a much more superior user experience if users reading those months later could still easily navigate to the originally intended information.
+It helps to keep the old links working when renaming the section header and/or moving sections from one document to another. This is because the old links are likely to be used in Issues, Forums, and Social media, and it'd make for a much more superior user experience if users reading those months later could still easily navigate to the originally intended information.
+
+## Troubleshooting GitHub Actions Runs
+
+If your GitHub Actions run fails, start by analyzing the error logs to identify the cause of the failure. Common issues include incorrect environment setup, missing dependencies, and faulty configuration. Check the error logs for any specific error messages or stack traces. Once you've identified the issue, refer to the common problems and solutions provided below for guidance on fixing the failure.
+
+### Analyzing Error Logs
+
+To begin troubleshooting, carefully analyze the error logs generated during the GitHub Actions run. Look for specific error messages, stack traces, or warnings that can point you to the cause of the failure. If necessary, search for these error messages online to find potential solutions from the developer community or official documentation.
+
+### Common Problems and Solutions
+
+- **Incorrect Environment Setup**: Verify that the environment setup in the GitHub Actions workflow file matches the required environment for the project. Check for any missing or outdated environment variables, paths, or tools.
+
+- **Missing Dependencies**: Ensure that all project dependencies are correctly installed and accessible during the GitHub Actions run. Check the dependency installation steps in the workflow file and inspect the build logs for any dependency-related errors.
+
+- **Faulty Configuration**: Review the workflow file for any misconfigurations, syntax errors, or invalid settings. Pay close attention to the job configurations, triggers, and environment specifications. Make necessary adjustments to address any configuration issues.
 
 Therefore, we simply keep a little map of moved sections at the end of the document where the original section was. The key is to preserve the original anchor.
 

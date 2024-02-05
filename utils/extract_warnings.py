@@ -122,6 +122,7 @@ if __name__ == "__main__":
         for idx, (name, url) in enumerate(artifacts.items()):
             print(name)
             print(url)
+            time.sleep(1)
             print("=" * 80)
             download_artifact(name, url, args.output_dir, args.token)
             # Be gentle to GitHub
