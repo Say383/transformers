@@ -4,6 +4,7 @@ import math
 import os
 import time
 import logging
+import sys
 from logging import basicConfig
 import traceback
 import zipfile
@@ -270,8 +271,16 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
 
-    reduced_by_error = reduce_by_error(errors)
-    reduced_by_model = reduce_by_model(errors)
+    try:
+        reduced_by_error = reduce_by_error(errors)
+    except Exception as e:
+        logging.error(f"Failed to reduce errors: {e}")
+        reduced_by_error = {}
+    try:
+        reduced_by_model = reduce_by_model(errors)
+    except Exception as e:
+        logging.error(f"Failed to reduce errors by model: {e}")
+        reduced_by_model = {}
 
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
