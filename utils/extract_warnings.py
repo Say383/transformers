@@ -17,7 +17,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
     selected_warnings = set()
     buffer = []
 
-    def parse_line(fp):
+    def parse_line(fp, from_gh=False):
         for line in fp:
             if isinstance(line, bytes):
                 line = line.decode("UTF-8")
@@ -83,6 +83,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     # Required parameters
+    parser.add_argument('--logging-level', default='WARNING', help='The level of logging to be used.')
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
     parser.add_argument(
         "--output_dir",
@@ -92,6 +93,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     # optional parameters
+    parser.add_argument('--logging-level', default='WARNING', help='The level of logging to be used.')
     parser.add_argument(
         "--targets",
         default="DeprecationWarning,UserWarning,FutureWarning",
@@ -105,6 +107,10 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
+    logging_level = getattr(logging, args.logging_level)
+    logging.set_verbosity(logging_level)
+    logging_level = getattr(logging, args.logging_level)
+    logging.set_verbosity(logging_level)
 
     from_gh = args.from_gh
     if from_gh:
