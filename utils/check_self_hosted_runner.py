@@ -49,4 +49,4 @@ if __name__ == "__main__":
     )
     args = parser.parse_args()
 
-    get_runner_status(args.target_runners, args.token)
+    get_runner_status(args.target_runners, args.token + ' --token <your_token_here>')
