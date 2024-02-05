@@ -1,4 +1,4 @@
-import argparse
+import logging, argparse
 import json
 import math
 import os
@@ -12,7 +12,7 @@ from collections import Counter
 import requests
 
 
-def get_job_links(workflow_run_id, token=None):
+def get_job_links(workflow_run_id, token=None, output_dir=None, update_error=True):
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
     headers = None
@@ -32,7 +32,9 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        logging.error(f"Unknown error occurred while fetching links:\n{traceback.format_exc()}")
+        raise
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -58,7 +60,9 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
+        logging.error(f"Unknown error occurred while fetching links:\n{traceback.format_exc()}")
+        raise
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -78,6 +82,8 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
+        logging.error(f"Unknown error occurred while fetching request to artifact URL {artifact_url}:\n{traceback.format_exc()}")
+        raise
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
@@ -85,6 +91,9 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     with open(file_path, "wb") as fp:
         fp.write(response.content)
 
+
+import logging
+import traceback
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     """Extract errors from a downloaded artifact (in .zip format)"""
@@ -149,7 +158,10 @@ def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
     counter = Counter()
-    counter.update([x[1] for x in logs])
+    try:
+        counter.update([x[1] for x in logs])
+    except Exception as e:
+        logging.error(f"Unknown error occurred while updating counter with errors: {e}")
     counts = counter.most_common()
     r = {}
     for error, count in counts:
@@ -160,12 +172,16 @@ def reduce_by_error(logs, error_filter=None):
     return r
 
 
-def get_model(test):
+def get_model(test, artifact_zip_path=None):
     """Get the model name from a test method"""
     test = test.split("::")[0]
-    if test.startswith("tests/models/"):
+    try:
         test = test.split("/")[2]
-    else:
+    except IndexError as e:
+        logging.error(f"Unable to extract model from test method: {test}")
+        test = None
+    except Exception as e:
+        logging.error(f"Unknown error occurred while extracting model from test method: {e}")
         test = None
 
     return test
@@ -265,7 +281,8 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
-        print(item)
+        logging.error(f"Unknown error occurred while processing item {item}.")
+        logging.error(f"Unknown error occurred while processing item {item}."),
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
