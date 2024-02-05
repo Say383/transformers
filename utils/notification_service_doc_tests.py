@@ -323,6 +323,10 @@ def retrieve_available_artifacts():
 
 
 if __name__ == "__main__":
+    from fnmatch import fnmatch
+    from typing import Dict
+    available_artifacts = retrieve_available_artifacts()
+    available_artifacts.setdefault("doc_tests_gpu_test_reports", None)
     github_actions_job_links = get_job_links()
     available_artifacts = retrieve_available_artifacts()
 
