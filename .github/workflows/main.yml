@@ -1,0 +1,32 @@
+name: Main Workflow
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Create offline_runners.txt
+      run: touch offline_runners.txt
+
+    - name: Check runner status
+      run: python utils/check_self_hosted_runner.py --target_runners single-gpu-ci-runner-docker,multi-gpu-ci-runner-docker,single-gpu-scheduled-ci-runner-docker,multi-scheduled-scheduled-ci-runner-docker,single-gpu-doctest-ci-runner-docker --token ${{ secrets.TOKEN }}
+
+    - name: Read offline runners
+      run: offline_runners=$(python3 -c 'fp = open("offline_runners.txt"); failed = fp.read(); fp.close(); print(failed)')
+
+    - name: Run tests
+      run: pytest
