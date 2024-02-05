@@ -696,6 +696,7 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
 
 
 def retrieve_available_artifacts():
+    offline_runners = ""
     class Artifact:
         def __init__(self, name: str, single_gpu: bool = False, multi_gpu: bool = False):
             self.name = name
@@ -711,7 +712,11 @@ def retrieve_available_artifacts():
 
     _available_artifacts: Dict[str, Artifact] = {}
 
-    directories = filter(os.path.isdir, os.listdir())
+    try:
+        directories = filter(os.path.isdir, os.listdir())
+    except FileNotFoundError:
+        offline_runners = "" 
+        directories = []
     for directory in directories:
         artifact_name = directory
 
