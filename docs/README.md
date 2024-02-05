@@ -359,10 +359,30 @@ works as expected.
 
 ## Docstring testing
 
-To do so each example should be included in the doctests. 
-We use pytests' [doctest integration](https://docs.pytest.org/doctest.html) to verify that all of our examples run correctly. 
-For Transformers, the doctests are run on a daily basis via GitHub Actions as can be 
-seen [here](https://github.com/huggingface/transformers/actions/workflows/doctests.yml).
+To run doc tests, include each example in the doctests. We use pytests' [doctest integration](https://docs.pytest.org/doctest.html) to verify that all of our examples run correctly. For Transformers, the doctests are run on a daily basis via GitHub Actions as can be seen [here](https://github.com/huggingface/transformers/actions/workflows/doctests.yml).
+
+### Running Doc Tests
+
+To run all the tests in the docstrings of a given Python file, use the following command. For instance, to test the modeling file of Wav2Vec2:
+```bash
+pytest --doctest-modules src/transformers/models/wav2vec2/modeling_wav2vec2.py -sv --doctest-continue-on-failure
+```
+If you want to isolate a specific docstring, add `::` after the file name and then type the whole path of the function/class/method whose docstring you want to test. For instance, to test just the forward method of `Wav2Vec2ForCTC`:
+```bash
+pytest --doctest-modules src/transformers/models/wav2vec2/modeling_wav2vec2.py::transformers.models.wav2vec2.modeling_wav2vec2.Wav2Vec2ForCTC.forward -sv --doctest-continue-on-failure
+```
+To test a given Markdown file, use this command (here testing the quicktour):
+```bash
+pytest --doctest-modules docs/source/quicktour.md -sv --doctest-continue-on-failure --doctest-glob="*.md"
+```
+### Writing Doc Tests
+
+#### Tips for Writing Successful Doctests
+
+- Ensure that the outputs of the code exactly match the expected output. Be mindful of differences like single quotes vs. double quotes and avoid leaving very long code blocks to execute.
+- Each line of code producing a result should have that result written below. You can ignore an output by adding a comment ` # doctest: +IGNORE_RESULT` at the end of the line of code producing it.
+- Take care to maintain readability, use necessary whitespace, and be mindful of nummerical values, aim to write 4-5 digits only for expected results. This is to ensure compatibility across different setups or library versions.
+- If a code block is too long to execute, you can add a comment ` # doctest: +SKIP` at the end of the code lines so that it's ignored.
 
 To include your example in the daily doctests, you need to add the filename that
 contains the example docstring to the [documentation_tests.txt](../utils/documentation_tests.txt).

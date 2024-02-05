@@ -44,7 +44,7 @@ def handle_test_results(test_results):
         if "passed" in expression:
             success += int(expressions[i - 1])
 
-    return failed, success, time_spent
+    return success, failed, time_spent
 
 
 def extract_first_line_failure(failures_short_lines):
@@ -317,7 +317,7 @@ def retrieve_available_artifacts():
         if artifact_name not in _available_artifacts:
             _available_artifacts[artifact_name] = Artifact(artifact_name)
 
-            _available_artifacts[artifact_name].add_path(directory)
+            _available_artifacts[artifact_name].add_path(os.path.abspath(directory))
 
     return _available_artifacts
 
