@@ -7,7 +7,7 @@ def get_runner_status(target_runners, token):
     offline_runners = []
 
     cmd = (
-        f'curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer {token}"'
+        f'curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer {args.token}"'
         " https://api.github.com/repos/huggingface/transformers/actions/runners"
     )
     output = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
