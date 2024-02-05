@@ -500,24 +500,6 @@ class Message:
         if self.n_additional_failures > 0:
             blocks.append(self.additional_failures)
 
-        if self.n_model_failures == 0 and self.n_additional_failures == 0:
-            blocks.append(self.no_failures)
-
-        if len(self.selected_warnings) > 0:
-            blocks.append(self.warnings)
-
-        return json.dumps(blocks)
-
-    @staticmethod
-    def error_out(title, ci_title="", runner_not_available=False, runner_failed=False, setup_failed=False):
-        blocks = []
-        title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
-        blocks.append(title_block)
-
-        if ci_title:
-            ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
-            blocks.append(ci_title_block)
-
         offline_runners = []
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
