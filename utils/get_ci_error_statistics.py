@@ -10,6 +10,7 @@ import zipfile
 from collections import Counter
 
 import requests
+from get_github_job_time import get_job_time, extract_time_from_single_job
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -24,6 +25,9 @@ def get_job_links(workflow_run_id, token=None):
     job_links = {}
 
     try:
+    
+    # Add exception handling and logging
+    
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -50,6 +54,9 @@ def get_artifacts_links(worflow_run_id, token=None):
     artifacts = {}
 
     try:
+    
+    # Add exception handling and logging
+    
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -106,7 +113,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
+                                except Exception as e:
+                                    print(f"An error occurred: {e}")
                                     # skip un-related lines
                                     pass
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
