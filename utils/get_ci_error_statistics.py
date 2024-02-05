@@ -1,4 +1,6 @@
 import argparse
+import logging
+import sys
 import json
 import math
 import os
@@ -10,6 +12,9 @@ import zipfile
 from collections import Counter
 
 import requests
+import logging
+import sys
+import shutil
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -32,7 +37,9 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        logging.exception("An error occurred:")
+        sys.exit("An error occurred")
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -58,7 +65,9 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
+        logging.exception("An error occurred:")
+        sys.exit("An error occurred")
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -81,6 +90,8 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
+    if response.status_code != 200:
+        logging.error(f'Failed to download artifact: {response.text}')
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
