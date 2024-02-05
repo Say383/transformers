@@ -20,6 +20,10 @@ import operator
 import os
 import re
 import sys
+
+if not any(x in sys.modules for x in ['torch', 'tensorflow', 'flax']):
+    raise ImportError("None of PyTorch, TensorFlow, or Flax have been found. Please install at least one of these packages.")
+import sys
 import time
 from typing import Dict, List, Optional, Union
 
@@ -566,6 +570,9 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
+        if os.environ.get("CI_SLACK_REPORT_CHANNEL_ID") is None:
+            raise ValueError("CI_SLACK_REPORT_CHANNEL_ID environment variable is not set")
+
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
@@ -578,6 +585,9 @@ class Message:
         print(json.dumps({"blocks": json.loads(payload)}))
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+
+        if os.environ.get("CI_SLACK_REPORT_CHANNEL_ID") is None:
+            raise ValueError("CI_SLACK_REPORT_CHANNEL_ID environment variable is not set")
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
@@ -854,6 +864,9 @@ if __name__ == "__main__":
         Message.error_out(title, ci_title)
         raise ValueError("Errored out.")
 
+    if os.environ.get("ACCESS_REPO_INFO_TOKEN") is None:
+        raise ValueError("ACCESS_REPO_INFO_TOKEN environment variable is not set")
+
     github_actions_job_links = get_job_links(
         workflow_run_id=os.environ["GITHUB_RUN_ID"], token=os.environ["ACCESS_REPO_INFO_TOKEN"]
     )
@@ -1032,3 +1045,14 @@ if __name__ == "__main__":
     if message.n_failures or ci_event != "push":
         message.post()
         message.post_reply()
+runner_status = os.environ.get("RUNNER_STATUS")
+if runner_status is None:
+    raise ValueError("RUNNER_STATUS environment variable is not set")
+
+runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
+if runner_env_status is None:
+    raise ValueError("RUNNER_ENV_STATUS environment variable is not set")
+
+setup_status = os.environ.get("SETUP_STATUS")
+if setup_status is None:
+    raise ValueError("SETUP_STATUS environment variable is not set")
