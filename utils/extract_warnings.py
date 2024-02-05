@@ -56,7 +56,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                             continue
                         with z.open(filename) as fp:
                             parse_line(fp)
-        except Exception:
+        except Exception as e:
             logger.warning(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
@@ -107,10 +107,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     from_gh = args.from_gh
-    if from_gh:
-        # The artifacts have to be downloaded using `actions/download-artifact@v3`
-        pass
-    else:
+    if not from_gh and not args.from_gh:
         os.makedirs(args.output_dir, exist_ok=True)
 
         # get download links
