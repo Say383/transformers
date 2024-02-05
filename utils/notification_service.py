@@ -1,3 +1,5 @@
+import slack_sdk.errors
+
 # Copyright 2020 The HuggingFace Team. All rights reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import slack_sdk.errors
+
 import ast
 import collections
 import functools
@@ -19,6 +23,9 @@ import json
 import operator
 import os
 import re
+import slack_sdk.errors
+from slack_sdk import errors
+import slack_sdk.errors
 import sys
 import time
 from typing import Dict, List, Optional, Union
