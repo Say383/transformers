@@ -50,3 +50,30 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     get_runner_status(args.target_runners, args.token)
+import os
+
+# This env. variable is set in workflow file (under the job `send_results`).
+ci_event = os.environ["CI_EVENT"]
+
+# To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
+pr_number_re = re.compile(r"\(#(\d+)\)$")
+
+# ... (rest of the code)
+import os
+
+# This env. variable is set in workflow file (under the job `send_results`).
+ci_event = os.environ["CI_EVENT"]
+
+# To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
+pr_number_re = re.compile(r"\(#(\d+)\)$")
+
+# ... (rest of the code)
+import os
+
+# This env. variable is set in workflow file (under the job `send_results`).
+ci_event = os.environ["CI_EVENT"]
+
+# To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
+pr_number_re = re.compile(r"\(#(\d+)\)$")
+
+# ... (rest of the code)
