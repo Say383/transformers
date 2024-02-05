@@ -312,6 +312,11 @@ def retrieve_available_artifacts():
     _available_artifacts: Dict[str, Artifact] = {}
 
     directories = filter(os.path.isdir, os.listdir())
+
+    # Ensure that the 'doc_tests_gpu_test_reports' key always exists
+    if 'doc_tests_gpu_test_reports' not in _available_artifacts:
+        doc_tests_gpu_report_artifact = Artifact('doc_tests_gpu_test_reports')
+        _available_artifacts['doc_tests_gpu_test_reports'] = doc_tests_gpu_report_artifact
     for directory in directories:
         artifact_name = directory
         if artifact_name not in _available_artifacts:
@@ -346,6 +351,11 @@ if __name__ == "__main__":
 
     # Link to the GitHub Action job
     doc_test_results["job_link"] = github_actions_job_links.get("run_doctests")
+
+    # Check if 'doc_tests_gpu_test_reports' key exists in the available_artifacts
+    if "doc_tests_gpu_test_reports" not in available_artifacts:
+        print("Error: 'doc_tests_gpu_test_reports' key not found in available artifacts.")
+        exit(1)
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
