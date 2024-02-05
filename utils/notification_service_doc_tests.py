@@ -324,6 +324,7 @@ def retrieve_available_artifacts():
 
 if __name__ == "__main__":
     github_actions_job_links = get_job_links()
+    global_failure = False
     available_artifacts = retrieve_available_artifacts()
 
     docs = collections.OrderedDict(
@@ -351,6 +352,8 @@ if __name__ == "__main__":
     artifact = retrieve_artifact(artifact_path["name"])
     if "stats" in artifact:
         failed, success, time_spent = handle_test_results(artifact["stats"])
+        if failed > 0:
+            global_failure = True
         doc_test_results["failures"] = failed
         doc_test_results["success"] = success
         doc_test_results["time_spent"] = time_spent[1:-1] + ", "
