@@ -20,8 +20,12 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
-    job_links = {}
+    try:
+        result = requests.get(url, headers=headers).json()
+        job_links = {}
+    except Exception:
+        print(f"Unknown error, could not fetch job links from {url}:\n{traceback.format_exc()}")
+        return {}
 
     try:
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
@@ -106,7 +110,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
+                                except IndexError as e:
                                     # skip un-related lines
                                     pass
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
@@ -156,7 +160,10 @@ def reduce_by_error(logs, error_filter=None):
         if error_filter is None or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except Exception as e:
+        print(f"Error in sorting the dictionary based on count: {{e}}")
     return r
 
 
@@ -172,6 +179,8 @@ def get_model(test):
 
 
 def reduce_by_model(logs, error_filter=None):
+    if not logs:
+        return {}
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
@@ -189,7 +198,10 @@ def reduce_by_model(logs, error_filter=None):
         if n_errors > 0:
             r[test] = {"count": n_errors, "errors": error_counts}
 
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except Exception as e:
+        print(f"Error in sorting the dictionary based on count: {{e}}")
     return r
 
 

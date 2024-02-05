@@ -61,19 +61,39 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
 
-    return selected_warnings
+    except Exception as e:
+        logger.warning(
+            f"Error in sorting the dictionary based on count: {e}"
+        )
+
+    return r
 
 
-def extract_warnings(artifact_dir, targets):
-    """Extract warnings from all artifact files"""
+def reduce_by_model(logs, error_filter=None):
+    if not logs:
+        return {}
+    """count each error per model"""
 
-    selected_warnings = set()
+    logs = [(x[0], x[1], get_model(x[2])) for x in logs]
+    r = {}
+    for test, error, model in logs:
+        if model not in r:
+            r[model] = {}
+        if test not in r[model]:
+            r[model][test] = {"count": 0, "errors": {}}
+        r[model][test]["count"] += 1
+        if error not in r[model][test]["errors"]:
+            r[model][test]["errors"][error] = 0
+        r[model][test]["errors"][error] += 1
 
-    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
-    for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+    try:
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except Exception as e:
+        logger.warning(
+            f"Error in sorting the dictionary based on count: {e}"
+        )
 
-    return selected_warnings
+    return r
 
 
 if __name__ == "__main__":
@@ -112,7 +132,6 @@ if __name__ == "__main__":
         pass
     else:
         os.makedirs(args.output_dir, exist_ok=True)
-
         # get download links
         artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
         with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
