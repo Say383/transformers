@@ -29,16 +29,37 @@ client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
 
 
 def handle_test_results(test_results):
-    expressions = test_results.split(" ")
+    if "doc_tests_gpu_test_reports" not in available_artifacts:
+        print("No doc_tests_gpu_test_reports artifact found.")
+        exit(0)
 
-    failed = 0
-    success = 0
+    artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
+    artifact = retrieve_artifact(artifact_path["name"])
+    if "stats" in artifact:
+        failed, success, time_spent = handle_test_results(artifact["stats"])
+        doc_test_results["failures"] = failed
+        doc_test_results["success"] = success
+        doc_test_results["time_spent"] = time_spent[1:-1] + ", "
 
-    # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
-    # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+        all_failures = extract_first_line_failure(artifact["failures_short"])
+        for line in artifact["summary_short"].split("\n"):
+            if re.search("FAILED", line):
+                line = line.replace("FAILED ", "")
+                line = line.split()[0].replace("\n", "")
 
-    for i, expression in enumerate(expressions):
+                if "::" in line:
+                    file_path, test = line.split("::")
+                else:
+                    file_path, test = line, line
+
+                for file_regex in docs.keys():
+                    if fnmatch(file_path, file_regex):
+                        category = docs[file_regex]
+                        doc_test_results[category]["failed"].append(test)
+
+                        failure = all_failures[test] if test in all_failures else "N/A"
+                        doc_test_results[category]["failures"][test] = failure
+                        break
         if "failed" in expression:
             failed += int(expressions[i - 1])
         if "passed" in expression:
