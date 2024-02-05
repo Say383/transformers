@@ -6,15 +6,14 @@ import time
 import logging
 from logging import basicConfig
 import traceback
-import zipfile
 from collections import Counter
+from typing import Dict, List, Tuple
 
 import requests
 
 
-def get_job_links(workflow_run_id, token=None):
+def get_job_links(workflow_run_id: str, token: str = None) -> Dict[str, str]:
     """Extract job names and their job links in a GitHub Actions workflow run"""
-
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
