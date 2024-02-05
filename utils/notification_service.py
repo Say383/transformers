@@ -1031,4 +1031,11 @@ if __name__ == "__main__":
     # send report only if there is any failure (for push CI)
     if message.n_failures or ci_event != "push":
         message.post()
-        message.post_reply()
+result = os.environ.get("OFFLINE_RUNNERS")
+if result is not None:
+    try:
+        offline_runners = json.loads(result)
+    except json.decoder.JSONDecodeError:
+        offline_runners = []
+else:
+    offline_runners = []
