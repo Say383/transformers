@@ -44,10 +44,30 @@ def handle_test_results(test_results):
         if "passed" in expression:
             success += int(expressions[i - 1])
 
-    return failed, success, time_spent
+    try:
+        return failed, success, time_spent
+    except Exception as e:
+        logger.error(f"Error handling test results: {e}")
+        return 0, 0, "0s"
 
 
 def extract_first_line_failure(failures_short_lines):
+    failures = {}
+    file = None
+    in_error = False
+    for line in failures_short_lines.split("\n"):
+        if re.search(r"_ \[doctest\]", line):
+            in_error = True
+            file = line.split(" ")[2]
+        elif in_error and not line.split(" ")[0].isdigit():
+            failures[file] = line
+            in_error = False
+
+    try:
+        return failures
+    except Exception as e:
+        logger.error(f"Error extracting first line failure: {e}")
+        return {}
     failures = {}
     file = None
     in_error = False
