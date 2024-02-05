@@ -1,10 +1,22 @@
+# New file: utils/extract_warnings.py
+
 import argparse
 import json
 import os
 import time
 import zipfile
 
-from get_ci_error_statistics import download_artifact, get_artifacts_links
+from .get_ci_error_statistics import download_artifact, get_artifacts_links
+
+from transformers import logging
+
+import argparse
+import json
+import os
+import time
+import zipfile
+
+from .get_ci_error_statistics import download_artifact, get_artifacts_links
 
 from transformers import logging
 

@@ -218,6 +218,21 @@ def make_github_table_per_model(reduced_by_model):
     return "\n".join(lines)
 
 
+import argparse
+import json
+import math
+import os
+import time
+import traceback
+import zipfile
+from collections import Counter
+
+import requests
+
+
+def get_ci_error_statistics(workflow_run_id, output_dir, token=None):
+    ...
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Required parameters
