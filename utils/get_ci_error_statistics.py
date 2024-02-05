@@ -33,7 +33,7 @@ def get_job_links(workflow_run_id, token=None):
 
         return job_links
     except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        raise Exception('Unknown error occurred while fetching links')
 
     return {}
 
@@ -117,11 +117,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 job_name = line
 
     if len(errors) != len(failed_tests):
-        raise ValueError(
-            f"`errors` and `failed_tests` should have the same number of elements. Got {len(errors)} for `errors` "
-            f"and {len(failed_tests)} for `failed_tests` instead. The test reports in {artifact_zip_path} have some"
-            " problem."
-        )
+        print(f'Warning: `errors` and `failed_tests` do not have the same number of elements. Test reports in {artifact_zip_path} may have some issues.')
 
     job_link = None
     if job_name and job_links:

@@ -29,7 +29,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 if len(buffer) > 0:
                     warning = "\n".join(buffer)
                     # Only keep the warnings specified in `targets`
-                    if any(f": {x}: " in warning for x in targets):
+                    if any(f":" + x + ": " in warning for x in targets):
                         selected_warnings.add(warning)
                     buffer.clear()
                 continue

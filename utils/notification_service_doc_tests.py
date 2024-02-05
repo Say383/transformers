@@ -255,7 +255,7 @@ class Message:
                     channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
                     text=f"Results for {job}",
                     blocks=blocks,
-                    thread_ts=self.thread_ts["ts"],
+                    thread_ts=self.thread_ts
                 )
 
                 time.sleep(1)
@@ -350,7 +350,7 @@ if __name__ == "__main__":
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
     if "stats" in artifact:
-        failed, success, time_spent = handle_test_results(artifact["stats"])
+        failed, success, time_spent = doc_test_results
         doc_test_results["failures"] = failed
         doc_test_results["success"] = success
         doc_test_results["time_spent"] = time_spent[1:-1] + ", "
