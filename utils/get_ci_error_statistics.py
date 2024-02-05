@@ -4,6 +4,13 @@ import math
 import os
 import time
 import logging
+import traceback
+import zipfile
+import json
+import math
+import os
+import time
+import logging
 from logging import basicConfig
 import traceback
 import zipfile
@@ -20,7 +27,8 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers)
+    result_json = result.json()
     job_links = {}
 
     try:
@@ -32,6 +40,9 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\nError Details: {e}")
+        return {}
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
@@ -46,8 +57,20 @@ def get_artifacts_links(worflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
     artifacts = {}
+    try:
+        result = requests.get(url, headers=headers)
+        result_json = result.json()
+        artifacts.update({artifact['name']: artifact['archive_download_url'] for artifact in result_json['artifacts']})
+        pages_to_iterate_over = math.ceil((result_json['total_count'] - 100) / 100)
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers)
+            result_json = result.json()
+            artifacts.update({artifact['name']: artifact['archive_download_url'] for artifact in result_json['artifacts']})
+        return artifacts
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\nError Details: {e}")
+    return {}
 
     try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
@@ -76,13 +99,59 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        return
+    download_url = result.headers["Location"]
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch artifact from URL {download_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        return
+    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+    try:
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
+    except Exception as e:
+        logging.error(f"Unknown error, could not write artifact to file {file_path}:\n{traceback.format_exc()}\nError Details: {e}")
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        return
+    download_url = result.headers["Location"]
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch artifact from URL {download_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        return
+    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+    try:
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
+    except Exception as e:
+        logging.error(f"Unknown error, could not write artifact to file {file_path}:\n{traceback.format_exc()}\nError Details: {e}")
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        return
+    download_url = result.headers["Location"]
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch artifact from URL {download_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        return
+    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+    try:
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
+    except Exception as e:
+        logging.error(f"Unknown error, could not write artifact to file {file_path}:\n{traceback.format_exc()}\nError Details: {e}")
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
-    with open(file_path, "wb") as fp:
+    try:
+        with open(file_path, "wb") as fp:
         fp.write(response.content)
 
 
@@ -92,7 +161,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     failed_tests = []
     job_name = None
 
-    with zipfile.ZipFile(artifact_zip_path) as z:
+    try:
+        with zipfile.ZipFile(artifact_zip_path) as z:
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
@@ -115,6 +185,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 failed_tests.append(test)
                             elif filename == "job_name.txt":
                                 job_name = line
+                    except UnicodeDecodeError:
+                        continue
 
     if len(errors) != len(failed_tests):
         raise ValueError(
@@ -146,23 +218,27 @@ def get_all_errors(artifact_dir, job_links=None):
 
 
 def reduce_by_error(logs, error_filter=None):
-    """count each error"""
-
-    counter = Counter()
-    counter.update([x[1] for x in logs])
-    counts = counter.most_common()
+    """count each error and handle potential errors and exceptions"""
     r = {}
-    for error, count in counts:
-        if error_filter is None or error not in error_filter:
-            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
-
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
+        counter = Counter()
+        counter.update([x[1] for x in logs])
+        counts = counter.most_common()
+        for error, count in counts:
+            if error_filter is None or error not in error_filter:
+                r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except (Exception, error_filter) as e:
+        print(f"Error when counting errors: {e}")
     return r
 
 
-def get_model(test):
+def get_model(test):(test):
+    try:
     """Get the model name from a test method"""
     test = test.split("::")[0]
+    except Exception as e:
+        return None
     if test.startswith("tests/models/"):
         test = test.split("/")[2]
     else:
@@ -171,7 +247,7 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def reduce_by_model(logs, error_filter=None):(logs, error_filter=None):
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
