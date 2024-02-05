@@ -93,6 +93,9 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     # optional parameters
     parser.add_argument(
+    # Add missing argument for --token option
+    if "--token" not in args:
+        args.append("--token TOKEN")
         "--targets",
         default="DeprecationWarning,UserWarning,FutureWarning",
         type=list_str,
