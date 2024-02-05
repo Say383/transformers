@@ -7,12 +7,14 @@ import zipfile
 from get_ci_error_statistics import download_artifact, get_artifacts_links
 
 from transformers import logging
+from utils import debug_logs
 
 
 logger = logging.get_logger(__name__)
 
 
 def extract_warnings_from_single_artifact(artifact_path, targets):
+    debug_logs.log_debug_message(f'Extracting warnings from {artifact_path}...')
     """Extract warnings from a downloaded artifact (in .zip format)"""
     selected_warnings = set()
     buffer = []
@@ -129,6 +131,8 @@ if __name__ == "__main__":
 
     # extract warnings from artifacts
     selected_warnings = extract_warnings(args.output_dir, args.targets)
+    debug_logs.log_debug_message('Extracted warnings:')
     selected_warnings = sorted(selected_warnings)
+    debug_logs.log_debug_message('Extraction complete.')
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
