@@ -6,6 +6,9 @@ import zipfile
 
 from get_ci_error_statistics import download_artifact, get_artifacts_links
 
+import traceback
+import traceback
+import traceback
 from transformers import logging
 
 
