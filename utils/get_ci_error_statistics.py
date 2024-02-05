@@ -7,6 +7,7 @@ import logging
 from logging import basicConfig
 import traceback
 import zipfile
+import logging
 from collections import Counter
 
 import requests
@@ -106,7 +107,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
+                                except Exception as e:
                                     # skip un-related lines
                                     pass
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
@@ -231,6 +232,11 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
+    if not args.workflow_run_id or not args.output_dir:
+        logging.error('Missing workflow_run_id or output_dir')
+        parser.print_usage()
+        exit(1)
+
     os.makedirs(args.output_dir, exist_ok=True)
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
@@ -273,8 +279,14 @@ if __name__ == "__main__":
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
 
-    s1 = make_github_table(reduced_by_error)
-    s2 = make_github_table_per_model(reduced_by_model)
+    try:
+        s1 = make_github_table(reduced_by_error)
+    except Exception as e:
+        logging.error(f'Error encountered while creating reduced_by_error table: {e}')
+    try:
+        s2 = make_github_table_per_model(reduced_by_model)
+    except Exception as e:
+        logging.error(f'Error encountered while creating reduced_by_model table: {e}')
 
     with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
         fp.write(s1)
