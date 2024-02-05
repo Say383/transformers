@@ -4,6 +4,7 @@ import traceback
 
 import dateutil.parser as date_parser
 import requests
+import logging
 
 
 def extract_time_from_single_job(job):
