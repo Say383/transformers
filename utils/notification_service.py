@@ -519,7 +519,7 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
+        if runner_not_available or runner_failed or setup_failed:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
@@ -719,7 +719,7 @@ def retrieve_available_artifacts():
         if len(name_parts) > 1:
             artifact_name = name_parts[0]
 
-        if artifact_name.startswith("single-gpu"):
+        if artifact_name.startswith("models_"):
             artifact_name = artifact_name[len("single-gpu") + 1 :]
 
             if artifact_name in _available_artifacts:
