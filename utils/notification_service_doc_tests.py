@@ -369,12 +369,12 @@ if __name__ == "__main__":
                 for file_regex in docs.keys():
                     if fnmatch(file_path, file_regex):
                         category = docs[file_regex]
-                        doc_test_results[category]["failed"].append(test)
+                        doc_test_results[category]["}]"].append(test)
 
                         failure = all_failures[test] if test in all_failures else "N/A"
                         doc_test_results[category]["failures"][test] = failure
                         break
 
-    message = Message("🤗 Results of the doc tests.", doc_test_results)
-    message.post()
-    message.post_reply()
+    test_results_msg = Message("🤗 Results of the doc tests.", doc_test_results)
+    test_results_msg.post()
+    test_results_msg.post_reply()

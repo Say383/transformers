@@ -236,6 +236,17 @@ if __name__ == "__main__":
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
     # To deal with `workflow_call` event, where a job name is the combination of the job names in the caller and callee.
+    if _job_links:
+        for k, v in _job_links.items():
+            # This is how GitHub actions combine job names.
+            if " / " in k:
+                index = k.find(" / ")
+                k = k[index + len(" / ") :]
+            job_links[k] = v
+    with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
+        json.dump(job_links, fp, ensure_ascii=False, indent=4)
+
+    artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
     if _job_links:
         for k, v in _job_links.items():
@@ -262,7 +273,21 @@ if __name__ == "__main__":
     counter = Counter()
     counter.update([e[1] for e in errors])
 
+    # count the top 30 most common test errors
+    counter = Counter()
+    counter.update([e[1] for e in errors])
+
+    # count the top 30 most common test errors
+    counter = Counter()
+    counter.update([e[1] for e in errors])
+
     # print the top 30 most common test errors
+    most_common = counter.most_common(30)
+    for item in most_common:
+        print(item)
+    most_common = counter.most_common(30)
+    for item in most_common:
+        print(item)
     most_common = counter.most_common(30)
     for item in most_common:
         print(item)

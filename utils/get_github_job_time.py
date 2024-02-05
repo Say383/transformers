@@ -69,3 +69,7 @@ if __name__ == "__main__":
 
     for k, v in job_time.items():
         print(f'{k}: {v["duration"]}')
+    job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
+
+    for k, v in job_time.items():
+        print(f'{k}: {v["duration"]}')
