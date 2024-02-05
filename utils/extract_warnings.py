@@ -4,7 +4,7 @@ import os
 import time
 import zipfile
 
-from get_ci_error_statistics import download_artifact, get_artifacts_links
+from .get_ci_error_statistics import download_artifact, get_artifacts_links
 
 from transformers import logging
 
@@ -96,6 +96,7 @@ if __name__ == "__main__":
         "--targets",
         default="DeprecationWarning,UserWarning,FutureWarning",
         type=list_str,
+        nargs="?",
         help="Comma-separated list of target warning(s) which we want to extract.",
     )
     parser.add_argument(
@@ -129,6 +130,6 @@ if __name__ == "__main__":
 
     # extract warnings from artifacts
     selected_warnings = extract_warnings(args.output_dir, args.targets)
-    selected_warnings = sorted(selected_warnings)
+    selected_warnings = sorted(selected_warnings, key=lambda x: str(x))
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
