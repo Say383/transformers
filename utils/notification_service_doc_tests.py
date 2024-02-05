@@ -21,8 +21,9 @@ import time
 from fnmatch import fnmatch
 from typing import Dict
 
+from slack_sdk.web.client import WebClient
+import slack_sdk.errors
 import requests
-from slack_sdk import WebClient
 
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
@@ -330,6 +331,7 @@ if __name__ == "__main__":
         [
             ("*.py", "API Examples"),
             ("*.md", "MD Examples"),
+            ("*.txt", "Text Examples")
         ]
     )
 

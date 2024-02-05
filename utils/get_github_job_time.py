@@ -14,8 +14,8 @@ def extract_time_from_single_job(job):
     start = job["started_at"]
     end = job["completed_at"]
 
-    start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
+    start_datetime = date_parser.isoparse(start)
+    end_datetime = date_parser.isoparse(end)
 
     duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
 
@@ -34,7 +34,8 @@ def get_job_time(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    response = requests.get(url, headers=headers)
+    result = response.json()
     job_time = {}
 
     try:
