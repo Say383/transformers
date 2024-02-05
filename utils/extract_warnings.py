@@ -34,7 +34,10 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                     buffer.clear()
                 continue
             else:
-                line = line.strip()
+                try:
+                    line = line.strip()
+                except Exception as e:
+                    logger.warning(f'Error occurred while processing line: {e}')
                 buffer.append(line)
 
     if from_gh:
