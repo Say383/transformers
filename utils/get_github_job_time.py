@@ -35,6 +35,8 @@ def get_job_time(workflow_run_id, token=None):
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
+    pages_to_iterate_over = (result["total_count"] - 1) // 100
+    remaining_jobs = (result["total_count"] - 1) % 100
     job_time = {}
 
     try:
