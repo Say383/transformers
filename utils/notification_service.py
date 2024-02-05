@@ -541,7 +541,12 @@ class Message:
             },
         }
 
-        text = ""
+        try:
+            with open("offline_runners.txt","r") as file:
+                offline_runners = file.read()
+        except FileNotFoundError:
+            print('offline_runners.txt not found')
+            offline_runners = ""
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
