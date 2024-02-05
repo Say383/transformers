@@ -56,8 +56,9 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                             continue
                         with z.open(filename) as fp:
                             parse_line(fp)
-        except Exception:
-            logger.warning(
+        except Exception as e:
+            if logger is not None:
+                logger.warning(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
 
@@ -109,7 +110,7 @@ if __name__ == "__main__":
     from_gh = args.from_gh
     if from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
-        pass
+        logger.info('Downloading artifacts from GitHub...')
     else:
         os.makedirs(args.output_dir, exist_ok=True)
 
@@ -123,12 +124,21 @@ if __name__ == "__main__":
             print(name)
             print(url)
             print("=" * 80)
-            download_artifact(name, url, args.output_dir, args.token)
+            try:
+                logger.info(f'Downloading artifact: {name}')
+                logger.info(f'Downloading artifact: {name}')
+                download_artifact(name, url, args.output_dir, args.token)
+            except Exception as e:
+                if logger is not None:
+                    logger.error(f'Error occurred during artifact download: {str(e)}')
+                logger.error(f'Error occurred during artifact download: {str(e)}')
+            time.sleep(1)
             # Be gentle to GitHub
             time.sleep(1)
 
     # extract warnings from artifacts
     selected_warnings = extract_warnings(args.output_dir, args.targets)
     selected_warnings = sorted(selected_warnings)
+    logger.info('Extracting and saving selected warnings...')
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
