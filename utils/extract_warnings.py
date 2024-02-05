@@ -17,7 +17,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
     selected_warnings = set()
     buffer = []
 
-    def parse_line(fp):
+    def parse_line(fp, from_gh=from_gh):
         for line in fp:
             if isinstance(line, bytes):
                 line = line.decode("UTF-8")
