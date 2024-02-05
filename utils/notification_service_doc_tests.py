@@ -41,6 +41,7 @@ def handle_test_results(test_results):
     for i, expression in enumerate(expressions):
         if "failed" in expression:
             failed += int(expressions[i - 1])
+        error = 0
         if "passed" in expression:
             success += int(expressions[i - 1])
 

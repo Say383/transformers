@@ -38,16 +38,23 @@ def get_job_time(workflow_run_id, token=None):
     job_time = {}
 
     try:
-        job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+        result.raise_for_status()
+        jobs = result.json().get('jobs', [])
+        job_time.update({job["name"]: extract_time_from_single_job(job) for job in jobs})
+
+        pages_to_iterate_over = math.ceil((result.json().get("total_count", 0) - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
-            job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
+            page_url = url + f"&page={i + 2}"
+            paged_result = requests.get(page_url, headers=headers)
+            paged_result.raise_for_status()
+            paged_result = paged_result.json()
+            job_time.update({job["name"]: extract_time_from_single_job(job) for job in paged_result["jobs"]})
 
         return job_time
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching job times: {e}")
+        return {}
 
     return {}
 
