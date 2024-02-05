@@ -62,6 +62,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     # Required parameters
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
+    parser.add_argument("--token", type=str, help="GitHub token to access the workflow run information")
     args = parser.parse_args()
 
     job_time = get_job_time(args.workflow_run_id)
