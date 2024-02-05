@@ -50,12 +50,44 @@ def get_artifacts_links(worflow_run_id, token=None):
     artifacts = {}
 
     try:
+        try:
+            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+            pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+            for i in range(pages_to_iterate_over):
+                result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+                artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+        except Exception:
+            print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+            return {}
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+    try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+
+    return {}
+    try:
+        artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        return {}
+
+    return {}
 
         return artifacts
     except Exception:
@@ -80,8 +112,16 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
-    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except Exception as e:
+        print(f"Error occurred when getting artifact download URL:
+{traceback.format_exc()}")
+    try:
+        file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+    except Exception as e:
+        print(f"Error occurred when creating file path:
+{traceback.format_exc()}")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
 
@@ -92,21 +132,36 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     failed_tests = []
     job_name = None
 
-    with zipfile.ZipFile(artifact_zip_path) as z:
+    try:
+        try:
+        with zipfile.ZipFile(artifact_zip_path) as z:
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
-                    with z.open(filename) as f:
+                    try:
+                        try:
+                            with z.open(filename) as f:
                         for line in f:
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
-                                try:
+                                    try:
+                                for line in f:
+                                    line = line.decode("UTF-8").strip()
+                                    if filename == "failures_line.txt":
+                                        try:
+                                            # `error_line` is the place where `error` occurs
+                                            error_line = line[: line.index(": ")]
+                                            error = line[line.index(": ") + len(": ") :]
+                                            errors.append([error_line, error])
+                                        except Exception as e:
+                                            raise ValueError(f"Error occurred when extracting errors from {artifact_zip_path}:
+{traceback.format_exc()}")
                                     # `error_line` is the place where `error` occurs
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
+                                except Exception as e:
                                     # skip un-related lines
                                     pass
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
@@ -140,7 +195,11 @@ def get_all_errors(artifact_dir, job_links=None):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
+        try:
         errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+    except Exception as e:
+        print(f'Error occurred when processing artifact {p}:
+{traceback.format_exc()}')
 
     return errors
 
@@ -149,7 +208,10 @@ def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
     counter = Counter()
-    counter.update([x[1] for x in logs])
+    counter.update(        try:
+            counter.update([x[1] for x in logs])
+        except Exception as e:
+            print(f'Error occurred when updating counter with test errors:\n{e}'))
     counts = counter.most_common()
     r = {}
     for error, count in counts:
@@ -171,18 +233,24 @@ def get_model(test):
     return test
 
 
-def reduce_by_model(logs, error_filter=None):
+def reduce_by_model_safe(logs, error_filter=None):
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
     logs = [x for x in logs if x[2] is not None]
     tests = {x[2] for x in logs}
 
+    try:
     r = {}
+    
+    for test in tests:
     for test in tests:
         counter = Counter()
         # count by errors in `test`
-        counter.update([x[1] for x in logs if x[2] == test])
+                counter.update([x[1] for x in logs if x[2] == test])
+except Exception as e:
+    print(f'Error occurred when counting errors per model:
+{e}')
         counts = counter.most_common()
         error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
         n_errors = sum(error_counts.values())
