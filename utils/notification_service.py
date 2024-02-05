@@ -688,7 +688,12 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
         for file in files:
             try:
                 with open(os.path.join(artifact_path, file)) as f:
-                    _artifact[file.split(".")[0]] = f.read()
+                    try:
+                            with open(os.path.join(artifact_path, file)) as f:
+                                _artifact[file.split(".")[0]] = json.load(f)
+                    except json.decoder.JSONDecodeError as e:
+                        print("Error: JSON file is empty or invalid.")
+                        sys.exit(1)
             except UnicodeDecodeError as e:
                 raise ValueError(f"Could not open {os.path.join(artifact_path, file)}.") from e
 
