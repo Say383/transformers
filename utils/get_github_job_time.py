@@ -56,7 +56,7 @@ if __name__ == "__main__":
     r"""
     Example:
 
-        python get_github_job_time.py --workflow_run_id 2945609517
+        python get_github_job_time.py --workflow_run_id 2945609517 --job_time
     """
 
     parser = argparse.ArgumentParser()
