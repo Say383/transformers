@@ -375,6 +375,9 @@ if __name__ == "__main__":
                         doc_test_results[category]["failures"][test] = failure
                         break
 
+try:
     message = Message("🤗 Results of the doc tests.", doc_test_results)
     message.post()
     message.post_reply()
+except Exception as e:
+    print(f'Error constructing message: {e}')

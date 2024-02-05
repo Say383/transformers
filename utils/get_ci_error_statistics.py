@@ -20,7 +20,7 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers).json() if requests.get(url, headers=headers).status_code==200 else {'jobs':[]} if requests.get(url, headers=headers).status_code==200 else {'jobs':[]}
     job_links = {}
 
     try:
@@ -46,7 +46,7 @@ def get_artifacts_links(worflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers).json() if requests.get(url, headers=headers).status_code==200 else {'artifacts':[]}
     artifacts = {}
 
     try:
@@ -80,7 +80,11 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(f'Error downloading artifact: {e}')
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
@@ -157,7 +161,10 @@ def reduce_by_error(logs, error_filter=None):
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
-    return r
+    try:
+        return r
+    except Exception as e:
+        print(f'Error in reducing errors by model: {e}')
 
 
 def get_model(test):

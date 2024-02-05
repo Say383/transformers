@@ -44,8 +44,11 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 # read the file
                 if filename != "warnings.txt":
                     continue
-                with open(file_path) as fp:
-                    parse_line(fp)
+                try:
+                    with open(file_path) as fp:
+                        parse_line(fp)
+                except Exception:
+                    logger.warning(f"Error reading file: {file_path}")
     else:
         try:
             with zipfile.ZipFile(artifact_path) as z:
@@ -54,8 +57,15 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                         # read the file
                         if filename != "warnings.txt":
                             continue
-                        with z.open(filename) as fp:
-                            parse_line(fp)
+                        try:
+                            with z.open(filename) as fp:
+                                parse_line(fp)
+                        except Exception:
+                            logger.warning(f"Error reading file: {filename}")
+        except Exception:
+            logger.warning(
+                f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
+            )
         except Exception:
             logger.warning(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
@@ -71,7 +81,10 @@ def extract_warnings(artifact_dir, targets):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
     for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+        try:
+            selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+        except Exception:
+            logger.warning(f"Error extracting warnings from artifact: {p}")
 
     return selected_warnings
 
@@ -112,7 +125,6 @@ if __name__ == "__main__":
         pass
     else:
         os.makedirs(args.output_dir, exist_ok=True)
-
         # get download links
         artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
         with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
@@ -132,3 +144,5 @@ if __name__ == "__main__":
     selected_warnings = sorted(selected_warnings)
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
+        except Exception:
+            logger.warning(f"Error extracting warnings from artifact: {p}")
