@@ -4,6 +4,7 @@ import os
 import time
 import zipfile
 
+import zipfile
 from get_ci_error_statistics import download_artifact, get_artifacts_links
 
 from transformers import logging
@@ -106,7 +107,10 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    from_gh = args.from_gh
+    try:
+        from_gh = args.from_gh
+    except KeyError as e:
+        print(f"Error occurred: {e}")
     if from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
         pass
@@ -123,7 +127,10 @@ if __name__ == "__main__":
             print(name)
             print(url)
             print("=" * 80)
-            download_artifact(name, url, args.output_dir, args.token)
+            try:
+                download_artifact(name, url, args.output_dir, args.token)
+            except Exception as e:
+                print(f"Failed to download artifact: {e}")
             # Be gentle to GitHub
             time.sleep(1)
 

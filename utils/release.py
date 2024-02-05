@@ -75,7 +75,11 @@ def update_version_in_file(fname: str, version: str, file_type: str):
         file_type (`str`): The type of the file (should be a key in `REPLACE_PATTERNS`).
     """
     with open(fname, "r", encoding="utf-8", newline="\n") as f:
-        code = f.read()
+        try:
+            code = f.read()
+        except Exception as e:
+            print(f"Failed to read file: {e}")
+            code = ""
     re_pattern, replace = REPLACE_PATTERNS[file_type]
     replace = replace.replace("VERSION", version)
     code = re_pattern.sub(replace, code)

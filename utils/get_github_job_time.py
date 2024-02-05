@@ -4,6 +4,7 @@ import traceback
 
 import dateutil.parser as date_parser
 import requests
+import traceback
 
 
 def extract_time_from_single_job(job):
@@ -34,7 +35,11 @@ def get_job_time(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    try:
+        result = requests.get(url, headers=headers).json()
+    except Exception as e:
+        print(f"Failed to retrieve job times: {e}")
+        result = {}
     job_time = {}
 
     try:
@@ -46,8 +51,8 @@ def get_job_time(workflow_run_id, token=None):
             job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
 
         return job_time
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\n{e}")
 
     return {}
 
