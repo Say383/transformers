@@ -5,6 +5,7 @@ import time
 import zipfile
 
 from get_ci_error_statistics import download_artifact, get_artifacts_links
+from github_actions_utils import download_artifact, get_artifacts_links
 
 from transformers import logging
 
@@ -19,7 +20,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
 
     def parse_line(fp):
         for line in fp:
-            if isinstance(line, bytes):
+            if isinstance(line, bytes) and 'UTF-8' in line:
                 line = line.decode("UTF-8")
             if "warnings summary (final)" in line:
                 continue
@@ -57,7 +58,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                         with z.open(filename) as fp:
                             parse_line(fp)
         except Exception:
-            logger.warning(
+            print(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
 
