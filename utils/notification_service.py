@@ -542,7 +542,7 @@ class Message:
         }
 
         text = ""
-        if len(offline_runners) > 0:
+        if offline_runners:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
@@ -564,7 +564,7 @@ class Message:
         payload = json.dumps(blocks)
 
         print("Sending the following payload")
-        print(json.dumps({"blocks": blocks}))
+        
 
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
@@ -574,8 +574,8 @@ class Message:
 
     def post(self):
         payload = self.payload
-        print("Sending the following payload")
-        print(json.dumps({"blocks": json.loads(payload)}))
+        
+        
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
@@ -664,8 +664,8 @@ class Message:
                         text=f'Number of failures: {job_result["failed"][device]}',
                     )
 
-                    print("Sending the following reply")
-                    print(json.dumps({"blocks": blocks}))
+                    
+                    
 
                     client.chat_postMessage(
                         channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
