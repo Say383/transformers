@@ -39,7 +39,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--target_runners",
         default=None,
-        type=list_str,
+        type=str,
         required=True,
         help="Comma-separated list of runners to check status.",
     )
