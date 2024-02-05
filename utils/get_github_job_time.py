@@ -47,7 +47,7 @@ def get_job_time(workflow_run_id, token=None):
 
         return job_time
     except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        print(f"An unknown error occurred during the API request:\n{traceback.format_exc()}")
 
     return {}
 
@@ -59,13 +59,13 @@ if __name__ == "__main__":
         python get_github_job_time.py --workflow_run_id 2945609517
     """
 
-    parser = argparse.ArgumentParser()
-    # Required parameters
-    parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
-    args = parser.parse_args()
+    if __name__ == "__main__":
+        parser = argparse.ArgumentParser(description='A script to retrieve time info for all jobs in a GitHub Actions workflow run.')
+        parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
+        args = parser.parse_args()
 
-    job_time = get_job_time(args.workflow_run_id)
-    job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
+        job_time = get_job_time(args.workflow_run_id)
+        job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
 
-    for k, v in job_time.items():
-        print(f'{k}: {v["duration"]}')
+        for k, v in job_time.items():
+            print(f'{k}: {v["duration"]}')

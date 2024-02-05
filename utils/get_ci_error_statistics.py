@@ -22,6 +22,9 @@ def get_job_links(workflow_run_id, token=None):
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
     job_links = {}
+    if 'jobs' not in result:
+        print(f'Error: No jobs key found in result: {result}')
+        return {}
 
     try:
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
@@ -48,6 +51,9 @@ def get_artifacts_links(worflow_run_id, token=None):
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
     result = requests.get(url, headers=headers).json()
     artifacts = {}
+    if 'artifacts' not in result:
+        print(f'Error: No artifacts key found in result: {result}')
+        return {}
 
     try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
