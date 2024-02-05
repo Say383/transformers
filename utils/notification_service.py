@@ -17,6 +17,7 @@ import collections
 import functools
 import json
 import operator
+import json
 import os
 import re
 import sys
@@ -545,7 +546,7 @@ class Message:
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
-        text += "🙏 Let's fix it ASAP! 🙏"
+        text = f"The following runners are offline:\n  • \n  • \n🙏 Let's fix it ASAP! 🙏"
 
         error_block_2 = {
             "type": "section",
@@ -577,7 +578,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
-        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+        text = f"{self.n_failures} failures out of {self.n_tests} tests." if self.n_failures else "All tests passed."
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
