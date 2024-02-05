@@ -267,17 +267,20 @@ def get_job_links():
     result = requests.get(url).json()
     jobs = {}
 
-    try:
-        jobs.update({job["name"]: job["html_url"] for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
-
-        for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}").json()
+    if "jobs" in result:
+        try:
             jobs.update({job["name"]: job["html_url"] for job in result["jobs"]})
+            pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
-        return jobs
-    except Exception as e:
-        print("Unknown error, could not fetch links.", e)
+            for i in range(pages_to_iterate_over):
+                result = requests.get(url + f"&page={i + 2}").json()
+                jobs.update({job["name"]: job["html_url"] for job in result["jobs"]})
+
+            return jobs
+        except Exception as e:
+            print("Unknown error, could not fetch links.", e)
+    else:
+        return {}
 
     return {}
 
@@ -347,33 +350,34 @@ if __name__ == "__main__":
     # Link to the GitHub Action job
     doc_test_results["job_link"] = github_actions_job_links.get("run_doctests")
 
-    artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
-    artifact = retrieve_artifact(artifact_path["name"])
-    if "stats" in artifact:
-        failed, success, time_spent = handle_test_results(artifact["stats"])
-        doc_test_results["failures"] = failed
-        doc_test_results["success"] = success
-        doc_test_results["time_spent"] = time_spent[1:-1] + ", "
+    if "doc_tests_gpu_test_reports" in available_artifacts:
+        artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
+        artifact = retrieve_artifact(artifact_path["name"])
+        if "stats" in artifact:
+            failed, success, time_spent = handle_test_results(artifact["stats"])
+            doc_test_results["failures"] = failed
+            doc_test_results["success"] = success
+            doc_test_results["time_spent"] = time_spent[1:-1] + ", "
 
-        all_failures = extract_first_line_failure(artifact["failures_short"])
-        for line in artifact["summary_short"].split("\n"):
-            if re.search("FAILED", line):
-                line = line.replace("FAILED ", "")
-                line = line.split()[0].replace("\n", "")
+            all_failures = extract_first_line_failure(artifact["failures_short"])
+            for line in artifact["summary_short"].split("\n"):
+                if re.search("FAILED", line):
+                    line = line.replace("FAILED ", "")
+                    line = line.split()[0].replace("\n", "")
 
-                if "::" in line:
-                    file_path, test = line.split("::")
-                else:
-                    file_path, test = line, line
+                    if "::" in line:
+                        file_path, test = line.split("::")
+                    else:
+                        file_path, test = line, line
 
-                for file_regex in docs.keys():
-                    if fnmatch(file_path, file_regex):
-                        category = docs[file_regex]
-                        doc_test_results[category]["failed"].append(test)
+                    for file_regex in docs.keys():
+                        if fnmatch(file_path, file_regex):
+                            category = docs[file_regex]
+                            doc_test_results[category]["failed"].append(test)
 
-                        failure = all_failures[test] if test in all_failures else "N/A"
-                        doc_test_results[category]["failures"][test] = failure
-                        break
+                            failure = all_failures[test] if test in all_failures else "N/A"
+                            doc_test_results[category]["failures"][test] = failure
+                            break
 
     message = Message("🤗 Results of the doc tests.", doc_test_results)
     message.post()

@@ -26,7 +26,11 @@ from typing import Dict, List, Optional, Union
 import requests
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
-from slack_sdk import WebClient
+try:
+    from slack_sdk import WebClient
+except ImportError:
+    print("Error: The 'slack_sdk' package is not installed. Please install it before running this script.")
+    sys.exit(1)
 
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"], auth=('username', 'password'))
