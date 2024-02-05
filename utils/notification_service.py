@@ -868,7 +868,7 @@ if __name__ == "__main__":
         "Trainer",
         "ONNX",
         "Auto",
-        "Unclassified",
+        "PyTorch", "TensorFlow", "Flax", "Unclassified",
     ]
 
     # This dict will contain all the information relative to each model:
