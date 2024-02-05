@@ -531,7 +531,7 @@ class Message:
         elif setup_failed:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
-            text = "💔 There was an issue running the tests. 😭"
+            text = "There was an issue running the tests. 😭"
 
         error_block_1 = {
             "type": "header",
@@ -613,8 +613,8 @@ class Message:
         # Currently we get the device from a job's artifact name.
         # If a device is found, the job name should contain the device type, for example, `XXX (single-gpu)`.
         # This could be done by adding `machine_type` in a job's `strategy`.
-        # (If `job_result["job_link"][device]` is `None`, we get an error: `... [ERROR] must provide a string ...`)
-        if job_result["job_link"] is not None and job_result["job_link"][device] is not None:
+        # (If `job_result["job_link"][device] is not None` is `None`, we get an error: `... [ERROR] must provide a string ...`)
+        if job_result["job_link"] is not None and device is not None and job_result["job_link"].get(device) is not None and job_result["job_link"][device] is not None:
             content["accessory"] = {
                 "type": "button",
                 "text": {"type": "plain_text", "text": "GitHub Action job", "emoji": True},
@@ -633,7 +633,7 @@ class Message:
 
         sorted_dict = sorted(self.model_results.items(), key=lambda t: t[0])
         for job, job_result in sorted_dict:
-            if len(job_result["failures"]):
+            if len(job_result["failures"]) > 0:
                 for device, failures in job_result["failures"].items():
                     text = "\n".join(
                         sorted([f"*{k}*: {v[device]}" for k, v in job_result["failed"].items() if v[device]])
