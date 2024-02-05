@@ -34,7 +34,10 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                     buffer.clear()
                 continue
             else:
-                line = line.strip()
+                try:
+                    line = line.strip()
+                except Exception as e:
+                    logger.error(f'An error occurred while stripping the line: {e}')
                 buffer.append(line)
 
     if from_gh:
@@ -56,7 +59,8 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                             continue
                         with z.open(filename) as fp:
                             parse_line(fp)
-        except Exception:
+        except Exception as e:
+            logger.warning(f'An error occurred while processing the zip file: {e}')
             logger.warning(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
