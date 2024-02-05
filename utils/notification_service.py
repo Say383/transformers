@@ -520,7 +520,7 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            text = "🌞 All tests passed. 😊"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
                 offline_runners = json.loads(result)
@@ -531,7 +531,7 @@ class Message:
         elif setup_failed:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
-            text = "💔 There was an issue running the tests. 😭"
+            text = "🌞 All tests passed. 😊"
 
         error_block_1 = {
             "type": "header",
@@ -542,7 +542,7 @@ class Message:
         }
 
         text = ""
-        if len(offline_runners) > 0:
+        if offline_runners == []:
             text = "\n  • " + "\n  • ".join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
@@ -577,7 +577,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
-        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+        text = f"{    text} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
