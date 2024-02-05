@@ -26,9 +26,10 @@ def try_infer_format_from_ext(path: str):
     if not path:
         return "pipe"
 
-    for ext in PipelineDataFormat.SUPPORTED_FORMATS:
-        if path.endswith(ext):
-            return ext
+    if path:
+        for ext in PipelineDataFormat.SUPPORTED_FORMATS:
+            if path.endswith(ext):
+                return ext
 
     raise Exception(
         f"Unable to determine file format from file extension {path}. "
@@ -45,13 +46,14 @@ def run_command_factory(args):
         device=args.device,
     )
     format = try_infer_format_from_ext(args.input) if args.format == "infer" else args.format
-    reader = PipelineDataFormat.from_str(
+    reader = PipelineDataFormat(
         format=format,
         output_path=args.output,
         input_path=args.input,
         column=args.column if args.column else nlp.default_input_names,
-        overwrite=args.overwrite,
+        overwrite=args.overwrite
     )
+    return RunCommand(nlp, reader)
     return RunCommand(nlp, reader)
 
 
@@ -95,7 +97,7 @@ class RunCommand(BaseTransformersCLICommand):
     def run(self):
         nlp, outputs = self._nlp, []
 
-        for entry in self._reader:
+        for entry in self._reader.entries():
             output = nlp(**entry) if self._reader.is_multi_columns else nlp(entry)
             if isinstance(output, dict):
                 outputs.append(output)

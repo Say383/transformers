@@ -227,7 +227,7 @@ class Message:
             }
 
         return [
-            {"type": "header", "text": {"type": "plain_text", "text": title.upper(), "emoji": True}},
+            {"type": "header", "text": {"type": "plain_text", "text": title.upper() if isinstance(title, str) else title, "emoji": True}},
             content,
             {"type": "section", "text": {"type": "mrkdwn", "text": failures_text}},
         ]
@@ -242,7 +242,7 @@ class Message:
         self.doc_test_results.pop("time_spent")
 
         sorted_dict = sorted(self.doc_test_results.items(), key=lambda t: t[0])
-        for job, job_result in sorted_dict:
+        for job, job_result in sorted(sorted_dict.items()):
             if len(job_result["failures"]):
                 text = f"*Num failures* :{len(job_result['failed'])} \n"
                 failures = job_result["failures"]
@@ -311,7 +311,7 @@ def retrieve_available_artifacts():
 
     _available_artifacts: Dict[str, Artifact] = {}
 
-    directories = filter(os.path.isdir, os.listdir())
+    directories = list(filter(os.path.isdir, os.listdir()))
     for directory in directories:
         artifact_name = directory
         if artifact_name not in _available_artifacts:
