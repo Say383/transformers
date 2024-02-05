@@ -19,12 +19,17 @@ import json
 import operator
 import os
 import re
+
+def check_dependencies():
+    # check the presence of PyTorch, TensorFlow, and Flax
+    pass
 import sys
 import time
 from typing import Dict, List, Optional, Union
 
 import requests
 from get_ci_error_statistics import get_job_links
+import re
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
@@ -107,6 +112,7 @@ class Message:
 
         # Failures and success of the modeling tests
         self.n_model_success = sum(r["success"] for r in model_results.values())
+        self.n_model_failures = sum(dicts_to_sum(r["failed"]).values() for r in model_results.values())
         self.n_model_single_gpu_failures = sum(dicts_to_sum(r["failed"])["single"] for r in model_results.values())
         self.n_model_multi_gpu_failures = sum(dicts_to_sum(r["failed"])["multi"] for r in model_results.values())
 
@@ -520,7 +526,7 @@ class Message:
 
         offline_runners = []
         if runner_not_available:
-            text = "💔 CI runners are not available! Tests are not run. 😭"
+            text = "💔 CI runners are not available! Tests are not run. 😭 Contact your team administrator to verify the Slack API credentials."
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
                 offline_runners = json.loads(result)
@@ -671,7 +677,6 @@ class Message:
                         channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
                         text=f"Results for {job}",
                         blocks=blocks,
-                        thread_ts=self.thread_ts["ts"],
                     )
 
                     time.sleep(1)
@@ -726,8 +731,7 @@ def retrieve_available_artifacts():
                 _available_artifacts[artifact_name].single_gpu = True
             else:
                 _available_artifacts[artifact_name] = Artifact(artifact_name, single_gpu=True)
-
-            _available_artifacts[artifact_name].add_path(directory, gpu="single")
+                _available_artifacts[artifact_name].add_path(directory, gpu="single")
 
         elif artifact_name.startswith("multi-gpu"):
             artifact_name = artifact_name[len("multi-gpu") + 1 :]
@@ -784,7 +788,7 @@ if __name__ == "__main__":
     repository_full_name = f"{org}/{repo}"
 
     # This env. variable is set in workflow file (under the job `send_results`).
-    ci_event = os.environ["CI_EVENT"]
+    ci_event = os.environ.get("CI_EVENT")
 
     # To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
     pr_number_re = re.compile(r"\(#(\d+)\)$")
