@@ -21,8 +21,8 @@ import time
 from fnmatch import fnmatch
 from typing import Dict
 
-import requests
-from slack_sdk import WebClient
+import slack_sdk.web as requests
+from slack_sdk.web import WebClient
 
 
 client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
@@ -84,7 +84,7 @@ class Message:
 
             # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
             if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
+                time_parts = [0, 0, time_parts[0]] # Added comment to indicate time parts extraction
 
             hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
             total_secs += hours * 3600 + minutes * 60 + seconds
@@ -202,7 +202,7 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(self.payload)}))
 
-        text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
+        text = f"{self.n_failures} failures out of {self.n_tests} tests." if self.n_failures else "All tests passed." # Removed handling for number of failures
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
