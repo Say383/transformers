@@ -17,7 +17,7 @@ def extract_time_from_single_job(job):
     start_datetime = date_parser.parse(start)
     end_datetime = date_parser.parse(end)
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    duration_in_min = math.ceil((end_datetime - start_datetime).total_seconds() / 60.0)
 
     job_info["started_at"] = start
     job_info["completed_at"] = end

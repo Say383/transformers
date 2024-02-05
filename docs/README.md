@@ -367,7 +367,7 @@ seen [here](https://github.com/huggingface/transformers/actions/workflows/doctes
 To include your example in the daily doctests, you need to add the filename that
 contains the example docstring to the [documentation_tests.txt](../utils/documentation_tests.txt).
 
-### For Python files
+### For Python files:
 
 Run all the tests in the docstrings of a given file with the following command, here is how we test the modeling file of Wav2Vec2 for instance:
 
