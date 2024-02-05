@@ -1,6 +1,7 @@
 import argparse
 import json
 import subprocess
+import os
 
 
 def get_runner_status(target_runners, token):
@@ -20,9 +21,14 @@ def get_runner_status(target_runners, token):
             if runner["status"] == "offline":
                 offline_runners.append(runner)
 
-    # save the result so we can report them on Slack
-    with open("offline_runners.txt", "w") as fp:
-        fp.write(json.dumps(offline_runners))
+    save_offline_runners(offline_runners)
+
+
+def save_offline_runners(offline_runners):
+    file_path = os.path.join(os.path.dirname(__file__), "offline_runners.txt")
+    with open(file_path, "w") as fp:
+        for runner in offline_runners:
+            fp.write(runner["name"] + "\n")
 
     if len(offline_runners) > 0:
         failed = "\n".join([x["name"] for x in offline_runners])
@@ -38,7 +44,7 @@ if __name__ == "__main__":
     # Required parameters
     parser.add_argument(
         "--target_runners",
-        default='<YOUR_VALID_TOKEN>',
+        default=None,
         type=list_str,
         required=True,
         help="Comma-separated list of runners to check status.",
