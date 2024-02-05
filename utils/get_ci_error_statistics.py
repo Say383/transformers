@@ -15,7 +15,10 @@ import requests
 def get_job_links(workflow_run_id, token=None):
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
-    headers = None
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
+    else:
+        headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
@@ -41,7 +44,10 @@ def get_job_links(workflow_run_id, token=None):
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
 
-    headers = None
+    if token is not None:
+        headers = {'Accept': 'application/vnd.github+json', 'Authorization': f'Bearer {token}'}
+    else:
+        headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
@@ -71,7 +77,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     but it can't be used to download directly. We need to get a redirect URL first.
     See https://docs.github.com/en/rest/actions/artifacts#download-an-artifact
     """
-    headers = None
+    if token is not None:
+        headers = {'Accept': 'application/vnd.github+json', 'Authorization': f'Bearer {token}'}
+    else:
+        headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
@@ -124,7 +133,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
         )
 
     job_link = None
-    if job_name and job_links:
+    if job_name and job_links is not None:
         job_link = job_links.get(job_name, None)
 
     # A list with elements of the form (line of error, error, failed test)
@@ -153,7 +162,7 @@ def reduce_by_error(logs, error_filter=None):
     counts = counter.most_common()
     r = {}
     for error, count in counts:
-        if error_filter is None or error not in error_filter:
+        if error_filter is None or not error_filter or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
@@ -191,8 +200,6 @@ def reduce_by_model(logs, error_filter=None):
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
-
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
@@ -202,10 +209,12 @@ def make_github_table(reduced_by_error):
         line = f"| {count} | {error[:100]} |  |"
         lines.append(line)
 
-    return "\n".join(lines)
+    return "\n".join(lines) if reduced_by_error else ""
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(reduced_by_model): # Add condition to check if reduced_by_model is empty
+    if not reduced_by_model:
+        return ''
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
