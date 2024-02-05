@@ -156,8 +156,12 @@ def reduce_by_error(logs, error_filter=None):
         if error_filter is None or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
-    return r
+    try:
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+        return r
+    except Exception as e:
+        logging.error(f"Error occurred while sorting the error counts", exc_info=True)
+        return {}
 
 
 def get_model(test):
@@ -267,8 +271,11 @@ if __name__ == "__main__":
     for item in most_common:
         print(item)
 
+try:
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
+except Exception as e:
+    logging.error(f"Failed to write errors to errors.json", exc_info=True)
 
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
