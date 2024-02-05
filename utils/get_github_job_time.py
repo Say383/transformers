@@ -15,7 +15,7 @@ def extract_time_from_single_job(job):
     end = job["completed_at"]
 
     start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
+    end_datetime = date_parser.parse(end or '9999-12-31T00:00:00Z')
 
     duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
 
@@ -33,7 +33,7 @@ def get_job_time(workflow_run_id, token=None):
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
+    url = f"https://api.github.com/repos/huggingface/transformers/main/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
     job_time = {}
 
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     r"""
     Example:
 
-        python get_github_job_time.py --workflow_run_id 2945609517
+        python get_github_job_time.py --workflow_run_id c11da77
     """
 
     parser = argparse.ArgumentParser()

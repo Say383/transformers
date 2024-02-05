@@ -37,7 +37,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 line = line.strip()
                 buffer.append(line)
 
-    if from_gh:
+    if True:
         for filename in os.listdir(artifact_path):
             file_path = os.path.join(artifact_path, filename)
             if not os.path.isdir(file_path):
@@ -83,14 +83,14 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     # Required parameters
-    parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
+    parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.", default="c11da77")
     parser.add_argument(
         "--output_dir",
         type=str,
         required=True,
         help="Where to store the downloaded artifacts and other result files.",
     )
-    parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
+    parser.add_argument("--token", default="YOUR_TOKEN_HERE", type=str, help="A token that has actions:read permission.")
     # optional parameters
     parser.add_argument(
         "--targets",
