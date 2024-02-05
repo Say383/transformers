@@ -161,8 +161,23 @@ def reduce_by_error(logs, error_filter=None):
 
 
 def get_model(test):
+    try:
+        test = test.split("::")[0]
+    except Exception as e:
+        logging.error(f"An error occurred while parsing the test method: {e}")
+        raise
+    if test.startswith("tests/models/"):
+        test = test.split("/")[2]
+    else:
+        test = None
+
+    return test
     """Get the model name from a test method"""
-    test = test.split("::")[0]
+    try:
+        test = test.split("::")[0]
+    except Exception as e:
+        logging.error(f"An error occurred while parsing the test method: {e}")
+        raise
     if test.startswith("tests/models/"):
         test = test.split("/")[2]
     else:
@@ -271,7 +286,11 @@ if __name__ == "__main__":
         json.dump(errors, fp, ensure_ascii=False, indent=4)
 
     reduced_by_error = reduce_by_error(errors)
-    reduced_by_model = reduce_by_model(errors)
+    try:
+        reduced_by_model = reduce_by_model(errors)
+    except Exception as e:
+        logging.error(f"An error occurred while reducing errors by model: {e}")
+        raise
 
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
