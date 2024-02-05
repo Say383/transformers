@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  workflow_run:
+    workflows:
+      - CI
+    types:
+      - completed
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set OFFLINE_RUNNERS
+        run: echo "::set-env name=OFFLINE_RUNNERS::['runner1', 'runner2']"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: pytest
+
+      - name: Run notification service
+        run: python utils/notification_service.py
