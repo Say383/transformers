@@ -1,4 +1,4 @@
-import argparse
+import argparse, json, math, time, os
 import json
 import math
 import os
@@ -6,10 +6,11 @@ import time
 import logging
 from logging import basicConfig
 import traceback
-import zipfile
+import zipfile, traceback
 from collections import Counter
 
-import requests
+import requests, traceback
+from collections import Counter
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -32,7 +33,7 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -58,7 +59,7 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -77,13 +78,13 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+        download_url = result.headers["Location"]
+        response = requests.get(download_url, allow_redirects=True)
+        file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
     except Exception as e:
-        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
-    download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
-    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
-    with open(file_path, "wb") as fp:
-        fp.write(response.content)
+        logging.error(f"Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
@@ -138,7 +139,7 @@ def get_all_errors(artifact_dir, job_links=None):
 
     errors = []
 
-    paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
+    paths = [os.path.join(artifact_dir, p) for p in os.scandir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
         errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
 
@@ -174,7 +175,7 @@ def get_model(test):
 def reduce_by_model(logs, error_filter=None):
     """count each error per model"""
 
-    logs = [(x[0], x[1], get_model(x[2])) for x in logs]
+    logs = [(x[0], x[1], get_model(x[3])) for x in logs]
     logs = [x for x in logs if x[2] is not None]
     tests = {x[2] for x in logs}
 
@@ -193,7 +194,7 @@ def reduce_by_model(logs, error_filter=None):
     return r
 
 
-def make_github_table(reduced_by_error):
+def make_github_table(reduced_by_error: dict):
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
     lines = [header, sep]
@@ -205,7 +206,7 @@ def make_github_table(reduced_by_error):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(reduced_by_model: dict):
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
@@ -230,6 +231,31 @@ if __name__ == "__main__":
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    _job_links = get_job_links(args.workflow_run_id, token=args.token)
+    job_links = {}
+    if _job_links:
+        for k, v in _job_links.items():
+            if " / " in k:
+                index = k.find(" / ")
+                k = k[index + len(" / ") :]
+            job_links[k] = v
+    with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
+        json.dump(job_links, fp, ensure_ascii=False, indent=4)
+        artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
+    with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
+        json.dump(artifacts, fp, ensure_ascii=False, indent=4)
+    for idx, (name, url) in enumerate(artifacts.items()):
+        download_artifact(name, url, args.output_dir, args.token)
+        # Be gentle to GitHub
+        time.sleep(1)
+
+    errors = get_all_errors(args.output_dir, job_links=job_links)
+
+    # `e[1]` is the error
+    counter = Counter()
+    counter.update([e[1] for e in errors])
 
     os.makedirs(args.output_dir, exist_ok=True)
 
