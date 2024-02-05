@@ -6,6 +6,7 @@ import zipfile
 
 from get_ci_error_statistics import download_artifact, get_artifacts_links
 
+from get_ci_error_statistics import get_artifacts_links
 from transformers import logging
 
 
@@ -71,7 +72,7 @@ def extract_warnings(artifact_dir, targets):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
     for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+        selected_warnings.update(extract_warnings_from_single_artifact(p, targets=args.targets))
 
     return selected_warnings
 
@@ -113,7 +114,8 @@ if __name__ == "__main__":
     else:
         os.makedirs(args.output_dir, exist_ok=True)
 
-        # get download links
+        # # get download links
+        artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
         artifacts = get_artifacts_links(args.workflow_run_id, token=args.token)
         with open(os.path.join(args.output_dir, "artifacts.json"), "w", encoding="UTF-8") as fp:
             json.dump(artifacts, fp, ensure_ascii=False, indent=4)
@@ -126,9 +128,8 @@ if __name__ == "__main__":
             download_artifact(name, url, args.output_dir, args.token)
             # Be gentle to GitHub
             time.sleep(1)
-
     # extract warnings from artifacts
-    selected_warnings = extract_warnings(args.output_dir, args.targets)
+    selected_warnings = extract_warnings(args.output_dir, targets=args.targets)
     selected_warnings = sorted(selected_warnings)
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
