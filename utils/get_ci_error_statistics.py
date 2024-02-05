@@ -4,6 +4,7 @@ import math
 import os
 import time
 import logging
+from .unzip_tool import get_ci_error_statistics as get_ci_error_statistics
 from logging import basicConfig
 import traceback
 import zipfile
@@ -12,27 +13,30 @@ from collections import Counter
 import requests
 
 
-def get_job_links(workflow_run_id, token=None):
+def get_job_links(workflow_run_id, token=None, headers=None):
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
-
+    
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers, allow_redirects=False).json()
     job_links = {}
-
+    
     try:
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
-
+    
         for i in range(pages_to_iterate_over):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
-
+    
         return job_links
     except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    
+    return {}
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -40,7 +44,6 @@ def get_job_links(workflow_run_id, token=None):
 
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
-
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
@@ -76,17 +79,17 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
-        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+        result = requests.get(artifact_url, headers=headers, allow_redirects=True)
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    response = requests.get(download_url, headers=headers, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
-    with open(file_path, "wb") as fp:
-        fp.write(response.content)
+    with open(file_path, "wb") as artifact_file:
+        artifact_file.write(response.content)
 
 
-def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
+def get_errors_from_single_artifact_test(artifact_zip_path, job_links=None):
     """Extract errors from a downloaded artifact (in .zip format)"""
     errors = []
     failed_tests = []
@@ -145,7 +148,9 @@ def get_all_errors(artifact_dir, job_links=None):
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+from collections import Counter
+
+def reduce_by_error(logs, error_filter=None, test_filter=None):
     """count each error"""
 
     counter = Counter()
@@ -193,7 +198,7 @@ def reduce_by_model(logs, error_filter=None):
     return r
 
 
-def make_github_table(reduced_by_error):
+def make_github_table_test(reduced_by_error):
     header = "| no. | error | status |"
     sep = "|-:|:-|:-|"
     lines = [header, sep]
@@ -205,7 +210,7 @@ def make_github_table(reduced_by_error):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model_test(reduced_by_model):
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
@@ -270,7 +275,7 @@ if __name__ == "__main__":
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
 
-    reduced_by_error = reduce_by_error(errors)
+    reduced_by_error = reduce_by_error(errors, test_filter=None)
     reduced_by_model = reduce_by_model(errors)
 
     s1 = make_github_table(reduced_by_error)
