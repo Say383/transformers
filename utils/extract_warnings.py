@@ -4,6 +4,8 @@ import os
 import time
 import zipfile
 
+import os
+import zipfile
 from get_ci_error_statistics import download_artifact, get_artifacts_links
 
 from transformers import logging
