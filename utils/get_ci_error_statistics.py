@@ -7,6 +7,7 @@ import logging
 from logging import basicConfig
 import traceback
 import zipfile
+import requests
 from collections import Counter
 
 import requests
@@ -20,6 +21,18 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
+    result = requests.get(url, headers=headers).json()
+    job_links = {}
+    try:
+        job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
+        return job_links
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    return {}
     result = requests.get(url, headers=headers).json()
     job_links = {}
 
@@ -76,6 +89,14 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
+        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+        download_url = result.headers["Location"]
+        response = requests.get(download_url, allow_redirects=True)
+        file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
