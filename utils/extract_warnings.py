@@ -21,7 +21,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
         for line in fp:
             if isinstance(line, bytes):
                 line = line.decode("UTF-8")
-            if "warnings summary (final)" in line:
+            if '##[error]' in line:
                 continue
             # This means we are outside the body of a warning
             elif not line.startswith(" "):

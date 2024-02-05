@@ -192,11 +192,11 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
 
-        client.chat_postMessage(
-            channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
-            text="There was an issue running the tests.",
-            blocks=payload,
-        )
+    client.chat_postMessage(
+        channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
+        text="There was an issue running the tests.",
+        blocks=payload,
+    )
 
     def post(self):
         print("Sending the following payload")
