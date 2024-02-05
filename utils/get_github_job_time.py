@@ -11,13 +11,13 @@ def extract_time_from_single_job(job):
 
     job_info = {}
 
-    start = job["started_at"]
-    end = job["completed_at"]
+    start = job.get("started_at", "")
+    end = job.get("completed_at", "")
 
-    start_datetime = date_parser.parse(start)
-    end_datetime = date_parser.parse(end)
+    start_datetime = date_parser.parse(start) if start else None
+    end_datetime = date_parser.parse(end) if end else None
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0) if start and end else None
 
     job_info["started_at"] = start
     job_info["completed_at"] = end
@@ -34,15 +34,15 @@ def get_job_time(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url + '?per_page=100', headers=headers).json()
     job_time = {}
 
     try:
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100) if result["total_count"] > 100 else 0
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            result = requests.get(url + f"&page={i + 2}&per_page=100", headers=headers).json()
             job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
 
         return job_time
