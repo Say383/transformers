@@ -71,7 +71,7 @@ def extract_warnings(artifact_dir, targets):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
     for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+        selected_warnings |= extract_warnings_from_single_artifact(p, targets)
 
     return selected_warnings
 
@@ -106,7 +106,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    from_gh = args.from_gh
+    from_gh = args.from_gh if hasattr(args, 'from_gh') else False
     if from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
         pass
