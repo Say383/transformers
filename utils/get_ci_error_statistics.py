@@ -28,7 +28,7 @@ def get_job_links(workflow_run_id, token=None):
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json() if result is not None else {}
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
@@ -47,7 +47,7 @@ def get_artifacts_links(worflow_run_id, token=None):
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
     result = requests.get(url, headers=headers).json()
-    artifacts = {}
+    artifacts = None
 
     try:
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
@@ -117,6 +117,9 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 job_name = line
 
     if len(errors) != len(failed_tests):
+        raise ValueError(f"`errors` and `failed_tests` should have the same number of elements. Got {len(errors)} for `errors` "
+                        f"and {len(failed_tests)} for `failed_tests` instead. The test reports in {artifact_zip_path} have some"
+                        " problem.")
         raise ValueError(
             f"`errors` and `failed_tests` should have the same number of elements. Got {len(errors)} for `errors` "
             f"and {len(failed_tests)} for `failed_tests` instead. The test reports in {artifact_zip_path} have some"
@@ -153,7 +156,7 @@ def reduce_by_error(logs, error_filter=None):
     counts = counter.most_common()
     r = {}
     for error, count in counts:
-        if error_filter is None or error not in error_filter:
+        if error_filter is None or (error_filter is not None and error not in error_filter):
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
@@ -184,7 +187,7 @@ def reduce_by_model(logs, error_filter=None):
         # count by errors in `test`
         counter.update([x[1] for x in logs if x[2] == test])
         counts = counter.most_common()
-        error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
+        error_counts = {error: count for error, count in counts if error_filter is None or error not in error_filter}
         n_errors = sum(error_counts.values())
         if n_errors > 0:
             r[test] = {"count": n_errors, "errors": error_counts}
@@ -209,7 +212,7 @@ def make_github_table_per_model(reduced_by_model):
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
-    for model in reduced_by_model:
+    for model, data in (reduced_by_model.items() if reduced_by_model else {}):
         count = reduced_by_model[model]["count"]
         error, _count = list(reduced_by_model[model]["errors"].items())[0]
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
