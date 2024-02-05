@@ -182,7 +182,7 @@ class Message:
             "accessory": {
                 "type": "button",
                 "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}",
             },
         }
 
@@ -202,7 +202,7 @@ class Message:
             "accessory": {
                 "type": "button",
                 "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}",
             },
         }
 
@@ -211,7 +211,7 @@ class Message:
         # If something goes wrong, let's avoid the CI report failing to be sent.
         button_text = "Check warnings (Link not found)"
         # Use the workflow run link
-        job_link = f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+        job_link = f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}"
         if "Extract warnings in CI artifacts" in github_actions_job_links:
             button_text = "Check warnings"
             # Use the actual job link
@@ -421,7 +421,7 @@ class Message:
             output_dir = os.path.join(os.getcwd(), "previous_reports")
             os.makedirs(output_dir, exist_ok=True)
             prev_tables = get_last_daily_ci_reports(
-                artifact_names=artifact_names, output_dir=output_dir, token=os.environ["ACCESS_REPO_INFO_TOKEN"]
+                artifact_names=artifact_names, output_dir=output_dir, token=os.environ.get('ACCESS_REPO_INFO_TOKEN', 'Missing ACCESS_REPO_INFO_TOKEN environment variable')
             )
 
             # if the last run produces artifact named `test_failure_tables`
@@ -556,7 +556,7 @@ class Message:
             "accessory": {
                 "type": "button",
                 "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
-                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ.get('GITHUB_RUN_ID', 'Missing GITHUB_RUN_ID environment variable')}",
             },
         }
         blocks.extend([error_block_1, error_block_2])
@@ -566,8 +566,11 @@ class Message:
         print("Sending the following payload")
         print(json.dumps({"blocks": blocks}))
 
+        slack_channel = os.environ.get("CI_SLACK_REPORT_CHANNEL_ID")
+        if slack_channel is None:
+            raise ValueError("Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable.")
         client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel=slack_channel,
             text=text,
             blocks=payload, auth=('username', 'password'),
         )
@@ -579,8 +582,11 @@ class Message:
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
+        slack_channel = os.environ.get("CI_SLACK_REPORT_CHANNEL_ID")
+        if slack_channel is None:
+            raise ValueError("Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable.")
         self.thread_ts = client.chat_postMessage(
-            channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+            channel=slack_channel,
             blocks=payload,
             text=text,
         )
@@ -645,7 +651,7 @@ class Message:
                     print(json.dumps({"blocks": blocks}))
 
                     client.chat_postMessage(
-                        channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                        channel=os.environ.get("CI_SLACK_REPORT_CHANNEL_ID", "Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable"),
                         text=f"Results for {job}",
                         blocks=blocks,
                         thread_ts=self.thread_ts["ts"],
@@ -668,7 +674,7 @@ class Message:
                     print(json.dumps({"blocks": blocks}))
 
                     client.chat_postMessage(
-                        channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
+                        channel=os.environ.get("CI_SLACK_REPORT_CHANNEL_ID", "Missing 'CI_SLACK_REPORT_CHANNEL_ID' environment variable"),
                         text=f"Results for {job}",
                         blocks=blocks,
                         thread_ts=self.thread_ts["ts"],
@@ -774,6 +780,13 @@ if __name__ == "__main__":
     runner_status = os.environ.get("RUNNER_STATUS")
     runner_env_status = os.environ.get("RUNNER_ENV_STATUS")
     setup_status = os.environ.get("SETUP_STATUS")
+
+    if runner_status is None:
+        raise ValueError("'RUNNER_STATUS' environment variable cannot be None.")
+    if runner_env_status is None:
+        raise ValueError("'RUNNER_ENV_STATUS' environment variable cannot be None.")
+    if setup_status is None:
+        raise ValueError("'SETUP_STATUS' environment variable cannot be None.")
 
     runner_not_available = True if runner_status is not None and runner_status != "success" else False
     runner_failed = True if runner_env_status is not None and runner_env_status != "success" else False
