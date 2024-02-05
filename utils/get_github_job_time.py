@@ -7,6 +7,15 @@ import requests
 
 
 def extract_time_from_single_job(job):
+    """
+    Extract time info from a single job in a GitHub Actions workflow run
+
+    # Example
+    # -------
+    # job = {...}
+    # time_info = extract_time_from_single_job(job)
+    # print(time_info)
+    """
     """Extract time info from a single job in a GitHub Actions workflow run"""
 
     job_info = {}

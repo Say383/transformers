@@ -96,6 +96,11 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
+# Example
+# -------
+# with open('filename.txt', 'r') as f:
+#     for line in f:
+#         print(line)
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
                         for line in f:
@@ -134,7 +139,15 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
 
 
 def get_all_errors(artifact_dir, job_links=None):
-    """Extract errors from all artifact files"""
+    """
+Extract errors from all artifact files
+
+# Example
+# -------
+# artifact_dir = 'path/to/directory'
+# job_links = {}
+# errors = get_all_errors(artifact_dir, job_links=job_links)
+"""
 
     errors = []
 
@@ -146,7 +159,14 @@ def get_all_errors(artifact_dir, job_links=None):
 
 
 def reduce_by_error(logs, error_filter=None):
-    """count each error"""
+    """
+count each error
+
+# Example
+# -------
+# logs = [...]
+# reduced_by_error = reduce_by_error(logs)
+"""
 
     counter = Counter()
     counter.update([x[1] for x in logs])
