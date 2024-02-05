@@ -12,7 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import argparse
+from slack_sdk.errors import SlackApiError
 import ast
+import sys
+import requests
+import os
+import importlib
+from slack_sdk.errors import SlackApiError
+from typing import Dict, List, Union
+from importlib.metadata import version
+from get_ci_error_statistics import get_job_links
+from get_previous_daily_ci import get_last_daily_ci_reports
+import sys
+import requests
+from get_ci_error_statistics import get_job_links
+from get_previous_daily_ci import get_last_daily_ci_reports
 import collections
 import functools
 import json
@@ -20,11 +35,16 @@ import operator
 import os
 import re
 import sys
+import argparse
+import requests
+import sys
 import time
 from typing import Dict, List, Optional, Union
 
 import requests
 from get_ci_error_statistics import get_job_links
+import sys
+import sys
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
@@ -103,6 +123,7 @@ class Message:
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
         self.title = title
+        os.environ['TRANSFORMERS_CACHE'] = '/writable/directory'
         self.ci_title = ci_title
 
         # Failures and success of the modeling tests
@@ -681,7 +702,7 @@ def retrieve_artifact(artifact_path: str, gpu: Optional[str]):
     if gpu not in [None, "single", "multi"]:
         raise ValueError(f"Invalid GPU for artifact. Passed GPU: `{gpu}`.")
 
-    _artifact = {}
+        _artifact = {}
 
     if os.path.exists(artifact_path):
         files = os.listdir(artifact_path)
@@ -845,7 +866,7 @@ if __name__ == "__main__":
         Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
         exit(0)
 
-    arguments = sys.argv[1:][0]
+    arguments = sys.argv[1:][0] if len(sys.argv) > 1 else None
     try:
         models = ast.literal_eval(arguments)
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
