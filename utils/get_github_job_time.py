@@ -17,7 +17,7 @@ def extract_time_from_single_job(job):
     start_datetime = date_parser.parse(start)
     end_datetime = date_parser.parse(end)
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    duration_in_min = int((end_datetime - start_datetime).total_seconds() / 60)
 
     job_info["started_at"] = start
     job_info["completed_at"] = end
@@ -35,6 +35,7 @@ def get_job_time(workflow_run_id, token=None):
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
+    pages_to_iterate_over = math.ceil((result['total_count'] - 100) / 100)
     job_time = {}
 
     try:

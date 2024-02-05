@@ -71,7 +71,7 @@ def extract_warnings(artifact_dir, targets):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
     for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+        selected_warnings.update(extract_warnings_from_single_artifact(p, targets) if p.endswith(".zip") else extract_warnings(p, targets))
 
     return selected_warnings
 
