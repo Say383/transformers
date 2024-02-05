@@ -311,7 +311,10 @@ def retrieve_available_artifacts():
 
     _available_artifacts: Dict[str, Artifact] = {}
 
-    directories = filter(os.path.isdir, os.listdir())
+    try:
+        directories = filter(os.path.isdir, os.listdir())
+    except Exception as e:
+        print(f"An error occurred during listing directories: {e}")
     for directory in directories:
         artifact_name = directory
         if artifact_name not in _available_artifacts:
