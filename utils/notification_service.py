@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import ast
+import requests
 import collections
 import functools
 import json
@@ -24,6 +25,8 @@ import time
 from typing import Dict, List, Optional, Union
 
 import requests
+import json
+from requests.exceptions import ConnectionError, Timeout, TooManyRedirects
 from get_ci_error_statistics import get_job_links
 from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
