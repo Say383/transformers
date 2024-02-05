@@ -29,6 +29,15 @@ def get_runner_status(target_runners, token):
         raise ValueError(f"The following runners are offline:\n{failed}")
 
 
+import sys
+
+if len(sys.argv) < 3:
+    print("Usage: python utils/check_self_hosted_runner.py --target_runners TARGET_RUNNERS --token TOKEN")
+    sys.exit(1)
+
+target_runners = sys.argv[2]
+token = sys.argv[4]
+
 if __name__ == "__main__":
 
     def list_str(values):
