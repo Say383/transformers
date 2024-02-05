@@ -266,6 +266,8 @@ def get_job_links():
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{run_id}/jobs?per_page=100"
     result = requests.get(url).json()
     jobs = {}
+    run_id = os.environ["GITHUB_RUN_ID"]
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{run_id}/jobs?per_page=100"
 
     try:
         jobs.update({job["name"]: job["html_url"] for job in result["jobs"]})
