@@ -140,7 +140,7 @@ def get_all_errors(artifact_dir, job_links=None):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
-        errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        errors += get_errors_from_single_artifact(p, job_links=job_links)
 
     return errors
 
@@ -182,7 +182,12 @@ def reduce_by_model(logs, error_filter=None):
     for test in tests:
         counter = Counter()
         # count by errors in `test`
-        counter.update([x[1] for x in logs if x[2] == test])
+        counts = Counter([x[1] for x in logs if x[2] == test])
+        error_counts = counts.most_common()
+        if error_filter:
+            error_counts = [pair for pair in error_counts if pair[0] not in error_filter]
+        n_errors = sum([x[1] for x in error_counts])
+        r[test] = {"count": n_errors, "errors": dict(error_counts)}
         counts = counter.most_common()
         error_counts = {error: count for error, count in counts if (error_filter is None or error not in error_filter)}
         n_errors = sum(error_counts.values())
@@ -211,7 +216,7 @@ def make_github_table_per_model(reduced_by_model):
     lines = [header, sep]
     for model in reduced_by_model:
         count = reduced_by_model[model]["count"]
-        error, _count = list(reduced_by_model[model]["errors"].items())[0]
+        error, _count = next(iter(reduced_by_model[model]["errors"].items()))
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
         lines.append(line)
 
