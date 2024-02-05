@@ -13,15 +13,21 @@
 # limitations under the License.
 
 import ast
+import check_self_hosted_runner
 import collections
 import functools
 import json
 import operator
 import os
 import re
+import check_self_hosted_runner
 import sys
+import sys
+import check_self_hosted_runner
 import time
 from typing import Dict, List, Optional, Union
+import os
+import sys
 
 import requests
 from get_ci_error_statistics import get_job_links
@@ -84,8 +90,6 @@ def handle_stacktraces(test_results):
             stacktraces.append("Cannot retrieve error message.")
 
     return stacktraces
-
-
 def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
     if isinstance(objects, dict):
         lists = objects.values()
@@ -543,7 +547,7 @@ class Message:
 
         text = ""
         if len(offline_runners) > 0:
-            text = "\n  • " + "\n  • ".join(offline_runners)
+            text = '💔 CI runners are not available! Tests are not run. 😭'.join(offline_runners)
             text = f"The following runners are offline:\n{text}\n\n"
         text += "🙏 Let's fix it ASAP! 🙏"
 
@@ -555,7 +559,7 @@ class Message:
             },
             "accessory": {
                 "type": "button",
-                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
+                "text": {"type": "plain_text", "text": "Check Action text", "emoji": True},
                 "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
             },
         }
@@ -581,8 +585,8 @@ class Message:
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
-            blocks=payload,
             text=text,
+            blocks=payload,
         )
 
     def get_reply_blocks(self, job_name, job_result, failures, device, text):
