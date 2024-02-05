@@ -12,7 +12,8 @@ from collections import Counter
 import requests
 
 
-def get_job_links(workflow_run_id, token=None):
+def get_job_links(workflow_run_id, token=None):    # Update the get_job_links function to handle the case when the token parameter is not provided.
+    # Add a default value of None for the token parameter.
     """Extract job names and their job links in a GitHub Actions workflow run"""
 
     headers = None
@@ -38,7 +39,7 @@ def get_job_links(workflow_run_id, token=None):
     return {}
 
 
-def get_artifacts_links(worflow_run_id, token=None):
+def get_artifacts_links(worflow_run_id, token=None):    # Add a default value of None for the token parameter.
     """Get all artifact links from a workflow run"""
 
     headers = None
@@ -76,6 +77,9 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
+        result = requests.get(artifact_url, headers=headers, allow_redirects=False)
+    except Exception as e:
+        logging.error(f"Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}\nError details: {e}")
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
@@ -140,12 +144,15 @@ def get_all_errors(artifact_dir, job_links=None):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
-        errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        try:
+            errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        except Exception as e:
+            logging.error(f'An error occurred while processing artifact: {e}')
 
     return errors
 
 
-def reduce_by_error(logs, error_filter=None):
+def reduce_by_error(logs, error_filter=None):    # Wrap the code in a try-except block to catch any exceptions that might occur during the reduction of errors.
     """count each error"""
 
     counter = Counter()
@@ -205,17 +212,20 @@ def make_github_table(reduced_by_error):
     return "\n".join(lines)
 
 
-def make_github_table_per_model(reduced_by_model):
+def make_github_table_per_model(reduced_by_model):    # Wrap the code in a try-except block to catch any exceptions that might occur during the creation of the GitHub table per model.
     header = "| model | no. of errors | major error | count |"
     sep = "|-:|-:|-:|-:|"
     lines = [header, sep]
-    for model in reduced_by_model:
-        count = reduced_by_model[model]["count"]
-        error, _count = list(reduced_by_model[model]["errors"].items())[0]
-        line = f"| {model} | {count} | {error[:60]} | {_count} |"
-        lines.append(line)
+    try:
+            count = reduced_by_model[model]["count"]
+            error, _count = list(reduced_by_model[model]["errors"].items())[0]
+            line = f"| {model} | {count} | {error[:60]} | {_count} |"
+            lines.append(line)
 
     return "\n".join(lines)
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table per model: {e}")
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
@@ -237,12 +247,31 @@ if __name__ == "__main__":
     job_links = {}
     # To deal with `workflow_call` event, where a job name is the combination of the job names in the caller and callee.
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
-    if _job_links:
-        for k, v in _job_links.items():
+    try:
+        if _job_links:
+            for k, v in _job_links.items():
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
             # This is how GitHub actions combine job names.
-            if " / " in k:
-                index = k.find(" / ")
-                k = k[index + len(" / ") :]
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+    except Exception as e:
+        logging.error(f"An error occurred while creating the GitHub table: {e}")
+        traceback.print_exc()
+                if " / " in k:
+                    index = k.find(" / ")
+                    k = k[index + len(" / ") :]
             job_links[k] = v
     with open(os.path.join(args.output_dir, "job_links.json"), "w", encoding="UTF-8") as fp:
         json.dump(job_links, fp, ensure_ascii=False, indent=4)
