@@ -33,7 +33,7 @@ def get_job_links(workflow_run_id, token=None):
 
         return job_links
     except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\n")
 
     return {}
 
@@ -59,7 +59,7 @@ def get_artifacts_links(worflow_run_id, token=None):
 
         return artifacts
     except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\n")
 
     return {}
 
@@ -94,7 +94,7 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
 
     with zipfile.ZipFile(artifact_zip_path) as z:
         for filename in z.namelist():
-            if not os.path.isdir(filename):
+            if not z.isdir(filename):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
@@ -103,10 +103,10 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                             if filename == "failures_line.txt":
                                 try:
                                     # `error_line` is the place where `error` occurs
-                                    error_line = line[: line.index(": ")]
+                                    error_line = line.split(": ")[0]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
+                                except Exception as e:
                                     # skip un-related lines
                                     pass
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
