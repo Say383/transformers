@@ -6,7 +6,33 @@ import dateutil.parser as date_parser
 import requests
 
 
+# New file content for get_github_job_time.py
+import argparse
+import math
+import traceback
+
+import dateutil.parser as date_parser
+import requests
+
+
 def extract_time_from_single_job(job):
+    """Extract time info from a single job in a GitHub Actions workflow run"""
+
+    job_info = {}
+
+    start = job["started_at"]
+    end = job["completed_at"]
+
+    start_datetime = date_parser.parse(start)
+    end_datetime = date_parser.parse(end)
+
+    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+
+    job_info["started_at"] = start
+    job_info["completed_at"] = end
+    job_info["duration"] = duration_in_min
+
+    return job_info
     """Extract time info from a single job in a GitHub Actions workflow run"""
 
     job_info = {}
