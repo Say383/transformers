@@ -3,7 +3,11 @@ import json
 import math
 import os
 import time
+import traceback
 import logging
+
+docstring = '''Extract job names and their job links in a GitHub Actions workflow run'''
+logger = logging.getLogger(__name__)
 from logging import basicConfig
 import traceback
 import zipfile
