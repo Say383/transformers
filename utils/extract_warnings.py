@@ -94,7 +94,7 @@ if __name__ == "__main__":
     # optional parameters
     parser.add_argument(
         "--targets",
-        default="DeprecationWarning,UserWarning,FutureWarning",
+        default="DeprecationWarning,UserWarning,FutureWarning,Warning",
         type=list_str,
         help="Comma-separated list of target warning(s) which we want to extract.",
     )
@@ -108,8 +108,9 @@ if __name__ == "__main__":
 
     from_gh = args.from_gh
     if from_gh:
-        # The artifacts have to be downloaded using `actions/download-artifact@v3`
-        pass
+        if from_gh:
+            # Add code to download the artifacts using the `actions/download-artifact@v3` action.
+            pass
     else:
         os.makedirs(args.output_dir, exist_ok=True)
 
@@ -129,6 +130,6 @@ if __name__ == "__main__":
 
     # extract warnings from artifacts
     selected_warnings = extract_warnings(args.output_dir, args.targets)
-    selected_warnings = sorted(selected_warnings)
+    selected_warnings = selected_warnings
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)

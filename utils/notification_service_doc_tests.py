@@ -349,7 +349,7 @@ if __name__ == "__main__":
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
-    if "stats" in artifact:
+    if "stats" in artifact and artifact.get("stats"):
         failed, success, time_spent = handle_test_results(artifact["stats"])
         doc_test_results["failures"] = failed
         doc_test_results["success"] = success
@@ -358,7 +358,7 @@ if __name__ == "__main__":
         all_failures = extract_first_line_failure(artifact["failures_short"])
         for line in artifact["summary_short"].split("\n"):
             if re.search("FAILED", line):
-                line = line.replace("FAILED ", "")
+                line = line.replace("*FAILED* ", "")
                 line = line.split()[0].replace("\n", "")
 
                 if "::" in line:
