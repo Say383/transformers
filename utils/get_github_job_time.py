@@ -35,6 +35,8 @@ def get_job_time(workflow_run_id, token=None):
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
+    if token is None:
+        token = ""
     job_time = {}
 
     try:
@@ -49,7 +51,10 @@ def get_job_time(workflow_run_id, token=None):
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
-    return {}
+    if len(job_time) > 0:
+        job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
+    else:
+        print("No job time information extracted")
 
 
 if __name__ == "__main__":

@@ -61,7 +61,10 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
 
-    return selected_warnings
+    try:
+        return selected_warnings or set()
+    except Exception as e:
+        logger.warning(f"Failed to extract warnings: {e}") or set()
 
 
 def extract_warnings(artifact_dir, targets):
