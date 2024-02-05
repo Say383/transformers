@@ -24,12 +24,17 @@ def get_job_links(workflow_run_id, token=None):
     job_links = {}
 
     try:
-        job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
-
-        for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+        if "jobs" in result:
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
+            pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+            for i in range(pages_to_iterate_over):
+                result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+                job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
+        else:
+            print(f"Error: 'jobs' key not found in result dictionary")
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
         return job_links
     except Exception:
@@ -56,6 +61,11 @@ def get_artifacts_links(worflow_run_id, token=None):
         for i in range(pages_to_iterate_over):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+                artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+        else:
+            print(f"Error: 'artifacts' key not found in result dictionary")
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
         return artifacts
     except Exception:
@@ -84,6 +94,8 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
+    except Exception:
+        print(f"Error occurred while writing the downloaded artifact:\n{traceback.format_exc()}")
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
