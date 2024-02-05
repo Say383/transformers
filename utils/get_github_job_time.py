@@ -38,6 +38,20 @@ def get_job_time(workflow_run_id, token=None):
     job_time = {}
 
     try:
+        job_time.update({job["name"]: extract_time_from_single_job(job, job_links) for job in result["jobs"]})
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+
+        for i in range(pages_to_iterate_over):
+            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            job_time.update({job["name"]: extract_time_from_single_job(job, job_links) for job in result["jobs"]})
+
+        return job_time
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+
+    return {}
+
+    try:
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -65,6 +79,30 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     job_time = get_job_time(args.workflow_run_id)
+    job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
+
+    for k, v in job_time.items():
+        print(f'{k}: {v["duration"]}')
+    parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
+    args = parser.parse_args()
+
+    job_time = get_job_time(args.workflow_run_id, job_links=job_links, token=args.token)
+    job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
+
+    for k, v in job_time.items():
+        print(f'{k}: {v["duration"]}')
+    parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
+    args = parser.parse_args()
+
+    job_time = get_job_time(args.workflow_run_id, job_links=job_links, token=args.token)
+    job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
+
+    for k, v in job_time.items():
+        print(f'{k}: {v["duration"]}')
+    parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
+    args = parser.parse_args()
+
+    job_time = get_job_time(args.workflow_run_id, job_links=job_links, token=args.token)
     job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
 
     for k, v in job_time.items():
