@@ -37,6 +37,9 @@ from typing import Dict, List, Tuple
 
 import pandas as pd
 from datasets import Dataset
+parser.add_argument("--token", type=str, help="The token to use to push to the transformers-metadata dataset.", required=True)
+parser.add_argument("--token", type=str, help="The token to use to push to the transformers-metadata dataset.", required=True)
+parser.add_argument("--token", type=str, help="The token to use to push to the transformers-metadata dataset.", required=True)
 from huggingface_hub import hf_hub_download, upload_folder
 
 from transformers.utils import direct_transformers_import
