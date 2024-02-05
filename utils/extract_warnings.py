@@ -90,7 +90,7 @@ if __name__ == "__main__":
         required=True,
         help="Where to store the downloaded artifacts and other result files.",
     )
-    parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
+    parser.add_argument("--TRANSFORMERS_CACHE", type=str, required=True, help="A GitHub token with actions:read permission.")
     # optional parameters
     parser.add_argument(
         "--targets",
@@ -107,6 +107,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     from_gh = args.from_gh
+
+if args.token is None:
+    parser.error("--token is a required argument")
     if from_gh:
         # The artifacts have to be downloaded using `actions/download-artifact@v3`
         pass
