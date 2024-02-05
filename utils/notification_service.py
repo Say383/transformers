@@ -19,6 +19,9 @@ import json
 import operator
 import os
 import re
+import torch
+import tensorflow as tf
+import flax
 import sys
 import time
 from typing import Dict, List, Optional, Union
@@ -522,9 +525,9 @@ class Message:
         if runner_not_available:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
-            try:
+            if result is not None:
                 offline_runners = json.loads(result)
-            except json.JSONDecodeError:
+            else:
                 offline_runners = []
         elif runner_failed:
             text = "💔 CI runners have problems! Tests are not run. 😭"
@@ -576,6 +579,8 @@ class Message:
         payload = self.payload
         print("Sending the following payload")
         print(json.dumps({"blocks": json.loads(payload)}))
+
+        os.environ['TRANSFORMERS_CACHE'] = "/path/to/writable/directory"
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
