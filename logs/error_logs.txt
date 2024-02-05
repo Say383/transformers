@@ -1,0 +1,21 @@
+import os
+import logging
+import traceback
+
+def create_error_logs_file():
+    # Step 2: Create the logs directory if it doesn't exist
+    os.makedirs("logs", exist_ok=True)
+
+    # Step 2: Create the error_logs.txt file in the logs directory
+    file_path = os.path.join("logs", "error_logs.txt")
+    with open(file_path, "w") as file:
+        pass  # File created with default permissions and encoding
+
+    # Step 4: Add error logging functionality
+    def log_unknown_error(error_message, traceback_details):
+        logging.error(f"Unknown error: {error_message}\n{traceback_details}")
+
+    return file_path
+
+# Usage example
+error_logs_file = create_error_logs_file()
