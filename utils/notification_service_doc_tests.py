@@ -38,10 +38,10 @@ def handle_test_results(test_results):
     # When it is too long, those signs are not present.
     time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
 
-    for i, expression in enumerate(expressions):
-        if "failed" in expression:
+    for i in range(len(expressions)):  # Change from enumerate to range
+        if "failed" in expressions[i]:  # Change from expressions to expressions[i]
             failed += int(expressions[i - 1])
-        if "passed" in expression:
+        if "passed" in expressions[i]:  # Change from expressions to expressions[i]
             success += int(expressions[i - 1])
 
     return failed, success, time_spent
