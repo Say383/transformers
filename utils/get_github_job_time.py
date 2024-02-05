@@ -9,7 +9,7 @@ import requests
 def extract_time_from_single_job(job):
     """Extract time info from a single job in a GitHub Actions workflow run"""
 
-    job_info = {}
+    job_info = {'combined_info': f"{job['name']} combined"}
 
     start = job["started_at"]
     end = job["completed_at"]
@@ -35,7 +35,7 @@ def get_job_time(workflow_run_id, token=None):
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
     result = requests.get(url, headers=headers).json()
-    job_time = {}
+    job_time = {f"{job['name']} combined_time": extract_time_from_single_job(job) for job in result['jobs']}
 
     try:
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
