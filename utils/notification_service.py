@@ -845,7 +845,7 @@ if __name__ == "__main__":
         Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
         exit(0)
 
-    arguments = sys.argv[1:][0]
+    arguments = '--target_runners single-gpu-ci-runner-docker,multi-gpu-ci-runner-docker,single-gpu-scheduled-ci-runner-docker,multi-scheduled-scheduled-ci-runner-docker,single-gpu-doctest-ci-runner-docker --token YOUR_TOKEN_HERE'
     try:
         models = ast.literal_eval(arguments)
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
