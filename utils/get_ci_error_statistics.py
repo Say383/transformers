@@ -3,7 +3,7 @@ import json
 import math
 import os
 import time
-import logging
+from utils import logging
 from logging import basicConfig
 import traceback
 import zipfile
@@ -41,7 +41,12 @@ def get_job_links(workflow_run_id, token=None):
 def get_artifacts_links(worflow_run_id, token=None):
     """Get all artifact links from a workflow run"""
 
+    # Initialize headers
     headers = None
+    
+    # Check for token and set appropriate headers
+    if token is not None:
+        headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
@@ -56,8 +61,17 @@ def get_artifacts_links(worflow_run_id, token=None):
         for i in range(pages_to_iterate_over):
             result = requests.get(url + f"&page={i + 2}", headers=headers).json()
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+            pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
-        return artifacts
+            for i in range(pages_to_iterate_over):
+                result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+                artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
+
+            return artifacts
+        except Exception:
+            print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+
+        return {}
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
@@ -78,6 +92,7 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
+        logging.error(f"Error encountered while fetching artifact URL: {artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
@@ -117,7 +132,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                 job_name = line
 
     if len(errors) != len(failed_tests):
-        raise ValueError(
+        logging.error(f"Error: The test reports in {artifact_zip_path} have some problem.\n{traceback.format_exc()}\n")
+    raise ValueError(
             f"`errors` and `failed_tests` should have the same number of elements. Got {len(errors)} for `errors` "
             f"and {len(failed_tests)} for `failed_tests` instead. The test reports in {artifact_zip_path} have some"
             " problem."
@@ -140,12 +156,24 @@ def get_all_errors(artifact_dir, job_links=None):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if p.endswith(".zip")]
     for p in paths:
-        errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        try:
+            errors.extend(get_errors_from_single_artifact(p, job_links=job_links))
+        except Exception as e:
+            logging.error(f"An error occurred while processing artifact {p}:\n{traceback.format_exc()}\nError Details: {e}")
 
     return errors
 
 
 def reduce_by_error(logs, error_filter=None):
+    """Count each error occurrence
+
+    Args:
+        logs (list): A list of error logs. 
+        error_filter (list, optional): A list of error names to exclude from the count. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing error counts and related details.
+    """
     """count each error"""
 
     counter = Counter()
@@ -172,6 +200,15 @@ def get_model(test):
 
 
 def reduce_by_model(logs, error_filter=None):
+    """Count each error per model
+
+    Args:
+        logs (list): A list of error logs. 
+        error_filter (list, optional): A list of error names to exclude from the count. Defaults to None.
+
+    Returns:
+        dict: A dictionary containing error counts per model and related details.
+    """
     """count each error per model"""
 
     logs = [(x[0], x[1], get_model(x[2])) for x in logs]
@@ -191,7 +228,6 @@ def reduce_by_model(logs, error_filter=None):
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
 
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
@@ -239,7 +275,7 @@ if __name__ == "__main__":
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
     if _job_links:
         for k, v in _job_links.items():
-            # This is how GitHub actions combine job names.
+            # This is how GitHub Actions combine job names.
             if " / " in k:
                 index = k.find(" / ")
                 k = k[index + len(" / ") :]
@@ -267,8 +303,13 @@ if __name__ == "__main__":
     for item in most_common:
         print(item)
 
-    with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
-        json.dump(errors, fp, ensure_ascii=False, indent=4)
+log_path = os.path.join(args.output_dir, "error.log")
+logging.basicConfig(filename=log_path, level=logging.INFO, filemode="w")
+
+with open(log_path, "w") as log_file:
+    for error in errors:
+        log_file.write(error)
+        log_file.write("\n")
 
     reduced_by_error = reduce_by_error(errors)
     reduced_by_model = reduce_by_model(errors)
