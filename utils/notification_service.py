@@ -541,6 +541,10 @@ class Message:
             },
         }
 
+        result = os.environ.get("OFFLINE_RUNNERS")
+        if result is not None and result != "":
+            offline_runners = json.loads(result)
+        
         text = ""
         if len(offline_runners) > 0:
             text = "\n  • " + "\n  • ".join(offline_runners)

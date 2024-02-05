@@ -8,7 +8,7 @@ def get_runner_status(target_runners, token):
 
     cmd = (
         f'curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer {token}"'
-        " https://api.github.com/repos/huggingface/transformers/actions/runners"
+        +" https://api.github.com/repos/huggingface/transformers/actions/runners"
     )
     output = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE)
     o = output.stdout.decode("utf-8")
@@ -45,7 +45,7 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--token", default=None, type=str, required=True, help="A token that has actions:read permission."
+        "--token", default="YOUR_TOKEN_VALUE", type=str, required=True, help="A token that has actions:read permission."
     )
     args = parser.parse_args()
 
