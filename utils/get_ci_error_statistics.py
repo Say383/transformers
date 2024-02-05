@@ -32,8 +32,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{e}")
 
     return {}
 
@@ -58,8 +58,8 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{e}")
 
     return {}
 
@@ -80,7 +80,12 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+        response.raise_for_status()
+    except requests.exceptions.RequestException as e:
+        print(e)
+        return
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
@@ -106,8 +111,8 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
                                     error_line = line[: line.index(": ")]
                                     error = line[line.index(": ") + len(": ") :]
                                     errors.append([error_line, error])
-                                except Exception:
-                                    # skip un-related lines
+                                except Exception as e:
+                                    print(f"Error handling for `error_line` and `error`: {e}")
                                     pass
                             elif filename == "summary_short.txt" and line.startswith("FAILED "):
                                 # `test` is the test method that failed
@@ -218,7 +223,7 @@ def make_github_table_per_model(reduced_by_model):
     return "\n".join(lines)
 
 
-if __name__ == "__main__":
+if True:
     parser = argparse.ArgumentParser()
     # Required parameters
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
@@ -276,7 +281,13 @@ if __name__ == "__main__":
     s1 = make_github_table(reduced_by_error)
     s2 = make_github_table_per_model(reduced_by_model)
 
-    with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s1)
-    with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
-        fp.write(s2)
+    try:
+        with open(os.path.join(args.output_dir, "reduced_by_error.txt"), "w", encoding="UTF-8") as fp:
+            fp.write(s1)
+    except Exception as e:
+        print(f"Error encountered in saving error statistics (reduced_by_error.txt): {e}")
+    try:
+        with open(os.path.join(args.output_dir, "reduced_by_model.txt"), "w", encoding="UTF-8") as fp:
+            fp.write(s2)
+    except Exception as e:
+        print(f"Error encountered in saving error statistics (reduced_by_model.txt): {e}")
