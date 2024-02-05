@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import collections
-import json
+import collections, os, re, time, requests
+import json, re
 import math
 import os
 import re
@@ -349,7 +349,7 @@ if __name__ == "__main__":
 
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
-    if "stats" in artifact:
+    if "stats" in artifact.keys():
         failed, success, time_spent = handle_test_results(artifact["stats"])
         doc_test_results["failures"] = failed
         doc_test_results["success"] = success
