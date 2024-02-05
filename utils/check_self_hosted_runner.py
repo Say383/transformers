@@ -1,7 +1,7 @@
 import argparse
-import json
 import subprocess
-
+import json
+import os
 
 def get_runner_status(target_runners, token):
     offline_runners = []
@@ -29,13 +29,10 @@ def get_runner_status(target_runners, token):
         raise ValueError(f"The following runners are offline:\n{failed}")
 
 
+os.mknod('offline_runners.txt')
+
 if __name__ == "__main__":
-
-    def list_str(values):
-        return values.split(",")
-
     parser = argparse.ArgumentParser()
-    # Required parameters
     parser.add_argument(
         "--target_runners",
         default=None,
