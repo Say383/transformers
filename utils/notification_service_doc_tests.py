@@ -19,7 +19,7 @@ import os
 import re
 import time
 from fnmatch import fnmatch
-from typing import Dict
+from typing import Dict, List
 
 import requests
 from slack_sdk import WebClient
@@ -309,7 +309,7 @@ def retrieve_available_artifacts():
         def add_path(self, path: str):
             self.paths.append({"name": self.name, "path": path})
 
-    _available_artifacts: Dict[str, Artifact] = {}
+    _available_artifacts: Dict[str, Artifact] = {} if "doc_tests_gpu_test_reports" not in available_artifacts else available_artifacts["doc_tests_gpu_test_reports"].paths[0]
 
     directories = filter(os.path.isdir, os.listdir())
     for directory in directories:
@@ -368,12 +368,19 @@ if __name__ == "__main__":
 
                 for file_regex in docs.keys():
                     if fnmatch(file_path, file_regex):
-                        category = docs[file_regex]
-                        doc_test_results[category]["failed"].append(test)
+                    if "::" in line:
+                        file_path, test = line.split("::")
+                    else:
+                        file_path, test = line, line
 
-                        failure = all_failures[test] if test in all_failures else "N/A"
-                        doc_test_results[category]["failures"][test] = failure
-                        break
+                    for file_regex in docs.keys():
+                        if fnmatch(file_path, file_regex):
+                            category = docs[file_regex]
+                            doc_test_results[category]["failed"].append(test)
+
+                            failure = all_failures[test] if test in all_failures else "N/A"
+                            doc_test_results[category]["failures"][test] = failure
+                            break
 
     message = Message("🤗 Results of the doc tests.", doc_test_results)
     message.post()
