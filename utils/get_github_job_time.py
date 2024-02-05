@@ -4,6 +4,7 @@ import traceback
 
 import dateutil.parser as date_parser
 import requests
+import requests.exceptions
 
 
 def extract_time_from_single_job(job):
@@ -34,7 +35,9 @@ def get_job_time(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers)
+    result.raise_for_status()
+    result = result.json()
     job_time = {}
 
     try:
