@@ -17,7 +17,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
     selected_warnings = set()
     buffer = []
 
-    def parse_line(fp):
+    def parse_line(line):
         for line in fp:
             if isinstance(line, bytes):
                 line = line.decode("UTF-8")
@@ -71,7 +71,7 @@ def extract_warnings(artifact_dir, targets):
 
     paths = [os.path.join(artifact_dir, p) for p in os.listdir(artifact_dir) if (p.endswith(".zip") or from_gh)]
     for p in paths:
-        selected_warnings.update(extract_warnings_from_single_artifact(p, targets))
+        selected_warnings.update(extract_warnings_from_single_artifact(p, args.targets))
 
     return selected_warnings
 

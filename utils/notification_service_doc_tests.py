@@ -200,13 +200,13 @@ class Message:
 
     def post(self):
         print("Sending the following payload")
-        print(json.dumps({"blocks": json.loads(self.payload)}))
+        print(json.dumps({"blocks": json.loads(self.doc_test_results)}))
 
         text = f"{self.n_failures} failures out of {self.n_tests} tests," if self.n_failures else "All tests passed."
 
         self.thread_ts = client.chat_postMessage(
             channel=os.environ["CI_SLACK_CHANNEL_ID_DAILY"],
-            blocks=self.payload,
+            blocks=json.loads(self.payload),
             text=text,
         )
 

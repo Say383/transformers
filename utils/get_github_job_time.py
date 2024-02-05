@@ -17,7 +17,7 @@ def extract_time_from_single_job(job):
     start_datetime = date_parser.parse(start)
     end_datetime = date_parser.parse(end)
 
-    duration_in_min = round((end_datetime - start_datetime).total_seconds() / 60.0)
+    duration_in_min = math.ceil((end_datetime - start_datetime).total_seconds() / 60.0)
 
     job_info["started_at"] = start
     job_info["completed_at"] = end
@@ -39,10 +39,10 @@ def get_job_time(workflow_run_id, token=None):
 
     try:
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
-        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
+        pages_to_iterate_over = math.ceil(result["total_count"] / 100)
 
         for i in range(pages_to_iterate_over):
-            result = requests.get(url + f"&page={i + 2}", headers=headers).json()
+            result = requests.get(url + f"&page={i + 1}", headers=headers).json()
             job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
 
         return job_time
