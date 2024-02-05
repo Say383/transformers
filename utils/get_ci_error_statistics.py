@@ -32,7 +32,10 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except os.error as e:
+        logging.error(f'Error while fetching links: {e}')
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        logging.error(f'Error while fetching links: {e}')
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -58,7 +61,10 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except os.error as e:
+        logging.error(f'Error while fetching links: {e}')
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+        logging.error(f'Error while fetching links: {e}')
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -77,13 +83,14 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
 
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
-    except Exception as e:
-        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
-    download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
-    file_path = os.path.join(output_dir, f"{artifact_name}.zip")
-    with open(file_path, "wb") as fp:
-        fp.write(response.content)
+        download_url = result.headers["Location"]
+        response = requests.get(download_url, allow_redirects=True)
+        file_path = os.path.join(output_dir, f"{artifact_name}.zip")
+        with open(file_path, "wb") as fp:
+            fp.write(response.content)
+    except os.error as e:
+        logging.error(f'Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}')
+        print(f"Unknown error, could not fetch request to artifact URL {artifact_url}:\n{traceback.format_exc()}")
 
 
 def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
@@ -148,7 +155,19 @@ def get_all_errors(artifact_dir, job_links=None):
 def reduce_by_error(logs, error_filter=None):
     """count each error"""
 
-    counter = Counter()
+    error_counts = {}
+    try:
+        _counter = Counter([x[1] for x in logs])
+        error_counts = _counter
+    except Exception as e:
+        logging.error(f'Error counting errors: {e}')
+        print(f'Error counting errors: {traceback.format_exc()}')
+        error_counts = counter
+    try:
+        counts = _counter.most_common()
+    except Exception as e:
+        logging.error(f'Error getting most common: {e}')
+        print(f'Error getting most common: {traceback.format_exc()}')
     counter.update([x[1] for x in logs])
     counts = counter.most_common()
     r = {}
@@ -180,7 +199,18 @@ def reduce_by_model(logs, error_filter=None):
 
     r = {}
     for test in tests:
-        counter = Counter()
+        error_counts = {}
+        try:
+            _counter = Counter([x[1] for x in logs if x[2] == test])
+            error_counts = _counter
+        except Exception as e:
+            logging.error(f'Error counting errors per model: {e}')
+            print(f'Error counting errors per model: {traceback.format_exc()}')
+        try:
+            counts = _counter.most_common()
+        except Exception as e:
+            logging.error(f'Error getting most common per model: {e}')
+            print(f'Error getting most common per model: {traceback.format_exc()}')
         # count by errors in `test`
         counter.update([x[1] for x in logs if x[2] == test])
         counts = counter.most_common()
