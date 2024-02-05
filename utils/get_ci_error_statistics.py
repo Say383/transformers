@@ -20,7 +20,7 @@ def get_job_links(workflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers).json() if 'jobs' in result else {'jobs': []}
     job_links = {}
 
     try:
@@ -46,7 +46,7 @@ def get_artifacts_links(worflow_run_id, token=None):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{worflow_run_id}/artifacts?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    result = requests.get(url, headers=headers).json() if 'artifacts' in result else {'artifacts': []}
     artifacts = {}
 
     try:
@@ -156,7 +156,11 @@ def reduce_by_error(logs, error_filter=None):
         if error_filter is None or error not in error_filter:
             r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
 
-    r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    try:
+        r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
+    except Exception as e:
+        logging.error(f"An error occurred while sorting the dictionary: {e}")
+        r = {}
     return r
 
 
