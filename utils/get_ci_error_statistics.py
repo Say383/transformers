@@ -3,7 +3,7 @@ import json
 import math
 import os
 import time
-import logging
+from utils.logging import logging
 from logging import basicConfig
 import traceback
 import zipfile
@@ -24,6 +24,7 @@ def get_job_links(workflow_run_id, token=None):
     job_links = {}
 
     try:
+        logging.info('Attempting to update job links.')
         job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -32,8 +33,11 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
-        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
+    except Exception as e:
+        logging.error('Unknown error, could not fetch links.')
+        logging.exception(e)
+        logging.error('Unknown error, could not fetch links.')
+        logging.exception(e)
 
     return {}
 
@@ -50,6 +54,7 @@ def get_artifacts_links(worflow_run_id, token=None):
     artifacts = {}
 
     try:
+        logging.info('Attempting to update artifacts.')
         artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -58,7 +63,9 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
+        logging.error('Unknown error, could not fetch artifacts.')
+        logging.exception(e)
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -76,8 +83,11 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
+        logging.info('Attempting to fetch request to artifact URL.')
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
+        logging.error(f'Unknown error, could not fetch request to artifact URL {artifact_url}:')
+        logging.exception(e)
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
