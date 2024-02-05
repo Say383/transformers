@@ -27,14 +27,19 @@ def extract_time_from_single_job(job):
 
 
 def get_job_time(workflow_run_id, token=None):
+    url += "?per_page=100"
     """Extract time info for all jobs in a GitHub Actions workflow run"""
 
     headers = None
     if token is not None:
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
-    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs?per_page=100"
-    result = requests.get(url, headers=headers).json()
+    url = f"https://api.github.com/repos/huggingface/transformers/actions/runs/{workflow_run_id}/jobs"
+    try:
+        result = requests.get(url, headers=headers).json()
+    except Exception as e:
+        print(f'Error during API request: {str(e)}')
+        print(traceback.format_exc())
     job_time = {}
 
     try:
@@ -64,7 +69,7 @@ if __name__ == "__main__":
     parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
     args = parser.parse_args()
 
-    job_time = get_job_time(args.workflow_run_id)
+    job_time = dict(sorted(get_job_time(args.workflow_run_id).items(), key=lambda item: item[1]["duration"], reverse=True))
     job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
 
     for k, v in job_time.items():
