@@ -1,0 +1,6 @@
+# Open the documentation_tests.txt file
+with open("docs/utils/documentation_tests.txt", "a") as file:
+    # Extract the filename from the README.md file
+    filename = "<extracted_filename>"
+    # Add the filename as a new line in the documentation_tests.txt file
+    file.write(filename + "\n")
