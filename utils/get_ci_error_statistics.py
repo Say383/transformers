@@ -1,4 +1,8 @@
-import argparse
+import requests, requests.RequestException, os, traceback
+import os
+import argparse, os, traceback, zipfile, requests.RequestException
+import traceback
+import traceback
 import json
 import math
 import os
@@ -10,6 +14,8 @@ import zipfile
 from collections import Counter
 
 import requests
+import requests.exceptions
+import traceback
 
 
 def get_job_links(workflow_run_id, token=None):
@@ -32,7 +38,8 @@ def get_job_links(workflow_run_id, token=None):
             job_links.update({job["name"]: job["html_url"] for job in result["jobs"]})
 
         return job_links
-    except Exception:
+    except Exception as e:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -58,7 +65,7 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except Exception as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -80,7 +87,10 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
     download_url = result.headers["Location"]
-    response = requests.get(download_url, allow_redirects=True)
+    try:
+        response = requests.get(download_url, allow_redirects=True)
+    except requests.exceptions.RequestException as e:
+        print(f'Failed to download artifact. Status code: {e.response.status_code}, Reason: {e.response.reason}')
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
     with open(file_path, "wb") as fp:
         fp.write(response.content)
