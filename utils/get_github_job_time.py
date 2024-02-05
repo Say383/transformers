@@ -23,7 +23,11 @@ def extract_time_from_single_job(job):
     job_info["completed_at"] = end
     job_info["duration"] = duration_in_min
 
-    return job_info
+    try:
+        return job_info
+    except Exception:
+        print(f"Unknown error, could not extract time from single job:\n{traceback.format_exc()}")
+        return {}
 
 
 def get_job_time(workflow_run_id, token=None):
@@ -38,6 +42,7 @@ def get_job_time(workflow_run_id, token=None):
     job_time = {}
 
     try:
+        pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
         job_time.update({job["name"]: extract_time_from_single_job(job) for job in result["jobs"]})
         pages_to_iterate_over = math.ceil((result["total_count"] - 100) / 100)
 
@@ -49,23 +54,10 @@ def get_job_time(workflow_run_id, token=None):
     except Exception:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
+    except Exception:
+        print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}\n")
+        return {}
     return {}
 
 
-if __name__ == "__main__":
-    r"""
-    Example:
 
-        python get_github_job_time.py --workflow_run_id 2945609517
-    """
-
-    parser = argparse.ArgumentParser()
-    # Required parameters
-    parser.add_argument("--workflow_run_id", type=str, required=True, help="A GitHub Actions workflow run id.")
-    args = parser.parse_args()
-
-    job_time = get_job_time(args.workflow_run_id)
-    job_time = dict(sorted(job_time.items(), key=lambda item: item[1]["duration"], reverse=True))
-
-    for k, v in job_time.items():
-        print(f'{k}: {v["duration"]}')
