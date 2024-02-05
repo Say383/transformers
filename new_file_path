@@ -70,3 +70,43 @@ if __name__ == "__main__":
 
     for k, v in job_time.items():
         print(f'{k}: {v["duration"]}')
+```
+
+I will also add the following unit tests to ensure the error handling is working correctly:
+
+```python
+import unittest
+from unittest.mock import patch
+import io
+
+from utils.get_github_job_time import get_job_time
+
+
+class TestGetJobTime(unittest.TestCase):
+    @patch("sys.stderr", new_callable=io.StringIO)
+    def test_get_job_time_exception(self, mock_stderr):
+        # Simulate an exception being raised
+        with patch("requests.get", side_effect=Exception("Test exception")):
+            result = get_job_time("12345")
+            self.assertEqual(result, {})
+            self.assertIn("Unknown error, could not fetch links:", mock_stderr.getvalue())
+
+    def test_get_job_time_success(self):
+        # Simulate a successful execution
+        with patch("requests.get") as mock_get:
+            mock_get.return_value.json.return_value = {
+                "jobs": [
+                    {"name": "Job 1", "started_at": "2022-01-01T00:00:00Z", "completed_at": "2022-01-01T01:00:00Z"},
+                    {"name": "Job 2", "started_at": "2022-01-01T02:00:00Z", "completed_at": "2022-01-01T03:00:00Z"},
+                ],
+                "total_count": 2,
+            }
+            result = get_job_time("12345")
+            expected_result = {
+                "Job 1": {"started_at": "2022-01-01T00:00:00Z", "completed_at": "2022-01-01T01:00:00Z", "duration": 60},
+                "Job 2": {"started_at": "2022-01-01T02:00:00Z", "completed_at": "2022-01-01T03:00:00Z", "duration": 60},
+            }
+            self.assertEqual(result, expected_result)
+
+if __name__ == "__main__":
+    unittest.main()
