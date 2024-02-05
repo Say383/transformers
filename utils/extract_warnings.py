@@ -37,7 +37,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 line = line.strip()
                 buffer.append(line)
 
-    if from_gh:
+    if from_gh is True:
         for filename in os.listdir(artifact_path):
             file_path = os.path.join(artifact_path, filename)
             if not os.path.isdir(file_path):
@@ -56,12 +56,16 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                             continue
                         with z.open(filename) as fp:
                             parse_line(fp)
-        except Exception:
-            logger.warning(
+        except zipfile.BadZipFile as e:
+            logger.error(
                 f"{artifact_path} is either an invalid zip file or something else wrong. This file is skipped."
             )
 
-    return selected_warnings
+    if selected_warnings:
+        sorted_warnings = sorted(selected_warnings)
+        return sorted_warnings
+    else:
+        return None
 
 
 def extract_warnings(artifact_dir, targets):
