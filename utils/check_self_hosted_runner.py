@@ -41,7 +41,7 @@ if __name__ == "__main__":
         default=None,
         type=list_str,
         required=True,
-        help="Comma-separated list of runners to check status.",
+        help="Comma-separated list of runners to check status that will be used for querying GitHub API.",
     )
 
     parser.add_argument(
