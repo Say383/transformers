@@ -29,7 +29,7 @@ from get_previous_daily_ci import get_last_daily_ci_reports
 from slack_sdk import WebClient
 
 
-client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
+client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"], auth=('username', 'password'))
 
 NON_MODEL_TEST_MODULES = [
     "benchmark",
@@ -569,7 +569,7 @@ class Message:
         client.chat_postMessage(
             channel=os.environ["CI_SLACK_REPORT_CHANNEL_ID"],
             text=text,
-            blocks=payload,
+            blocks=payload, auth=('username', 'password'),
         )
 
     def post(self):
