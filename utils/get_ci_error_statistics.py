@@ -58,7 +58,7 @@ def get_artifacts_links(worflow_run_id, token=None):
             artifacts.update({artifact["name"]: artifact["archive_download_url"] for artifact in result["artifacts"]})
 
         return artifacts
-    except Exception:
+    except requests.exceptions.RequestException as e:
         print(f"Unknown error, could not fetch links:\n{traceback.format_exc()}")
 
     return {}
@@ -76,9 +76,11 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
         headers = {"Accept": "application/vnd.github+json", "Authorization": f"Bearer {token}"}
 
     try:
+        logging.info('Fetching request to artifact URL...')
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
         logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        raise
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
@@ -202,7 +204,11 @@ def make_github_table(reduced_by_error):
         line = f"| {count} | {error[:100]} |  |"
         lines.append(line)
 
-    return "\n".join(lines)
+    try:
+        return "\n".join(lines)
+    except Exception as e:
+        logging.error(f"Error generating GitHub table: {e}")
+        return ""
 
 
 def make_github_table_per_model(reduced_by_model):
@@ -215,7 +221,11 @@ def make_github_table_per_model(reduced_by_model):
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
         lines.append(line)
 
-    return "\n".join(lines)
+    try:
+        return "\n".join(lines)
+    except Exception as e:
+        logging.error(f"Error generating GitHub table per model: {e}")
+        return ""
 
 
 if __name__ == "__main__":
