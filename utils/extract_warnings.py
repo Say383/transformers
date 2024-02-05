@@ -37,7 +37,7 @@ def extract_warnings_from_single_artifact(artifact_path, targets):
                 line = line.strip()
                 buffer.append(line)
 
-    if from_gh:
+    if not from_gh:
         for filename in os.listdir(artifact_path):
             file_path = os.path.join(artifact_path, filename)
             if not os.path.isdir(file_path):
@@ -128,7 +128,11 @@ if __name__ == "__main__":
             time.sleep(1)
 
     # extract warnings from artifacts
-    selected_warnings = extract_warnings(args.output_dir, args.targets)
+    try:
+        selected_warnings = extract_warnings(args.output_dir, args.targets)
+    except Exception as e:
+        logger.warning(f"Error extracting warnings: {e}")
+        selected_warnings = []
     selected_warnings = sorted(selected_warnings)
     with open(os.path.join(args.output_dir, "selected_warnings.json"), "w", encoding="UTF-8") as fp:
         json.dump(selected_warnings, fp, ensure_ascii=False, indent=4)
