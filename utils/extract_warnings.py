@@ -91,7 +91,18 @@ if __name__ == "__main__":
         help="Where to store the downloaded artifacts and other result files.",
     )
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
-    # optional parameters
+    # Add optional parameters for warning extraction
+    parser.add_argument(
+        "--targets",
+        default="DeprecationWarning,UserWarning,FutureWarning",
+        type=list_str,
+        help="Comma-separated list of target warning(s) which we want to extract.",
+    )
+    parser.add_argument(
+        "--from_gh",
+        action="store_true",
+        help="If running from a GitHub action workflow and collecting warnings from its artifacts.",
+    )
     parser.add_argument(
         "--targets",
         default="DeprecationWarning,UserWarning,FutureWarning",
@@ -108,7 +119,7 @@ if __name__ == "__main__":
 
     from_gh = args.from_gh
     if from_gh:
-        # The artifacts have to be downloaded using `actions/download-artifact@v3`
+        "# The artifacts have to be downloaded using `actions/download-artifact@v3`"
         pass
     else:
         os.makedirs(args.output_dir, exist_ok=True)
