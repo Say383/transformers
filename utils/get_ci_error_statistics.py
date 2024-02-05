@@ -3,7 +3,7 @@ import json
 import math
 import os
 import time
-import logging
+from utils.logging import logging
 from logging import basicConfig
 import traceback
 import zipfile
@@ -78,7 +78,9 @@ def download_artifact(artifact_name, artifact_url, output_dir, token):
     try:
         result = requests.get(artifact_url, headers=headers, allow_redirects=False)
     except Exception as e:
-        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:\n{traceback.format_exc()}\nError Details: {e}")
+        logging.error(f"Unknown error, could not fetch request to artifact URL{artifact_url}:
+{traceback.format_exc()}
+Error Details: {e}")
     download_url = result.headers["Location"]
     response = requests.get(download_url, allow_redirects=True)
     file_path = os.path.join(output_dir, f"{artifact_name}.zip")
@@ -93,12 +95,31 @@ def get_errors_from_single_artifact(artifact_zip_path, job_links=None):
     job_name = None
 
     with zipfile.ZipFile(artifact_zip_path) as z:
+        try:
         for filename in z.namelist():
             if not os.path.isdir(filename):
                 # read the file
                 if filename in ["failures_line.txt", "summary_short.txt", "job_name.txt"]:
                     with z.open(filename) as f:
-                        for line in f:
+                        try:
+                            line = line.decode("UTF-8").strip()
+                            if filename == "failures_line.txt":
+                                try:
+                                    # `error_line` is the place where `error` occurs
+                                    error_line = line[: line.index(": ")]
+                                    error = line[line.index(": ") + len(": ") :]
+                                    errors.append([error_line, error])
+                                except Exception:
+                                    # skip un-related lines
+                                    pass
+                            elif filename == "summary_short.txt" and line.startswith("FAILED "):
+                                # `test` is the test method that failed
+                                test = line[len("FAILED ") :]
+                                failed_tests.append(test)
+                            elif filename == "job_name.txt":
+                                job_name = line
+    except Exception as e:
+        logging.error(f"An error occurred while processing the artifact file:\n{traceback.format_exc()}\nError Details: {e}")
                             line = line.decode("UTF-8").strip()
                             if filename == "failures_line.txt":
                                 try:
@@ -154,7 +175,7 @@ def reduce_by_error(logs, error_filter=None):
     r = {}
     for error, count in counts:
         if error_filter is None or error not in error_filter:
-            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error]}
+            r[error] = {"count": count, "failed_tests": [(x[2], x[0]) for x in logs if x[1] == error], "job_link": None}
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
@@ -191,7 +212,6 @@ def reduce_by_model(logs, error_filter=None):
 
     r = dict(sorted(r.items(), key=lambda item: item[1]["count"], reverse=True))
     return r
-
 
 def make_github_table(reduced_by_error):
     header = "| no. | error | status |"
@@ -239,6 +259,9 @@ if __name__ == "__main__":
     # For example, `PyTorch 1.11 / Model tests (models/albert, single-gpu)`.
     if _job_links:
         for k, v in _job_links.items():
+    if "errors" not in reduced_by_model[model]:
+        reduced_by_model[model]["errors"] = {}
+    reduced_by_model[model]["errors"].update(error_counts)
             # This is how GitHub actions combine job names.
             if " / " in k:
                 index = k.find(" / ")
@@ -254,7 +277,7 @@ if __name__ == "__main__":
     for idx, (name, url) in enumerate(artifacts.items()):
         download_artifact(name, url, args.output_dir, args.token)
         # Be gentle to GitHub
-        time.sleep(1)
+        time.sleep(5)
 
     errors = get_all_errors(args.output_dir, job_links=job_links)
 
@@ -265,7 +288,7 @@ if __name__ == "__main__":
     # print the top 30 most common test errors
     most_common = counter.most_common(30)
     for item in most_common:
-        print(item)
+        logging.info(item)
 
     with open(os.path.join(args.output_dir, "errors.json"), "w", encoding="UTF-8") as fp:
         json.dump(errors, fp, ensure_ascii=False, indent=4)
