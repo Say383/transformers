@@ -14,7 +14,33 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# Generating the documentation
+# Steps to troubleshoot and resolve failing doc tests in the GitHub Actions workflow
+
+1. Identify the specific commit that caused the failing doc tests, for example, the commit with SHA `c11da77`.
+
+2. Clone the repository and checkout the specific commit using the following commands:
+```bash
+# Clone the repository
+$ git clone https://github.com/huggingface/transformers.git
+
+# Change directory to the repository
+$ cd transformers
+
+# Checkout the specific commit
+$ git checkout c11da77
+```
+
+3. Run the failing doc tests locally to replicate the issue and identify the root cause.
+
+4. Make the necessary code changes to fix the failing doc tests.
+
+5. Once the changes are made, run the doc tests again locally to ensure that the issue has been resolved.
+
+6. Create a new branch, commit the changes, and push the branch to the repository for review and validation.
+
+7. Open a pull request with the fix, referencing the specific commit (`c11da77`) and a brief description of the changes made.
+
+8. After the pull request is merged, monitor the GitHub Actions workflow to ensure that the doc tests are passing successfully.
 
 To generate the documentation, you first have to build it. Several packages are necessary to build the doc, 
 you can install them with the following command, at the root of the code repository:

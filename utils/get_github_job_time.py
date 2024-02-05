@@ -2,7 +2,7 @@ import argparse
 import math
 import traceback
 
-import dateutil.parser as date_parser
+import datetime as date_parser
 import requests
 
 

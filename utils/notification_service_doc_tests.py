@@ -29,36 +29,21 @@ client = WebClient(token=os.environ["CI_SLACK_BOT_TOKEN"])
 
 
 def handle_test_results(test_results):
-    expressions = test_results.split(" ")
-
-    failed = 0
-    success = 0
-
-    # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
-    # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
-
-    for i, expression in enumerate(expressions):
-        if "failed" in expression:
-            failed += int(expressions[i - 1])
-        if "passed" in expression:
-            success += int(expressions[i - 1])
-
+    stats = test_results.split()[-2].split(",")
+    time_spent = ", ".join(stats)
+    failed = int([s for s in test_results.split() if 'FAILED' in s][0])
+    success = int([s for s in test_results.split() if 'PASSED' in s][0])
     return failed, success, time_spent
 
 
 def extract_first_line_failure(failures_short_lines):
     failures = {}
-    file = None
-    in_error = False
     for line in failures_short_lines.split("\n"):
-        if re.search(r"_ \[doctest\]", line):
-            in_error = True
-            file = line.split(" ")[2]
-        elif in_error and not line.split(" ")[0].isdigit():
+        if '_ [doctest]' in line:
+            file = line.split()[2]
+        elif file and not line.strip().isdigit():
             failures[file] = line
-            in_error = False
-
+            file = None
     return failures
 
 
@@ -66,13 +51,23 @@ class Message:
     def __init__(self, title: str, doc_test_results: Dict):
         self.title = title
 
-        self._time_spent = doc_test_results["time_spent"].split(",")[0]
-        self.n_success = doc_test_results["success"]
-        self.n_failures = doc_test_results["failures"]
-        self.n_tests = self.n_success + self.n_failures
-
-        # Failures and success of the modeling tests
         self.doc_test_results = doc_test_results
+
+    @property
+    def n_success(self) -> int:
+        return self.doc_test_results["success"]
+
+    @property
+    def n_failures(self) -> int:
+        return self.doc_test_results["failures"]
+
+    @property
+    def n_tests(self) -> int:
+        return self.n_success + self.n_failures
+
+    @property
+    def _time_spent(self) -> str:
+        return self.doc_test_results["time_spent"].split(",")[0]
 
     @property
     def time(self) -> str:
@@ -244,7 +239,7 @@ class Message:
         sorted_dict = sorted(self.doc_test_results.items(), key=lambda t: t[0])
         for job, job_result in sorted_dict:
             if len(job_result["failures"]):
-                text = f"*Num failures* :{len(job_result['failed'])} \n"
+                text = f"*Num failures* :{len(job_result['failures'])} \n"
                 failures = job_result["failures"]
                 blocks = self.get_reply_blocks(job, job_link, failures, text=text)
 
