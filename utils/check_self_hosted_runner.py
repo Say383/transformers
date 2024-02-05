@@ -25,6 +25,9 @@ def get_runner_status(target_runners, token):
         fp.write(json.dumps(offline_runners))
 
     if len(offline_runners) > 0:
+        if len(offline_runners) > 0:
+            with open('offline_runners.txt', 'w') as fp:
+                fp.write(json.dumps(offline_runners))
         failed = "\n".join([x["name"] for x in offline_runners])
         raise ValueError(f"The following runners are offline:\n{failed}")
 
