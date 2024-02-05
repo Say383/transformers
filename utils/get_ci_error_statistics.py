@@ -202,7 +202,11 @@ def make_github_table(reduced_by_error):
         line = f"| {count} | {error[:100]} |  |"
         lines.append(line)
 
-    return "\n".join(lines)
+    try:
+        return "\n".join(lines)
+    except Exception as e:
+        logging.error(f'Error while generating GitHub table: {e}')
+        return ""
 
 
 def make_github_table_per_model(reduced_by_model):
@@ -215,7 +219,11 @@ def make_github_table_per_model(reduced_by_model):
         line = f"| {model} | {count} | {error[:60]} | {_count} |"
         lines.append(line)
 
-    return "\n".join(lines)
+    try:
+        return "\n".join(lines)
+    except Exception as e:
+        logging.error(f'Error while generating GitHub table per model: {e}')
+        return ""
 
 
 if __name__ == "__main__":
@@ -231,7 +239,11 @@ if __name__ == "__main__":
     parser.add_argument("--token", default=None, type=str, help="A token that has actions:read permission.")
     args = parser.parse_args()
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    try:
+        os.makedirs(args.output_dir, exist_ok=True)
+    except Exception as e:
+        logging.error(f'Error while creating directory: {args.output_dir}')
+        logging.error(f'Error Details: {e}')
 
     _job_links = get_job_links(args.workflow_run_id, token=args.token)
     job_links = {}
