@@ -42,7 +42,7 @@ NON_MODEL_TEST_MODULES = [
     "pipelines",
     "sagemaker",
     "trainer",
-    "utils",
+    "utils", "doc_tests",
 ]
 
 
@@ -54,7 +54,7 @@ def handle_test_results(test_results):
 
     # When the output is short enough, the output is surrounded by = signs: "== OUTPUT =="
     # When it is too long, those signs are not present.
-    time_spent = expressions[-2] if "=" in expressions[-1] else expressions[-1]
+    time_spent = expressions[-1].strip('=') if expressions[-1].startswith('=') else expressions[-1]
 
     for i, expression in enumerate(expressions):
         if "failed" in expression:
@@ -86,8 +86,8 @@ def handle_stacktraces(test_results):
     return stacktraces
 
 
-def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
-    if isinstance(objects, dict):
+def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict], List[Dict[str, Dict]]):
+    if isinstance(objects, dict) or isinstance(objects[0], dict):
         lists = objects.values()
     else:
         lists = objects
@@ -99,6 +99,11 @@ def dicts_to_sum(objects: Union[Dict[str, Dict], List[dict]]):
 
 
 class Message:
+    def __init__(self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None):
+        self.title = title
+        self.ci_title = ci_title
+        self.model_results = model_results
+        self.additional_results = additional_results
     def __init__(
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
@@ -106,7 +111,28 @@ class Message:
         self.ci_title = ci_title
 
         # Failures and success of the modeling tests
+        self.model_results = model_results
+        self.additional_results = additional_results
         self.n_model_success = sum(r["success"] for r in model_results.values())
+def handle_stacktraces(test_results):
+    # These files should follow the following architecture:
+    # === FAILURES ===
+    # <path>:<line>: Error ...
+    # <path>:<line>: Error ...
+    # <empty line>
+
+    total_stacktraces = test_results.split("\n")[1:-1]
+    stacktraces = []
+    for stacktrace in total_stacktraces:
+        try:
+            line = stacktrace[: stacktrace.index(" ")].split(":")[-2]
+            error_message = stacktrace[stacktrace.index(" ") :]
+
+            stacktraces.append(f"(line {line}) {error_message}")
+        except Exception:
+            stacktraces.append("Cannot retrieve error message.")
+
+    return stacktraces
         self.n_model_single_gpu_failures = sum(dicts_to_sum(r["failed"])["single"] for r in model_results.values())
         self.n_model_multi_gpu_failures = sum(dicts_to_sum(r["failed"])["multi"] for r in model_results.values())
 
@@ -149,6 +175,9 @@ class Message:
         time_spent = [r["time_spent"].split(", ")[0] for r in all_results if len(r["time_spent"])]
         total_secs = 0
 
+        all_results = [*self.model_results.values(), *self.additional_results.values()]
+        time_spent = [r["time_spent"].split(", ")[0] for r in all_results if len(r["time_spent"])]
+        total_secs = 0
         for time in time_spent:
             time_parts = time.split(":")
 
@@ -882,7 +911,7 @@ if __name__ == "__main__":
             "success": 0,
             "time_spent": "",
             "failures": {},
-            "job_link": {},
+            "job_link": {}, "time_spent": "",
         }
         for model in models
         if f"run_all_tests_gpu_{model}_test_reports" in available_artifacts
@@ -976,7 +1005,7 @@ if __name__ == "__main__":
             "time_spent": "",
             "error": False,
             "failures": {},
-            "job_link": {},
+            "job_link": {}, "time_spent": "", "time_spent": "",
         }
         for key in additional_files.keys()
     }
