@@ -519,8 +519,10 @@ class Message:
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
+        if len(offline_runners) > 0:
             text = "💔 CI runners are not available! Tests are not run. 😭"
+        elif not offline_runners:
+            text = "😊 All runners are available and functional."
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
                 offline_runners = json.loads(result)
