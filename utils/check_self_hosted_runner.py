@@ -1,10 +1,11 @@
-import argparse
+import argparse, json, subprocess
 import json
 import subprocess
 
 
 def get_runner_status(target_runners, token):
     offline_runners = []
+    offline_runners_file = "offline_runners.txt"
 
     cmd = (
         f'curl -H "Accept: application/vnd.github+json" -H "Authorization: Bearer {token}"'
