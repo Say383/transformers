@@ -1,0 +1,12 @@
+import os
+import sys
+import requests
+
+# Create a new file named "offline_runners.txt"
+file_path = os.path.join(os.path.dirname(__file__), "offline_runners.txt")
+with open(file_path, "w") as file:
+    # Populate the file with the necessary content
+    file.write("This is the content of the offline_runners.txt file.")
+
+# Close the file
+file.close()
