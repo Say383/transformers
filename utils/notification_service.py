@@ -103,7 +103,7 @@ class Message:
         self, title: str, ci_title: str, model_results: Dict, additional_results: Dict, selected_warnings: List = None
     ):
         self.title = title
-        self.ci_title = ci_title
+        self.ci_title = ci_title if ci_title else ""
 
         # Failures and success of the modeling tests
         self.n_model_success = sum(r["success"] for r in model_results.values())
@@ -514,12 +514,12 @@ class Message:
         title_block = {"type": "header", "text": {"type": "plain_text", "text": title}}
         blocks.append(title_block)
 
-        if ci_title:
+        if ci_title is not None:
             ci_title_block = {"type": "section", "text": {"type": "mrkdwn", "text": ci_title}}
             blocks.append(ci_title_block)
 
         offline_runners = []
-        if runner_not_available:
+        if runner_not_available or runner_failed or setup_failed:
             text = "💔 CI runners are not available! Tests are not run. 😭"
             result = os.environ.get("OFFLINE_RUNNERS")
             try:
@@ -532,6 +532,9 @@ class Message:
             text = "💔 Setup job failed. Tests are not run. 😭"
         else:
             text = "💔 There was an issue running the tests. 😭"
+
+        if len(offline_runners) == 0:
+            offline_runners = []
 
         error_block_1 = {
             "type": "header",
@@ -784,7 +787,11 @@ if __name__ == "__main__":
     repository_full_name = f"{org}/{repo}"
 
     # This env. variable is set in workflow file (under the job `send_results`).
-    ci_event = os.environ["CI_EVENT"]
+    ci_event = os.environ.get("CI_EVENT")
+    if ci_event is None:
+        ci_event = ""
+    if ci_event is None:
+        ci_event = ""
 
     # To find the PR number in a commit title, for example, `Add AwesomeFormer model (#99999)`
     pr_number_re = re.compile(r"\(#(\d+)\)$")
@@ -830,7 +837,7 @@ if __name__ == "__main__":
 
             merged_by = ci_details["merged_by"]["login"]
 
-        if merged_by is None:
+        if merged_by is not None:
             ci_title = f"<{ci_url}|{ci_title}>\nAuthor: {ci_author}"
         else:
             ci_title = f"<{ci_url}|{ci_title}>\nAuthor: {ci_author} | Merged by: {merged_by}"
@@ -843,7 +850,7 @@ if __name__ == "__main__":
 
     if runner_not_available or runner_failed or setup_failed:
         Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
-        exit(0)
+        
 
     arguments = sys.argv[1:][0]
     try:
