@@ -851,7 +851,13 @@ if __name__ == "__main__":
         # Need to change from elements like `models/bert` to `models_bert` (the ones used as artifact names).
         models = [x.replace("models/", "models_") for x in models]
     except SyntaxError:
-        Message.error_out(title, ci_title)
+        try:
+            Message.error_out(title, ci_title, runner_not_available, runner_failed, setup_failed)
+        except Exception as e:
+            if isinstance(e, json.decoder.JSONDecodeError):
+                runner_not_available = False
+                runner_failed = False
+                setup_failed = False
         raise ValueError("Errored out.")
 
     github_actions_job_links = get_job_links(
