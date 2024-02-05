@@ -56,35 +56,50 @@ def extract_first_line_failure(failures_short_lines):
             in_error = True
             file = line.split(" ")[2]
         elif in_error and not line.split(" ")[0].isdigit():
-            failures[file] = line
-            in_error = False
-
-    return failures
-
-
-class Message:
-    def __init__(self, title: str, doc_test_results: Dict):
-        self.title = title
-
-        self._time_spent = doc_test_results["time_spent"].split(",")[0]
-        self.n_success = doc_test_results["success"]
-        self.n_failures = doc_test_results["failures"]
-        self.n_tests = self.n_success + self.n_failures
-
-        # Failures and success of the modeling tests
-        self.doc_test_results = doc_test_results
+        return f"{int(hours)}h{int(minutes)}m{int(seconds)}s"
 
     @property
-    def time(self) -> str:
-        time_spent = [self._time_spent]
-        total_secs = 0
+    def header(self) -> Dict:
+        return {"type": "header", "text": {"type": "plain_text", "text": self.title}}
 
-        for time in time_spent:
-            time_parts = time.split(":")
+    @property
+    def no_failures(self) -> Dict:
+        return {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": f"🌞 There were no failures: all {self.n_tests} tests passed. The suite ran in {self.time}.",
+                "emoji": True,
+            },
+            "accessory": {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+            },
+        }
 
-            # Time can be formatted as xx:xx:xx, as .xx, or as x.xx if the time spent was less than a minute.
-            if len(time_parts) == 1:
-                time_parts = [0, 0, time_parts[0]]
+    @property
+    def failures(self) -> Dict:
+        return {
+            "type": "section",
+            "text": {
+                "type": "plain_text",
+                "text": (
+                    f"There were {self.n_failures} failures, out of {self.n_tests} tests.\nThe suite ran in"
+                    f" {self.time}."
+                ),
+                "emoji": True,
+            },
+            "accessory": {
+                "type": "button",
+                "text": {"type": "plain_text", "text": "Check Action results", "emoji": True},
+                "url": f"https://github.com/huggingface/transformers/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+            },
+        }
+
+    @property
+    def category_failures(self) -> Dict:
+                total_secs = hours * 3600 + minutes * 60 + seconds
 
             hours, minutes, seconds = int(time_parts[0]), int(time_parts[1]), float(time_parts[2])
             total_secs += hours * 3600 + minutes * 60 + seconds
@@ -350,7 +365,7 @@ if __name__ == "__main__":
     artifact_path = available_artifacts["doc_tests_gpu_test_reports"].paths[0]
     artifact = retrieve_artifact(artifact_path["name"])
     if "stats" in artifact:
-        failed, success, time_spent = handle_test_results(artifact["stats"])
+        failed, success, time_spent, seconds = handle_test_results(artifact["stats"])
         doc_test_results["failures"] = failed
         doc_test_results["success"] = success
         doc_test_results["time_spent"] = time_spent[1:-1] + ", "
